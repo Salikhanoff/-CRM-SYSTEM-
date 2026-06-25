@@ -4,17 +4,26 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Преподаватели — Эхо Гор CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F3F4F6; --card:#FFFFFF; --ink:#1F2430; --muted:#7B8294;
-    --line:#E6E8EE; --gold:#C9A24B; --gold-soft:#FBF4E2; --gold-ink:#A8842F;
-    --green:#2E9E6B; --green-soft:#E7F4EC; --red:#D8623B; --red-soft:#FBEAE3;
-    --blue:#4B6FB0; --shadow:0 10px 30px rgba(31,36,48,.06); --r:18px;
+    --bg:#F4F5F3; --card:#FFFFFF; --ink:#1A1A1A; --muted:#8A8F86;
+    --line:#E7E8E2; --gold:#947C51; --gold-soft:#F2EDE2; --gold-ink:#7A6440;
+    --green:#5C8A5C; --green-soft:#E9F0E6; --red:#C16B4A; --red-soft:#F6E9E1;
+    --blue:#87B1C5; --blue-soft:#EAF1F4; --purple:#947C51; --purple-soft:#F2EDE2;
+    --shadow:0 10px 30px rgba(26,26,26,.06); --r:16px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  body{font-family:'Inter','Oswald',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
     background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
   .app{display:flex;min-height:100vh}
+  .brand{background:var(--ink);border-radius:var(--r);padding:20px 22px;margin-bottom:12px}
+  .brand-logo{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;letter-spacing:.02em;display:flex;gap:4px}
+  .brand-logo .b-echo{color:var(--blue)}
+  .brand-logo .b-gor{color:#fff}
+  .brand-sub{color:#9aa0a6;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-top:6px}
+  h1,h2,.brand-logo{font-family:'Bebas Neue','Oswald',sans-serif;letter-spacing:.01em}
+
   .side{width:280px;flex-shrink:0;padding:24px 20px;display:flex;flex-direction:column;gap:8px}
   .side .intro{background:var(--card);border-radius:var(--r);padding:18px 20px;color:var(--muted);
     font-size:14px;box-shadow:var(--shadow);margin-bottom:8px}
@@ -266,13 +275,16 @@
 <body>
 <div class="app">
   <aside class="side">
-    <div class="intro">Вся сеть, финансы, филиалы, люди, риски и точки роста в одном executive-центре.</div>
+    <div class="brand">
+      <div class="brand-logo"><span class="b-echo">ЭХО</span><span class="b-gor">ГОР</span></div>
+      <div class="brand-sub">Студия кавказского танца</div>
+    </div>
     <nav class="nav">
       <a href="../index.html"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>Ученики</a>
-      <a class="active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg>Преподаватели</a>
+      <a href="teachers-echo-gor.html" class="active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg>Преподаватели</a>
       <a onclick="toast('Раздел: Зарплаты')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 7h20v12H2zM2 11h20"/></svg>Зарплаты</a>
       <a onclick="toast('Раздел: Журнал посещаемости')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Журнал посещаемости</a>
-      <a onclick="toast('Раздел: Расписание')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Расписание</a>
+      <a href="schedule-echo-gor.html"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Расписание</a>
       <a onclick="toast('Раздел: Настройки сети')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1l-.4-2.5h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5z"/></svg>Настройки сети</a>
     </nav>
     <div class="rbac">
