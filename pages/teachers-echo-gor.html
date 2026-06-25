@@ -34,20 +34,45 @@
 
   .dash-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px}
   .filters{display:flex;gap:10px;flex-wrap:wrap}
+  select,input,textarea{font-family:inherit}
   select{background:var(--card);border:1px solid var(--line);border-radius:999px;
     padding:10px 16px;font-size:14px;color:var(--ink);font-weight:600;cursor:pointer;outline:none}
   select:focus{border-color:var(--gold)}
   select.month{background:var(--gold-soft);border-color:#EAD9A8;color:var(--gold-ink)}
-  .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px}
+  .colcfg{position:relative}
+  .colcfg-btn{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+    border-radius:999px;padding:10px 16px;font-size:14px;color:var(--ink);font-weight:600;cursor:pointer}
+  .colcfg-btn:hover{border-color:var(--gold);color:var(--gold-ink)}
+  .colcfg-menu{position:absolute;top:46px;left:0;z-index:30;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;box-shadow:0 16px 40px rgba(31,36,48,.16);padding:8px;min-width:230px;display:none}
+  .colcfg-menu.open{display:block;animation:rise .15s}
+  .colcfg-menu .ttl{font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:8px 12px 4px}
+  .colcfg-row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;font-size:14px;font-weight:600}
+  .colcfg-row:hover{background:#F6F7F9}
+  .colcfg-row input{width:17px;height:17px;accent-color:var(--gold);cursor:pointer}
+  .colcfg-row.locked{opacity:.5;cursor:not-allowed}
+  .tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px}
   .tile{background:var(--card);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);cursor:pointer;
     transition:.15s;border:1px solid transparent}
   .tile:hover{transform:translateY(-2px);border-color:var(--gold)}
   .tile .lbl{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
   .tile .val{font-size:30px;font-weight:800;margin-top:6px}
-  .tile.alert .val{color:var(--red)}
   .tile .sub{font-size:12px;color:var(--muted);margin-top:2px}
 
-  /* teacher of month banner */
+  /* detail drawer for tile click */
+  .detail{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:24px;
+    overflow:hidden;display:none}
+  .detail.open{display:block;animation:rise .2s}
+  .detail .dh{padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}
+  .detail .dh b{font-size:17px}
+  .detail .dh .x{border:none;background:#EEF0F4;width:34px;height:34px;border-radius:10px;cursor:pointer;font-size:18px;color:var(--muted)}
+  .detail .dbody{padding:8px 24px 18px}
+  .drow{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--line);cursor:pointer}
+  .drow:first-child{border:none}
+  .drow:hover{color:var(--gold-ink)}
+  .drow .nm{font-weight:700}
+  .drow .meta{font-size:13px;color:var(--muted)}
+
   .tom{background:linear-gradient(120deg,#FBF4E2 0%,#fff 60%);border:1px solid #EFE2C0;border-radius:22px;
     padding:22px 26px;margin-bottom:24px;display:flex;align-items:center;gap:22px;box-shadow:var(--shadow);flex-wrap:wrap}
   .tom .crown{width:60px;height:60px;border-radius:50%;background:var(--gold);display:flex;align-items:center;
@@ -72,9 +97,12 @@
   .tcard .wbadge{position:absolute;top:18px;right:18px;background:var(--gold);color:#fff;font-size:11px;
     font-weight:800;padding:5px 12px;border-radius:999px;display:flex;align-items:center;gap:5px}
   .tcard .wbadge svg{width:12px;height:12px}
+  .tcard .catpill{position:absolute;top:18px;left:18px;font-size:11px;font-weight:800;padding:5px 12px;
+    border-radius:999px;background:var(--gold-soft);color:var(--gold-ink)}
   .tcard .top{display:flex;flex-direction:column;align-items:center;text-align:center}
   .ava{width:96px;height:96px;border-radius:50%;background:#DfE2EA;display:flex;align-items:center;
-    justify-content:center;font-size:32px;font-weight:800;color:#9aa1b2}
+    justify-content:center;font-size:32px;font-weight:800;color:#9aa1b2;overflow:hidden}
+  .ava img{width:100%;height:100%;object-fit:cover}
   .tcard h3{margin:16px 0 0;font-size:22px;font-weight:800}
   .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
   .st{background:#F6F7F9;border-radius:14px;padding:14px 16px}
@@ -83,12 +111,16 @@
   .open-link{background:none;border:none;color:var(--gold-ink);font-weight:800;font-size:15px;cursor:pointer;padding:0}
   .open-link:hover{text-decoration:underline}
 
-  .count-row{display:flex;justify-content:space-between;align-items:center;margin:26px 0 14px}
+  .count-row{display:flex;justify-content:space-between;align-items:center;margin:26px 0 14px;gap:12px;flex-wrap:wrap}
   .count-row .cnt{color:var(--muted);font-weight:600}
+  .count-row .actions{display:flex;gap:10px}
   .btn-gold{background:var(--gold);color:#fff;border:none;border-radius:999px;padding:14px 26px;
     font-weight:800;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s;
     box-shadow:0 6px 16px rgba(201,162,75,.35)}
   .btn-gold:hover{filter:brightness(1.05)}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:14px 22px;
+    font-weight:700;font-size:15px;cursor:pointer;transition:.15s}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-ink)}
 
   .tbl-wrap{background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow-x:auto}
   table{width:100%;border-collapse:collapse;min-width:900px}
@@ -149,7 +181,6 @@
   .kpi.final{background:var(--gold-soft)}
   .kpi.final .v{color:var(--gold-ink)}
 
-  /* KPI breakdown bars */
   .kbar{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:10px}
   .kbar .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
   .kbar .nm{font-weight:700}
@@ -168,7 +199,6 @@
   .sec-label{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
     color:var(--gold-ink);margin:18px 0 10px}
 
-  /* standards checklist */
   .std{background:var(--card);border-radius:14px;padding:14px 18px;margin-bottom:10px;display:flex;
     align-items:center;gap:14px}
   .std .ck{width:26px;height:26px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;
@@ -177,6 +207,7 @@
   .std .body{flex:1}
   .std .nm{font-weight:700}
   .std .det{font-size:13px;color:var(--muted);margin-top:2px}
+  .std .act{flex-shrink:0}
 
   .ai-box{background:linear-gradient(135deg,#FBF4E2,#fff);border:1px solid #EFE2C0;border-radius:18px;padding:22px 24px}
   .ai-box .ttl{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;margin-bottom:14px}
@@ -191,17 +222,33 @@
   .review .src{font-size:12px;color:var(--muted)}
   .review p{margin-top:8px;font-size:14px}
 
-  /* salary */
   .sal-hero{background:linear-gradient(135deg,var(--gold-soft),#fff);border:1px solid #EFE2C0;border-radius:18px;
     padding:24px;text-align:center;margin-bottom:18px}
   .sal-hero .k{font-size:13px;font-weight:700;color:var(--gold-ink);letter-spacing:.05em;text-transform:uppercase}
   .sal-hero .v{font-size:42px;font-weight:800;color:var(--ink);margin-top:6px}
   .sal-hero .sub{color:var(--muted);font-size:13px;margin-top:6px}
+  .sal-table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:14px}
+  .sal-table th{background:#F6F7F9;text-align:left;padding:12px 16px;font-size:12px;text-transform:uppercase;
+    letter-spacing:.04em;color:var(--muted)}
+  .sal-table td{padding:12px 16px;border-top:1px solid var(--line);font-size:14px}
+  .sal-table td.r,.sal-table th.r{text-align:right}
   .sal-line{display:flex;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line);font-size:15px}
   .sal-line:first-of-type{border:none}
   .sal-line.total{font-weight:800;font-size:17px;border-top:2px solid var(--gold)}
   .sal-line .pos{color:var(--green);font-weight:700}
   .note{color:var(--muted);font-size:13px;margin-top:10px}
+
+  /* form */
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field.full{grid-column:1/-1}
+  .field label{font-size:13px;font-weight:700;color:var(--muted)}
+  .field input,.field select,.field textarea{border:1px solid var(--line);border-radius:12px;padding:11px 14px;
+    font-size:14px;outline:none;background:#fff}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+  .avatar-pick{display:flex;align-items:center;gap:16px}
+  .avatar-pick .ava{width:64px;height:64px;font-size:22px}
+  .modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:8px}
 
   .toasts{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:90}
   .toast{background:var(--ink);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;font-size:14px;
@@ -212,7 +259,7 @@
   @media(max-width:900px){
     .side{display:none}.main{padding:24px 18px}
     .tiles{grid-template-columns:repeat(2,1fr)}h1{font-size:28px}
-    .grid2,.grid3{grid-template-columns:1fr}
+    .grid2,.grid3,.form-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -221,23 +268,11 @@
   <aside class="side">
     <div class="intro">Вся сеть, финансы, филиалы, люди, риски и точки роста в одном executive-центре.</div>
     <nav class="nav">
-      <a onclick="toast('Раздел: Dashboard')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Dashboard</a>
-      <a onclick="toast('Раздел: Филиалы')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg>Филиалы</a>
-      <a onclick="toast('Раздел: Ученики')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>Ученики</a>
+      <a href="../index.html"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>Ученики</a>
       <a class="active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg>Преподаватели</a>
       <a onclick="toast('Раздел: Зарплаты')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 7h20v12H2zM2 11h20"/></svg>Зарплаты</a>
       <a onclick="toast('Раздел: Журнал посещаемости')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Журнал посещаемости</a>
       <a onclick="toast('Раздел: Расписание')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Расписание</a>
-      <a onclick="toast('Раздел: Бухгалтерия')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/></svg>Бухгалтерия</a>
-      <a onclick="toast('Раздел: Выступления')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>Выступления</a>
-      <a onclick="toast('Раздел: Товары и склад')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18"/></svg>Товары и склад</a>
-      <a onclick="toast('Раздел: Документолог')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>Документолог</a>
-      <a onclick="toast('Раздел: Маркетинг')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Маркетинг</a>
-      <a onclick="toast('Раздел: Концерты')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/></svg>Концерты</a>
-      <a onclick="toast('Раздел: Афиша СНГ')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg>Афиша СНГ</a>
-      <a onclick="toast('Раздел: Объявления')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 11l18-5v12L3 14v-3z"/></svg>Объявления</a>
-      <a onclick="toast('Раздел: Аналитика')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16l4-4 3 3 5-6"/></svg>Аналитика</a>
-      <a onclick="toast('Раздел: AI Assistant')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>AI Assistant</a>
       <a onclick="toast('Раздел: Настройки сети')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1l-.4-2.5h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5z"/></svg>Настройки сети</a>
     </nav>
     <div class="rbac">
@@ -249,7 +284,7 @@
 
   <main class="main">
     <h1>Преподаватели сети</h1>
-    <p class="lead">Статистика и развитие педагогического состава. Выберите месяц, чтобы пересчитать KPI, удержание и зарплату. Нажмите на преподавателя — карточка с KPI, обучением, аттестацией, отзывами и ожидаемой ЗП.</p>
+    <p class="lead">Статистика и развитие педагогического состава. Выберите месяц — пересчитаются KPI, удержание и зарплата. Нажмите на показатель или преподавателя, чтобы раскрыть детали.</p>
 
     <div class="dash-bar">
       <div class="filters">
@@ -267,46 +302,53 @@
           <option value="">Любой статус</option>
           <option>Активен</option><option>Стажер</option>
         </select>
-        <select id="fFlag" onchange="applyFilters()">
-          <option value="">Без меток</option>
-          <option value="low">Низкое удержание</option>
-          <option value="journal">Не закрыл журнал</option>
-          <option value="winner">Педагог месяца</option>
-        </select>
       </div>
     </div>
 
-    <!-- Teacher of the month -->
     <div class="tom" id="tomBanner"></div>
 
     <div class="tiles">
-      <div class="tile" onclick="toast('Список: все преподаватели')"><div class="lbl">Всего</div><div class="val">2</div><div class="sub">в сети</div></div>
-      <div class="tile" onclick="toast('Активных: 1')"><div class="lbl">Активные</div><div class="val">1</div><div class="sub">работают</div></div>
-      <div class="tile" onclick="toast('На стажировке: 1')"><div class="lbl">Стажёры</div><div class="val">1</div><div class="sub">статус «Стажер»</div></div>
-      <div class="tile alert" onclick="toast('Не закрыли журнал: 1')"><div class="lbl">Не закрыли журнал</div><div class="val">1</div><div class="sub">входит в стандарты</div></div>
-      <div class="tile" id="tileRet" onclick="toast('Среднее удержание за месяц')"><div class="lbl">Ср. удержание</div><div class="val">33.9%</div><div class="sub">м/м</div></div>
-      <div class="tile" id="tileKpi" onclick="toast('Средний KPI за месяц')"><div class="lbl">Ср. KPI</div><div class="val">58</div><div class="sub">из 100</div></div>
+      <div class="tile" onclick="showDetail('all')"><div class="lbl">Всего</div><div class="val" id="tAll">2</div><div class="sub">в сети →</div></div>
+      <div class="tile" onclick="showDetail('active')"><div class="lbl">Активные</div><div class="val" id="tActive">1</div><div class="sub">работают →</div></div>
+      <div class="tile" onclick="showDetail('intern')"><div class="lbl">Стажёры</div><div class="val" id="tIntern">1</div><div class="sub">статус «Стажер» →</div></div>
+      <div class="tile" onclick="showDetail('ret')"><div class="lbl">Ср. удержание</div><div class="val" id="tRet">33.9%</div><div class="sub">м/м · детально →</div></div>
+      <div class="tile" onclick="showDetail('kpi')"><div class="lbl">Ср. KPI</div><div class="val" id="tKpi">58</div><div class="sub">из 100 · детально →</div></div>
+    </div>
+
+    <!-- detail panel for tile clicks -->
+    <div class="detail" id="detail">
+      <div class="dh"><b id="detTitle"></b><button class="x" onclick="closeDetail()">×</button></div>
+      <div class="dbody" id="detBody"></div>
     </div>
 
     <div class="cards" id="spotlight"></div>
 
     <div class="count-row">
       <span class="cnt" id="cnt">2 преподавателей в сети</span>
-      <button class="btn-gold" onclick="toast('Форма добавления преподавателя')">+ Добавить преподавателя</button>
+      <div class="actions">
+        <div class="colcfg">
+          <button class="colcfg-btn" onclick="toggleColMenu(event)">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="15" height="15"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+            Показатели
+          </button>
+          <div class="colcfg-menu" id="colMenu" style="left:auto;right:0"></div>
+        </div>
+        <button class="btn-ghost" onclick="openFinesLog()" style="border-color:#EBC4B6;color:var(--red)">Штрафы</button>
+        <button class="btn-ghost" onclick="openPayroll()">Рассчитать ЗП</button>
+        <button class="btn-gold" onclick="openForm()">+ Добавить преподавателя</button>
+      </div>
     </div>
 
     <div class="tbl-wrap">
       <table>
-        <thead><tr>
-          <th>Преподаватель</th><th>Специализация</th><th>Филиал</th>
-          <th>Категория</th><th>Удержание</th><th>KPI</th><th>Ожид. ЗП</th><th>Права</th><th style="text-align:right">Действия</th>
-        </tr></thead>
+        <thead><tr id="thead"></tr></thead>
         <tbody id="tbody"></tbody>
       </table>
     </div>
   </main>
 </div>
 
+<!-- CARD MODAL -->
 <div class="overlay" id="overlay" onclick="if(event.target===this)closeCard()">
   <div class="sheet">
     <div class="sheet-head">
@@ -318,50 +360,156 @@
     <div id="panes"></div>
   </div>
 </div>
+
+<!-- ADD/EDIT FORM MODAL -->
+<div class="overlay" id="formOv" onclick="if(event.target===this)closeForm()">
+  <div class="sheet" style="max-width:680px">
+    <div class="sheet-head">
+      <div><h2 id="formTitle">Новый преподаватель</h2><div class="meta">Заполните карточку сотрудника</div></div>
+      <button class="close" onclick="closeForm()">×</button>
+    </div>
+    <div class="pane active" style="display:block">
+      <div class="avatar-pick" style="margin-bottom:16px">
+        <div class="ava" id="formAva">+</div>
+        <button class="btn-sm" onclick="toast('Загрузка фото — выбор файла')">Загрузить фото</button>
+      </div>
+      <div class="form-grid">
+        <div class="field full"><label>ФИО *</label><input id="fName" placeholder="Иванов Иван"></div>
+        <div class="field"><label>Телефон *</label><input id="fPhone" placeholder="+7 ___ ___ __ __" oninput="if(!$('fLogin').dataset.touched)$('fLogin').value=this.value"></div>
+        <div class="field"><label>Дата рождения</label><input id="fBirth" type="date"></div>
+        <div class="field"><label>Дата приёма</label><input id="fHired" type="date"></div>
+        <div class="field"><label>Филиал *</label><select id="fBr"><option>Эхо Гор Чокина 109/1</option><option>Сатпаева 210/1</option></select></div>
+        <div class="field"><label>Категория</label><select id="fCt"><option value="1">1 категория</option><option value="2">2 категория</option><option value="3">3 категория</option></select></div>
+        <div class="field"><label>Роль</label><select id="fRl"><option>Преподаватель</option><option>Администратор</option><option>Управляющий</option></select></div>
+        <div class="field full"><label>Специализация</label><input id="fSpec" placeholder="Лезгинка, High Heels..."></div>
+        <div class="field"><label>Статус</label><select id="fSt"><option>Активен</option><option>Стажер</option></select></div>
+      </div>
+      <div class="sec-label" style="margin-top:20px">Доступ в личный кабинет</div>
+      <div class="form-grid">
+        <div class="field"><label>Логин (телефон)</label><input id="fLogin" placeholder="Подставится из телефона" oninput="this.dataset.touched=1"></div>
+        <div class="field"><label>Пароль</label>
+          <div style="display:flex;gap:8px">
+            <input id="fPass" type="text" placeholder="Пароль для входа" style="flex:1">
+            <button class="btn-sm" type="button" onclick="genPass()">Сгенерировать</button>
+          </div>
+        </div>
+      </div>
+      <p class="note">Логин по умолчанию = номер телефона. Педагог входит в личный кабинет и видит свои KPI, ЗП, штрафы, обучение. Пароль в рабочей системе хранится в зашифрованном виде на сервере.</p>
+      <div class="modal-foot">
+        <button class="btn-ghost" onclick="closeForm()">Отмена</button>
+        <button class="btn-gold" onclick="saveForm()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYROLL MODAL -->
+<div class="overlay" id="payOv" onclick="if(event.target===this)closePayroll()">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><h2>Расчёт зарплаты</h2><div class="meta">Автоматически из учеников групп · по системе оплаты Эхо Гор</div></div>
+      <button class="close" onclick="closePayroll()">×</button>
+    </div>
+    <div class="pane active" style="display:block">
+      <div class="form-grid" style="margin-bottom:8px">
+        <div class="field"><label>Преподаватель</label><select id="payWho" onchange="renderPayroll()"></select></div>
+        <div class="field"><label>Месяц</label><select id="payMonth" onchange="renderPayroll()"></select></div>
+      </div>
+      <div id="payBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINES LOG MODAL (по всей сети) -->
+<div class="overlay" id="finesLogOv" onclick="if(event.target===this)closeFinesLog()">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div><h2>Журнал штрафов</h2><div class="meta">Все штрафы по сети · вычитаются из ЗП автоматически</div></div>
+      <button class="close" onclick="closeFinesLog()">×</button>
+    </div>
+    <div class="pane active" style="display:block">
+      <div class="form-grid" style="margin-bottom:8px">
+        <div class="field"><label>Месяц</label><select id="logMonth" onchange="renderFinesLog()"></select></div>
+        <div class="field"><label>Преподаватель</label><select id="logWho" onchange="renderFinesLog()"><option value="">Все</option></select></div>
+      </div>
+      <div id="finesLogBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FINE MODAL -->
+<div class="overlay" id="fineOv" onclick="if(event.target===this)closeFine()">
+  <div class="sheet" style="max-width:520px">
+    <div class="sheet-head">
+      <div><h2>Начислить штраф</h2><div class="meta" id="fineWho"></div></div>
+      <button class="close" onclick="closeFine()">×</button>
+    </div>
+    <div class="pane active" style="display:block">
+      <div class="form-grid">
+        <div class="field"><label>Причина *</label><select id="fineReason">
+          <option>Опоздание</option><option>Незакрытый журнал</option><option>Нет плана работы</option>
+          <option>Нет фото прихода</option><option>Нарушение дисциплины</option><option>Другое</option>
+        </select></div>
+        <div class="field"><label>Сумма, тг *</label><input id="fineSum" type="number" placeholder="2000"></div>
+        <div class="field"><label>Месяц</label><select id="fineMonth"></select></div>
+        <div class="field"><label>Кто начислил</label><select id="fineBy"><option>Владелец</option><option>Управляющий</option></select></div>
+        <div class="field full"><label>Комментарий</label><textarea id="fineNote" rows="2" placeholder="Детали нарушения"></textarea></div>
+      </div>
+      <p class="note">Штраф вычитается из итоговой ЗП. Педагог видит причину, сумму, дату и кто начислил.</p>
+      <div class="modal-foot">
+        <button class="btn-ghost" onclick="closeFine()">Отмена</button>
+        <button class="btn-gold" onclick="saveFine()">Начислить штраф</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toasts" id="toasts"></div>
 
 <script>
 /* ===== CONFIG ===== */
-const KPI_WEIGHTS = {ret:35, funnel:30, reviews:17.5, standards:17.5}; // % веса итогового KPI
-const RATES = { // ставки за ученика, тг/мес
-  new:{1:1250,2:1500,3:1500},
-  reg:{1:2500,2:3000,3:3000},
-  regCont:{3:3500},
-};
-const RETENTION_BONUS = {1:0.20,2:0.20,3:0.30}; // ≤2 ушедших из группы
-const TEACHER_OF_MONTH_BONUS = 20000;
+const KPI_WEIGHTS={ret:35,funnel:30,reviews:17.5,standards:17.5};
+const RATES={new:{1:1250,2:1500,3:1500},reg:{1:2500,2:3000,3:3000},regCont:{3:3500}};
+const RETENTION_BONUS={1:0.20,2:0.20,3:0.30};
+const TEACHER_OF_MONTH_BONUS=20000;
+const MONTHS=['Январь 2026','Февраль 2026','Март 2026','Апрель 2026','Май 2026','Июнь 2026'];
 
-/* ===== MONTHS (демо-данные по месяцам) ===== */
-const MONTHS = ['Январь 2026','Февраль 2026','Март 2026','Апрель 2026','Май 2026','Июнь 2026'];
-
-/* ===== TEACHERS ===== */
-const TEACHERS = [
+/* ===== DATA ===== */
+const TEACHERS=[
   {
-    id:1, name:'Аслан Плиев', initials:'АП', phone:'+7 701 441 11 22',
-    spec:'Лезгинка, ансамблевая подготовка', branch:'Эхо Гор Чокина 109/1',
-    cat:3, role:'Преподаватель', status:'Активен',
-    birth:'14.03.1991', hired:'02.09.2021', years:'4 г. 9 мес.',
-    thanks:57, ltvMonths:7,
-    // помесячные метрики: удержание, воронка(приход→покупка %), ср.оценка отзывов(0-5), стандарты(0-100), новых ушло, фото-приход вовремя
+    id:1,name:'Аслан Плиев',initials:'АП',phone:'+7 701 441 11 22',login:'+7 701 441 11 22',pass:'aslan2026',
+    spec:'Лезгинка, ансамблевая подготовка',branch:'Эхо Гор Чокина 109/1',
+    cat:3,role:'Преподаватель',status:'Активен',
+    birth:'14.03.1991',hired:'02.09.2021',years:'4 г. 9 мес.',thanks:57,ltvMonths:7,
+    fines:{'Май 2026':[{date:'14.05.2026',reason:'Опоздание',sum:2000,note:'Урок 18:00, пришёл без фото прихода',by:'Управляющий'}]},
+    leavers:{
+      'Май 2026':[
+        {name:'Тимур Алиев',group:'Лезгинка · дети 8–11',branch:'Эхо Гор Чокина 109/1',date:'12.05.2026',reason:'Переезд'},
+        {name:'Дана Касымова',group:'Лезгинка · взрослые (вечер)',branch:'Эхо Гор Чокина 109/1',date:'28.05.2026',reason:'Финансы'},
+      ],
+      'Июнь 2026':[
+        {name:'Арман Беков',group:'Лезгинка · дети 8–11',branch:'Эхо Гор Чокина 109/1',date:'09.06.2026',reason:'Потеря интереса'},
+      ],
+    },
     byMonth:{
-      'Январь 2026':{ret:62,funnel:55,rev:4.6,std:90,openJ:0,students:26,newCnt:4,regCnt:22,regCont:8,left:1},
-      'Февраль 2026':{ret:64,funnel:58,rev:4.7,std:92,openJ:0,students:28,newCnt:5,regCnt:23,regCont:9,left:1},
-      'Март 2026':{ret:66,funnel:60,rev:4.7,std:95,openJ:0,students:29,newCnt:4,regCnt:25,regCont:10,left:2},
-      'Апрель 2026':{ret:67,funnel:62,rev:4.8,std:96,openJ:0,students:30,newCnt:5,regCnt:25,regCont:11,left:1},
-      'Май 2026':{ret:67.7,funnel:64,rev:4.8,std:98,openJ:0,students:31,newCnt:6,regCnt:25,regCont:12,left:2},
-      'Июнь 2026':{ret:69,funnel:66,rev:4.9,std:100,openJ:0,students:31,newCnt:6,regCnt:25,regCont:12,left:1},
+      'Январь 2026':{ret:62,funnel:55,rev:4.6,std:90,students:26,newCnt:4,regCnt:22,regCont:8,left:1},
+      'Февраль 2026':{ret:64,funnel:58,rev:4.7,std:92,students:28,newCnt:5,regCnt:23,regCont:9,left:1},
+      'Март 2026':{ret:66,funnel:60,rev:4.7,std:95,students:29,newCnt:4,regCnt:25,regCont:10,left:2},
+      'Апрель 2026':{ret:67,funnel:62,rev:4.8,std:96,students:30,newCnt:5,regCnt:25,regCont:11,left:1},
+      'Май 2026':{ret:67.7,funnel:64,rev:4.8,std:98,students:31,newCnt:6,regCnt:25,regCont:12,left:2},
+      'Июнь 2026':{ret:69,funnel:66,rev:4.9,std:100,students:31,newCnt:6,regCnt:25,regCont:12,left:1},
     },
     groups:[
-      {name:'Лезгинка · взрослые (вечер)',st:14,free:2,fill:88,ret:71},
-      {name:'Ансамбль «Эхо»',st:12,free:0,fill:100,ret:74},
-      {name:'Лезгинка · дети 8–11',st:5,free:5,fill:50,ret:58},
+      {name:'Лезгинка · взрослые (вечер)',st:14,free:2,fill:88,ret:71,newCnt:2,regCnt:12,regCont:0},
+      {name:'Ансамбль «Эхо»',st:12,free:0,fill:100,ret:74,newCnt:0,regCnt:0,regCont:12},
+      {name:'Лезгинка · дети 8–11',st:5,free:5,fill:50,ret:58,newCnt:4,regCnt:1,regCont:0},
     ],
     standards:[
-      {nm:'Приход вовремя (за 20 мин до урока)',det:'Фото прихода прикреплено · 21/22 дн.',s:'y'},
-      {nm:'Отметки в журнале проставлены',det:'Все занятия закрыты',s:'y'},
-      {nm:'План работы подготовлен заранее',det:'Загружен на каждую неделю',s:'y'},
-      {nm:'Оценка после открытого урока',det:'Проведён 18.05, оценка 9/10',s:'y'},
-      {nm:'Оценка после отчётного концерта',det:'Концерт в июне — в процессе',s:'p'},
+      {nm:'Приход вовремя (за 20 мин до урока)',det:'Фото с отметкой времени · 21/22 дн.',s:'y',type:'photo'},
+      {nm:'Отметки в журнале проставлены',det:'Все занятия закрыты',s:'y',type:'journal'},
+      {nm:'План работы подготовлен заранее',det:'Загружен на каждую неделю',s:'y',type:'plan'},
+      {nm:'Оценка после открытого урока',det:'Проведён 18.05, оценка 9/10',s:'y',type:'open'},
+      {nm:'Оценка после отчётного концерта',det:'Концерт в июне — в процессе',s:'p',type:'concert'},
     ],
     training:[
       {dir:'Начальные детские группы',st:'Аттестован',base:1},
@@ -385,22 +533,23 @@ const TEACHERS = [
       rec:'Подтвердить как кандидата в «Педагоги месяца». Дать ассистента на детскую группу.'},
   },
   {
-    id:2, name:'Хамит Муратович', initials:'ХМ', phone:'+7 (702) 123 46 58',
-    spec:'High Heels', branch:'Сатпаева 210/1',
-    cat:1, role:'Преподаватель', status:'Стажер',
-    birth:'09.07.1999', hired:'10.06.2026', years:'15 дней',
-    thanks:0, ltvMonths:1,
+    id:2,name:'Хамит Муратович',initials:'ХМ',phone:'+7 (702) 123 46 58',login:'+7 (702) 123 46 58',pass:'khamit01',
+    spec:'High Heels',branch:'Сатпаева 210/1',
+    cat:1,role:'Преподаватель',status:'Стажер',
+    birth:'09.07.1999',hired:'10.06.2026',years:'15 дней',thanks:0,ltvMonths:1,
+    fines:{'Июнь 2026':[{date:'12.06.2026',reason:'Незакрытый журнал',sum:5000,note:'Журнал не закрыт 2 дня подряд',by:'Владелец'}]},
+    leavers:{},
     byMonth:{
       'Январь 2026':null,'Февраль 2026':null,'Март 2026':null,'Апрель 2026':null,'Май 2026':null,
-      'Июнь 2026':{ret:0,funnel:20,rev:0,std:40,openJ:1,students:1,newCnt:1,regCnt:0,regCont:0,left:0},
+      'Июнь 2026':{ret:0,funnel:20,rev:0,std:40,students:1,newCnt:1,regCnt:0,regCont:0,left:0},
     },
-    groups:[{name:'High Heels · вводная',st:1,free:11,fill:8,ret:0}],
+    groups:[{name:'High Heels · вводная',st:1,free:11,fill:8,ret:0,newCnt:1,regCnt:0,regCont:0}],
     standards:[
-      {nm:'Приход вовремя (за 20 мин до урока)',det:'Фото прихода не прикреплено 6/15 дн.',s:'p'},
-      {nm:'Отметки в журнале проставлены',det:'Журнал за сегодня не закрыт',s:'n'},
-      {nm:'План работы подготовлен заранее',det:'Загружен частично',s:'p'},
-      {nm:'Оценка после открытого урока',det:'Ещё не проводился',s:'n'},
-      {nm:'Оценка после отчётного концерта',det:'Ещё не участвовал',s:'n'},
+      {nm:'Приход вовремя (за 20 мин до урока)',det:'Фото не прикреплено 6/15 дн.',s:'p',type:'photo'},
+      {nm:'Отметки в журнале проставлены',det:'Журнал за сегодня не закрыт',s:'n',type:'journal'},
+      {nm:'План работы подготовлен заранее',det:'Загружен частично',s:'p',type:'plan'},
+      {nm:'Оценка после открытого урока',det:'Ещё не проводился',s:'n',type:'open'},
+      {nm:'Оценка после отчётного концерта',det:'Ещё не участвовал',s:'n',type:'concert'},
     ],
     training:[
       {dir:'Начальные взрослые группы',st:'В процессе',base:1},
@@ -420,154 +569,212 @@ const $=id=>document.getElementById(id);
 const money=n=>Math.round(n).toLocaleString('ru-RU')+' тг';
 const retClass=v=>v>=60?'':v>=40?'warn':'bad';
 const catName=c=>c+' категория';
-const catBadge=c=>'b-gray';
 const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
 const fillColor=v=>v>=70?'var(--green)':v>=45?'var(--gold)':'var(--red)';
+let currentWinnerId=1;
 
-// нормализация компонентов в баллы 0-100
-function kpiComponents(m){
-  if(!m) return null;
-  return {
-    ret:Math.min(100,m.ret),                 // удержание уже %
-    funnel:Math.min(100,m.funnel),           // воронка уже %
-    reviews:Math.round((m.rev/5)*100),       // оценка 0-5 → 0-100
-    standards:m.std,                         // стандарты 0-100
-  };
-}
-function kpiTotal(comp){
-  if(!comp) return 0;
-  const w=KPI_WEIGHTS;
-  return Math.round(comp.ret*w.ret/100 + comp.funnel*w.funnel/100 +
-                    comp.reviews*w.reviews/100 + comp.standards*w.standards/100);
-}
-// ожидаемая ЗП по системе оплаты
-function salary(t,m){
-  if(!m) return null;
+function kpiComponents(m){if(!m)return null;return{ret:Math.min(100,m.ret),funnel:Math.min(100,m.funnel),reviews:Math.round((m.rev/5)*100),standards:m.std};}
+function kpiTotal(c){if(!c)return 0;const w=KPI_WEIGHTS;return Math.round(c.ret*w.ret/100+c.funnel*w.funnel/100+c.reviews*w.reviews/100+c.standards*w.standards/100);}
+function monthData(t,mn){return t.byMonth[mn||$('fMonth').value];}
+
+function salary(t,m,mn){
+  if(!m)return null;
+  mn=mn||$('fMonth').value;
   const c=t.cat;
   const newSum=m.newCnt*RATES.new[c];
-  const contCnt = c===3 ? (m.regCont||0) : 0;
-  const plainReg = Math.max(0,(m.regCnt||0)-contCnt);
+  const contCnt=c===3?(m.regCont||0):0;
+  const plainReg=Math.max(0,(m.regCnt||0)-contCnt);
   const regSum=plainReg*RATES.reg[c];
-  const contSum= c===3 ? contCnt*RATES.regCont[3] : 0;
+  const contSum=c===3?contCnt*RATES.regCont[3]:0;
   const base=newSum+regSum+contSum;
-  const retOk = m.left<=2;
-  const retBonus = retOk ? base*RETENTION_BONUS[c] : 0;
-  const isWinner = currentWinnerId===t.id;
-  const tomBonus = isWinner ? TEACHER_OF_MONTH_BONUS : 0;
-  return {newCnt:m.newCnt,newSum,plainReg,regSum,contCnt,contSum,base,retOk,retBonus,tomBonus,
-          total:base+retBonus+tomBonus};
+  const retOk=m.left<=2;
+  const retBonus=retOk?base*RETENTION_BONUS[c]:0;
+  const isWinner=currentWinnerId===t.id;
+  const tomBonus=isWinner?TEACHER_OF_MONTH_BONUS:0;
+  const fineList=(t.fines&&t.fines[mn])?t.fines[mn]:[];
+  const finesSum=fineList.reduce((s,f)=>s+f.sum,0);
+  return{newCnt:m.newCnt,newSum,plainReg,regSum,contCnt,contSum,base,retOk,retBonus,tomBonus,
+    fineList,finesSum,total:base+retBonus+tomBonus-finesSum};
 }
 
-let currentWinnerId=1; // утверждённый педагог месяца (демо)
-
-/* ===== RENDER ===== */
-function monthData(t){return t.byMonth[$('fMonth').value];}
-
+/* ===== TEACHER OF MONTH ===== */
 function renderTOM(){
-  // ИИ предлагает по максимальному KPI среди активных в выбранном месяце
   const active=TEACHERS.map(t=>({t,m:monthData(t)})).filter(x=>x.m);
   let best=null,bestK=-1;
   active.forEach(x=>{const k=kpiTotal(kpiComponents(x.m));if(k>bestK){bestK=k;best=x.t;}});
   const winner=TEACHERS.find(t=>t.id===currentWinnerId)||best;
-  const aiPick=best;
-  $('tomBanner').innerHTML = winner ? `
+  $('tomBanner').innerHTML=winner?`
     <div class="crown"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 7l5.5 4L12 5l3.5 6L21 7l-2 9H5zm0 2h14v2H5z"/></svg></div>
     <div class="info">
       <div class="elbl">Педагог месяца · ${$('fMonth').value}</div>
-      <div class="nm">${winner.name}</div>
+      <div class="nm">${winner.name} · ${catName(winner.cat)}</div>
       <div class="ai-tag"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>
-        ИИ предлагает: <b>&nbsp;${aiPick?aiPick.name:'—'}</b> (KPI ${bestK}). Бонус +${money(TEACHER_OF_MONTH_BONUS).replace(' тг','')} тг</div>
+        ИИ предлагает: <b>&nbsp;${best?best.name:'—'}</b> (KPI ${bestK}). Бонус +20 000 тг</div>
     </div>
     <div class="btns">
-      <button class="btn-sm primary" onclick="approveTOM(${aiPick?aiPick.id:winner.id})">Утвердить выбор ИИ</button>
-      <button class="btn-sm" onclick="toast('Открыт список — выберите другого педагога')">Выбрать другого</button>
-    </div>` : '<div class="info"><div class="elbl">Педагог месяца</div><div class="nm">Нет данных за месяц</div></div>';
+      <button class="btn-sm primary" onclick="approveTOM(${best?best.id:winner.id})">Утвердить выбор ИИ</button>
+      <button class="btn-sm" onclick="showDetail('kpi')">Сравнить педагогов</button>
+    </div>`:'<div class="info"><div class="elbl">Педагог месяца</div><div class="nm">Нет данных за месяц</div></div>';
 }
-function approveTOM(id){
-  currentWinnerId=id;
-  const t=TEACHERS.find(x=>x.id===id);
-  toast('Педагог месяца утверждён: '+t.name+' (+20 000 тг)');
-  renderAll();
-}
+function approveTOM(id){currentWinnerId=id;const t=TEACHERS.find(x=>x.id===id);toast('Педагог месяца утверждён: '+t.name+' (+20 000 тг)');renderAll();}
 
+/* ===== TILE DETAIL ===== */
+function showDetail(kind){
+  const mn=$('fMonth').value;
+  const list=TEACHERS.filter(t=>monthData(t));
+  let title='',rows='';
+  const rowHtml=(t,right)=>`<div class="drow" onclick="closeDetail();openCard(${t.id})"><div><div class="nm">${t.name}</div><div class="meta">${catName(t.cat)} · ${t.branch}</div></div><div style="text-align:right">${right}</div></div>`;
+  if(kind==='all'){title='Все преподаватели сети';rows=TEACHERS.map(t=>{const m=monthData(t);return rowHtml(t,`<b>${m?m.students:0}</b> уч. · ${t.status}`);}).join('');}
+  else if(kind==='active'){title='Активные преподаватели';rows=TEACHERS.filter(t=>t.status==='Активен').map(t=>{const m=monthData(t);return rowHtml(t,`<b>${m?m.students:0}</b> уч.`);}).join('');}
+  else if(kind==='intern'){title='Стажёры';rows=TEACHERS.filter(t=>t.status==='Стажер').map(t=>rowHtml(t,`принят ${t.hired}`)).join('');}
+  else if(kind==='ret'){
+    title='Удержание по педагогам · '+mn;
+    rows=list.map(t=>{
+      const m=monthData(t);
+      const lv=(t.leavers&&t.leavers[mn])?t.leavers[mn]:[];
+      const head=`<div class="drow" onclick="toggleSub('ret${t.id}')"><div><div class="nm">${t.name} <span style="color:var(--gold-ink);font-size:13px">${lv.length?'· показать ушедших ▾':''}</span></div><div class="meta">${catName(t.cat)} · ${t.branch}</div></div><div style="text-align:right"><b>${m.ret}%</b> · ушло ${m.left}</div></div>`;
+      let sub='';
+      if(lv.length){
+        sub=`<div id="ret${t.id}" style="display:none;padding:0 0 10px 0">
+          <table class="sal-table"><thead><tr><th>Ученик</th><th>Группа</th><th>Филиал</th><th>Дата ухода</th><th>Причина</th></tr></thead><tbody>`+
+          lv.map(s=>`<tr><td><b>${s.name}</b></td><td>${s.group}</td><td>${s.branch}</td><td>${s.date}</td><td>${s.reason}</td></tr>`).join('')+
+          `</tbody></table></div>`;
+      }
+      return head+sub;
+    }).join('');
+  }
+  else if(kind==='kpi'){
+    title='KPI по педагогам · '+mn;
+    rows=list.map(t=>{
+      const m=monthData(t);const c=kpiComponents(m);const k=kpiTotal(c);const w=KPI_WEIGHTS;
+      const head=`<div class="drow" onclick="toggleSub('kpi${t.id}')"><div><div class="nm">${t.name} <span style="color:var(--gold-ink);font-size:13px">· показать формулу ▾</span></div><div class="meta">${catName(t.cat)} · ${t.branch}</div></div><div style="text-align:right"><b>${k}</b>/100</div></div>`;
+      const part=(label,val,wt)=>`<tr><td>${label}</td><td class="r">${val}</td><td class="r">${wt}%</td><td class="r"><b>${(val*wt/100).toFixed(1)}</b></td></tr>`;
+      const sub=`<div id="kpi${t.id}" style="display:none;padding:0 0 10px 0">
+        <table class="sal-table"><thead><tr><th>Компонент</th><th class="r">Балл</th><th class="r">Вес</th><th class="r">Вклад</th></tr></thead><tbody>`+
+        part('Удержание из мес. в мес.',c.ret,w.ret)+
+        part('Воронка ПУ (приход → покупка)',c.funnel,w.funnel)+
+        part('Отзывы родителей',c.reviews,w.reviews)+
+        part('Выполнение стандартов',c.standards,w.standards)+
+        `<tr style="background:var(--gold-soft)"><td><b>Итоговый KPI</b></td><td class="r"></td><td class="r"></td><td class="r"><b>${k}/100</b></td></tr>`+
+        `</tbody></table></div>`;
+      return head+sub;
+    }).join('');
+  }
+  $('detTitle').textContent=title;
+  const actionsBar=`<div class="modal-foot" style="justify-content:flex-start;margin-bottom:6px">
+    <button class="btn-sm" onclick="openFinesLog()" style="border-color:#EBC4B6;color:var(--red)">Штрафы</button>
+    <button class="btn-sm" onclick="openPayroll()">Рассчитать ЗП</button>
+    <button class="btn-sm" onclick="openForm()">+ Добавить преподавателя</button>
+  </div>`;
+  $('detBody').innerHTML=(rows?actionsBar:'')+(rows||'<p class="note">Нет данных за выбранный месяц.</p>');
+  $('detail').classList.add('open');
+  $('detail').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function toggleSub(id){const el=$(id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
+function closeDetail(){$('detail').classList.remove('open');}
+
+/* ===== RENDER ===== */
 function renderSpotlight(list){
   $('spotlight').innerHTML=list.map(t=>{
-    const m=monthData(t); const comp=kpiComponents(m); const k=kpiTotal(comp);
-    const win=currentWinnerId===t.id;
+    const m=monthData(t);const k=kpiTotal(kpiComponents(m));const win=currentWinnerId===t.id;
+    const sal=salary(t,m);const fSum=sal?sal.finesSum:0;
     return `<div class="tcard ${win?'winner':''}">
+      <div class="catpill">${catName(t.cat)}</div>
       ${win?`<div class="wbadge"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 7l5.5 4L12 5l3.5 6L21 7l-2 9H5z"/></svg>Педагог месяца</div>`:''}
       <div class="top"><div class="ava">${t.initials}</div><h3>${t.name}</h3></div>
       <div class="stat-grid">
         <div class="st"><div class="k">Ученики</div><div class="v">${m?m.students:'—'}</div></div>
         <div class="st"><div class="k">Удержание</div><div class="v">${m?m.ret+'%':'—'}</div></div>
         <div class="st"><div class="k">KPI</div><div class="v">${m?k:'—'}</div></div>
-        <div class="st"><div class="k">Спасибо</div><div class="v">${t.thanks}</div></div>
+        <div class="st"><div class="k">Ожид. ЗП</div><div class="v" style="font-size:17px">${sal?money(sal.total):'—'}</div></div>
       </div>
+      ${fSum?`<div style="background:var(--red-soft);color:var(--red);border-radius:12px;padding:10px 14px;font-weight:700;font-size:14px;margin-bottom:16px;display:flex;justify-content:space-between"><span>Штрафы за месяц</span><span>− ${money(fSum)}</span></div>`:''}
       <button class="open-link" onclick="openCard(${t.id})">Открыть карточку ›</button>
     </div>`;}).join('');
 }
+/* ===== COLUMN CONFIG ===== */
+const COLUMNS=[
+  {id:'spec',  label:'Специализация', on:true,  cell:(t,m,k,sal)=>t.spec},
+  {id:'branch',label:'Филиал',        on:true,  cell:(t,m,k,sal)=>t.branch},
+  {id:'cat',   label:'Категория',     on:true,  cell:(t,m,k,sal)=>`<span class="badge b-role">${catName(t.cat)}</span>`},
+  {id:'ret',   label:'Удержание',     on:true,  cell:(t,m,k,sal)=>m?`<div class="meter ${retClass(m.ret)}"><span style="width:${m.ret}%"></span></div><small style="color:var(--muted)">${m.ret}%</small>`:'—'},
+  {id:'kpi',   label:'KPI',           on:true,  cell:(t,m,k,sal)=>`<b>${m?k:'—'}</b>`},
+  {id:'fines', label:'Штрафы',        on:true,  cell:(t,m,k,sal)=>sal&&sal.finesSum?`<span style="color:var(--red);font-weight:700">− ${money(sal.finesSum)}</span>`:'<span style="color:var(--muted)">—</span>'},
+  {id:'sal',   label:'Ожид. ЗП',      on:true,  cell:(t,m,k,sal)=>sal?money(sal.total):'—'},
+  {id:'students',label:'Ученики',     on:false, cell:(t,m,k,sal)=>m?m.students:'—'},
+  {id:'funnel',label:'Воронка ПУ',    on:false, cell:(t,m,k,sal)=>m?m.funnel+'%':'—'},
+  {id:'rev',   label:'Отзывы (оценка)',on:false,cell:(t,m,k,sal)=>m&&m.rev?m.rev.toFixed(1)+' ★':'—'},
+  {id:'std',   label:'Стандарты',     on:false, cell:(t,m,k,sal)=>m?m.std+'%':'—'},
+  {id:'phone', label:'Телефон',       on:false, cell:(t,m,k,sal)=>t.phone},
+  {id:'role',  label:'Права',         on:true,  cell:(t,m,k,sal)=>`<span class="badge b-role">${t.role}</span>`},
+];
+
+function renderColMenu(){
+  let h=`<div class="ttl">Колонки таблицы</div>`;
+  h+=`<div class="colcfg-row locked"><input type="checkbox" checked disabled> Преподаватель</div>`;
+  h+=COLUMNS.map(c=>`<label class="colcfg-row"><input type="checkbox" ${c.on?'checked':''} onchange="toggleCol('${c.id}',this.checked)"> ${c.label}</label>`).join('');
+  h+=`<div class="colcfg-row locked"><input type="checkbox" checked disabled> Действия</div>`;
+  $('colMenu').innerHTML=h;
+}
+function toggleCol(id,on){const c=COLUMNS.find(x=>x.id===id);if(c)c.on=on;applyFilters();}
+function toggleColMenu(e){e.stopPropagation();$('colMenu').classList.toggle('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.colcfg'))$('colMenu').classList.remove('open');});
+
 function renderTable(list){
+  const cols=COLUMNS.filter(c=>c.on);
+  $('thead').innerHTML=`<th>Преподаватель</th>`+cols.map(c=>`<th>${c.label}</th>`).join('')+`<th style="text-align:right">Действия</th>`;
   $('tbody').innerHTML=list.map(t=>{
-    const m=monthData(t); const k=kpiTotal(kpiComponents(m)); const sal=salary(t,m);
+    const m=monthData(t);const k=kpiTotal(kpiComponents(m));const sal=salary(t,m);
+    const cells=cols.map(c=>`<td>${c.cell(t,m,k,sal)}</td>`).join('');
     return `<tr onclick="openCard(${t.id})">
       <td class="who"><b>${t.name}</b><span>${t.phone} · ${m?m.students:0} уч.</span></td>
-      <td>${t.spec}</td><td>${t.branch}</td>
-      <td><span class="badge ${catBadge(t.cat)}">${catName(t.cat)}</span></td>
-      <td>${m?`<div class="meter ${retClass(m.ret)}"><span style="width:${m.ret}%"></span></div><small style="color:var(--muted)">${m.ret}%</small>`:'—'}</td>
-      <td><b>${m?k:'—'}</b></td>
-      <td>${sal?money(sal.total):'—'}</td>
-      <td><span class="badge b-role">${t.role}</span></td>
+      ${cells}
       <td onclick="event.stopPropagation()"><div class="acts">
-        <button class="icn" title="Редактировать" onclick="toast('Редактирование: ${t.name}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
-        <button class="icn" title="Архивировать" onclick="toast('Архивировать: ${t.name}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+        <button class="icn" title="Редактировать" onclick="openForm(${t.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+        <button class="icn" title="Архивировать" onclick="archive(${t.id})"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
       </div></td>
     </tr>`;}).join('');
   $('cnt').textContent=list.length+' преподавателей в сети';
 }
-function renderTiles(list){
-  const withM=list.map(t=>({t,m:monthData(t)})).filter(x=>x.m);
-  const avgRet=withM.length?(withM.reduce((s,x)=>s+x.m.ret,0)/withM.length):0;
-  const avgKpi=withM.length?(withM.reduce((s,x)=>s+kpiTotal(kpiComponents(x.m)),0)/withM.length):0;
-  $('tileRet').querySelector('.val').textContent=avgRet.toFixed(1)+'%';
-  $('tileKpi').querySelector('.val').textContent=Math.round(avgKpi);
+function renderTiles(){
+  const withM=TEACHERS.map(t=>({t,m:monthData(t)})).filter(x=>x.m);
+  const avgRet=withM.length?withM.reduce((s,x)=>s+x.m.ret,0)/withM.length:0;
+  const avgKpi=withM.length?withM.reduce((s,x)=>s+kpiTotal(kpiComponents(x.m)),0)/withM.length:0;
+  $('tAll').textContent=TEACHERS.length;
+  $('tActive').textContent=TEACHERS.filter(t=>t.status==='Активен').length;
+  $('tIntern').textContent=TEACHERS.filter(t=>t.status==='Стажер').length;
+  $('tRet').textContent=avgRet.toFixed(1)+'%';
+  $('tKpi').textContent=Math.round(avgKpi);
 }
 
 /* ===== FILTERS ===== */
 function applyFilters(){
-  const b=$('fBranch').value,c=$('fCat').value,s=$('fStatus').value,fl=$('fFlag').value;
-  let list=TEACHERS.filter(t=>{
-    const m=monthData(t);
-    return (!b||t.branch===b)&&(!c||catName(t.cat)===c)&&(!s||t.status===s)&&
-      (!fl||
-        (fl==='low'&&m&&m.ret<40)||
-        (fl==='journal'&&m&&m.openJ>0)||
-        (fl==='winner'&&t.id===currentWinnerId));
-  });
-  renderSpotlight(list);renderTable(list);renderTiles(list);renderTOM();
+  const b=$('fBranch').value,c=$('fCat').value,s=$('fStatus').value;
+  let list=TEACHERS.filter(t=>(!b||t.branch===b)&&(!c||catName(t.cat)===c)&&(!s||t.status===s));
+  renderSpotlight(list);renderTable(list);renderTiles();renderTOM();
 }
 function renderAll(){applyFilters();}
 
 /* ===== CARD ===== */
 function openCard(id){
-  const t=TEACHERS.find(x=>x.id===id); const m=monthData(t);
+  const t=TEACHERS.find(x=>x.id===id);const m=monthData(t);
   $('cAva').textContent=t.initials;
   $('cName').textContent=t.name;
   $('cMeta').textContent=`${t.spec} · ${t.branch} · ${catName(t.cat)} · ${$('fMonth').value}`;
   const TABS=[['info','Общая'],['kpi','KPI'],['groups','Группы'],['std','Стандарты'],
-    ['train','Обучение'],['att','Аттестация'],['rev','Отзывы'],['ai','AI-анализ'],['sal','Ожидаемая ЗП']];
+    ['train','Обучение'],['att','Аттестация'],['rev','Отзывы'],['ai','AI-анализ'],['fines','Штрафы'],['sal','Ожидаемая ЗП']];
   $('tabs').innerHTML=TABS.map((x,i)=>`<button class="tab ${i===0?'active':''}" onclick="switchTab('${x[0]}')">${x[1]}</button>`).join('');
   $('panes').innerHTML=buildPanes(t,m);
   $('overlay').classList.add('open');document.body.style.overflow='hidden';
 }
 function closeCard(){$('overlay').classList.remove('open');document.body.style.overflow='';}
 function switchTab(key){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick').includes(`'${key}'`)));
-  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+key));
+  document.querySelectorAll('#tabs .tab').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick').includes(`'${key}'`)));
+  document.querySelectorAll('#panes .pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+key));
 }
 
 function buildPanes(t,m){
-  const comp=kpiComponents(m); const k=kpiTotal(comp); const sal=salary(t,m);
-  // INFO
+  const comp=kpiComponents(m);const k=kpiTotal(comp);const sal=salary(t,m);
   let info=`<div class="pane active" id="pane-info"><h4>Основная информация</h4><div class="grid3">
     <div class="info"><div class="k">Телефон</div><div class="v">${t.phone}</div></div>
     <div class="info"><div class="k">Дата рождения</div><div class="v">${t.birth}</div></div>
@@ -578,41 +785,40 @@ function buildPanes(t,m){
     <div class="info"><div class="k">Роль</div><div class="v">${t.role}</div></div>
     <div class="info"><div class="k">Статус</div><div class="v">${t.status}</div></div>
     <div class="info"><div class="k">Специализация</div><div class="v">${t.spec}</div></div>
-  </div></div>`;
+  </div>
+  <h4>Доступ в личный кабинет</h4><div class="grid3">
+    <div class="info"><div class="k">Логин</div><div class="v">${t.login||t.phone}</div></div>
+    <div class="info"><div class="k">Пароль</div><div class="v">${t.pass?'••••••••':'<span style="color:var(--muted)">не задан</span>'}</div></div>
+    <div class="info"><div class="k">Кабинет</div><div class="v" style="color:var(--green)">${t.pass?'Активен':'Нет доступа'}</div></div>
+  </div>
+  <div class="modal-foot" style="justify-content:flex-start"><button class="btn-sm" onclick="closeCard();openForm(${t.id})">Редактировать карточку</button>${t.pass?`<button class="btn-sm" onclick="toast('Данные для входа отправлены: ${t.login||t.phone}')">Отправить доступ педагогу</button>`:''}</div></div>`;
 
-  // KPI
   let kpiPane=`<div class="pane" id="pane-kpi">`;
-  if(!comp){ kpiPane+=`<p style="color:var(--muted)">За ${$('fMonth').value} данных нет — педагог в этом месяце не работал.</p>`; }
+  if(!comp){kpiPane+=`<p class="note">За ${$('fMonth').value} данных нет — педагог в этом месяце не работал.</p>`;}
   else{
-    const rows=[
-      ['Удержание из мес. в мес.',comp.ret,KPI_WEIGHTS.ret],
-      ['Воронка ПУ (приход → покупка)',comp.funnel,KPI_WEIGHTS.funnel],
-      ['Отзывы родителей',comp.reviews,KPI_WEIGHTS.reviews],
-      ['Выполнение стандартов',comp.standards,KPI_WEIGHTS.standards],
-    ];
+    const rows=[['Удержание из мес. в мес.',comp.ret,KPI_WEIGHTS.ret],['Воронка ПУ (приход → покупка)',comp.funnel,KPI_WEIGHTS.funnel],['Отзывы родителей',comp.reviews,KPI_WEIGHTS.reviews],['Выполнение стандартов',comp.standards,KPI_WEIGHTS.standards]];
     kpiPane+=`<div class="kpi final" style="margin-bottom:18px"><div class="v">${k}</div><div class="k">Итоговый KPI за ${$('fMonth').value} · из 100</div></div>`;
-    kpiPane+=rows.map(r=>`<div class="kbar"><div class="hd"><span class="nm">${r[0]}</span>
-      <span><span class="wt">вес ${r[2]}% · </span><span class="sc">${r[1]}</span></span></div>
-      <div class="track"><div class="fill" style="width:${r[1]}%;background:${fillColor(r[1])}"></div></div></div>`).join('');
+    kpiPane+=rows.map(r=>`<div class="kbar"><div class="hd"><span class="nm">${r[0]}</span><span><span class="wt">вес ${r[2]}% · </span><span class="sc">${r[1]}</span></span></div><div class="track"><div class="fill" style="width:${r[1]}%;background:${fillColor(r[1])}"></div></div></div>`).join('');
     kpiPane+=`<p class="note">Итог = удержание×${KPI_WEIGHTS.ret}% + воронка×${KPI_WEIGHTS.funnel}% + отзывы×${KPI_WEIGHTS.reviews}% + стандарты×${KPI_WEIGHTS.standards}%. Влияет на категорию, звание «Педагог месяца» и бонусы.</p>`;
   }
   kpiPane+=`</div>`;
 
-  // GROUPS
   let groups=`<div class="pane" id="pane-groups"><h4>Закреплённые группы</h4>`+
-    t.groups.map(g=>`<div class="row-item">
-      <div><div class="ttl">${g.name}</div><div class="det">${g.st} учеников · свободно ${g.free} · удержание ${g.ret}%</div></div>
-      <div style="text-align:right"><div class="meter ${retClass(g.fill)}" style="margin-left:auto"><span style="width:${g.fill}%"></span></div>
-      <small style="color:var(--muted)">заполн. ${g.fill}%</small></div></div>`).join('')+`</div>`;
+    t.groups.map(g=>`<div class="row-item"><div><div class="ttl">${g.name}</div><div class="det">${g.st} учеников · свободно ${g.free} · удержание ${g.ret}%</div></div>
+      <div style="text-align:right"><div class="meter ${retClass(g.fill)}" style="margin-left:auto"><span style="width:${g.fill}%"></span></div><small style="color:var(--muted)">заполн. ${g.fill}%</small></div></div>`).join('')+`</div>`;
 
-  // STANDARDS
+  // STANDARDS with active buttons
   const sLabel={y:'✓',n:'✕',p:'~'};
+  const stdBtn=x=>{
+    if(x.type==='photo')return `<button class="btn-sm" onclick="markArrival('${t.name}')">📷 Отметить приход</button>`;
+    if(x.type==='plan')return `<button class="btn-sm" onclick="uploadPlan('${t.name}')">📎 Загрузить план</button>`;
+    if(x.type==='journal')return `<button class="btn-sm" onclick="toast('Открыт раздел «Журнал посещаемости»')">Открыть журнал</button>`;
+    return `<button class="btn-sm" onclick="toast('Запрос оценки отправлен родителям')">Запросить оценку</button>`;
+  };
   let std=`<div class="pane" id="pane-std"><h4>Базовые стандарты · ${$('fMonth').value}</h4>`+
-    t.standards.map(x=>`<div class="std"><div class="ck ${x.s}">${sLabel[x.s]}</div>
-      <div class="body"><div class="nm">${x.nm}</div><div class="det">${x.det}</div></div></div>`).join('')+
-    `<p class="note">Выполнение стандартов даёт процент (компонент KPI, вес ${KPI_WEIGHTS.standards}%) и влияет на бонусы и звание «Педагог месяца». ✓ выполнено · ~ частично · ✕ нет.</p></div>`;
+    t.standards.map(x=>`<div class="std"><div class="ck ${x.s}">${sLabel[x.s]}</div><div class="body"><div class="nm">${x.nm}</div><div class="det">${x.det}</div></div><div class="act">${stdBtn(x)}</div></div>`).join('')+
+    `<p class="note"><b>Как это фиксируется:</b> приход — фото с серверным штампом времени и геометкой филиала, сравнивается с расписанием (вовремя = за 20 мин). План — файл/текст с привязкой к неделе. Оценки — через личный кабинет родителя и авто-запрос после открытого урока/концерта. Выполнение стандартов даёт % (вес ${KPI_WEIGHTS.standards}% в KPI) и влияет на бонусы и звание.</p></div>`;
 
-  // TRAINING
   function tb(s){return s==='Аттестован'?'b-green':s==='В процессе'?'b-role':'b-gray';}
   const base=t.training.filter(x=>x.base),extra=t.training.filter(x=>!x.base);
   let train=`<div class="pane" id="pane-train"><div class="sec-label">Базовая программа</div>`+
@@ -620,17 +826,14 @@ function buildPanes(t,m){
     `<div class="sec-label">Дополнительные направления</div>`+
     extra.map(x=>`<div class="train-item"><div class="hd"><span class="nm">${x.dir}</span><span class="badge ${tb(x.st)}">${x.st}</span></div></div>`).join('')+`</div>`;
 
-  // ATTEST
   let att=`<div class="pane" id="pane-att"><h4>История аттестаций</h4>`+
-    t.attest.map(a=>`<div class="row-item"><div><div class="ttl">${a.dir} ${a.mark!=='—'?'· '+a.mark:''}</div><div class="det">${a.note}</div></div>
-      <div style="text-align:right"><span class="badge ${a.res==='Аттестован'?'b-green':'b-gray'}">${a.res}</span><div class="det">${a.date}</div></div></div>`).join('')+
-    `<p class="note">История сохраняется бессрочно.</p></div>`;
+    t.attest.map(a=>`<div class="row-item"><div><div class="ttl">${a.dir} ${a.mark!=='—'?'· '+a.mark:''}</div><div class="det">${a.note}</div></div><div style="text-align:right"><span class="badge ${a.res==='Аттестован'?'b-green':'b-gray'}">${a.res}</span><div class="det">${a.date}</div></div></div>`).join('')+
+    `<div class="modal-foot" style="justify-content:flex-start"><button class="btn-sm" onclick="toast('Назначить аттестацию (только владелец)')">Назначить аттестацию</button></div><p class="note">История сохраняется бессрочно.</p></div>`;
 
-  // REVIEWS
   let rev=`<div class="pane" id="pane-rev"><h4>Отзывы и оценки</h4>`+
-    t.reviews.map(r=>`<div class="review"><div class="hd"><div><span class="stars">${r.stars?stars(r.stars):''}</span> <span class="src">${r.who} · ${r.src}</span></div></div><p>${r.text}</p></div>`).join('')+`</div>`;
+    t.reviews.map(r=>`<div class="review"><div class="hd"><div><span class="stars">${r.stars?stars(r.stars):''}</span> <span class="src">${r.who} · ${r.src}</span></div></div><p>${r.text}</p></div>`).join('')+
+    `<div class="modal-foot" style="justify-content:flex-start"><button class="btn-sm" onclick="toast('Загрузить отзыв (скрин/фото/видео/ссылка)')">Прикрепить отзыв</button><button class="btn-sm" onclick="toast('Ссылка на оценку отправлена родителям в WhatsApp')">Запросить у родителей</button></div></div>`;
 
-  // AI
   const a=t.ai;
   let ai=`<div class="pane" id="pane-ai"><div class="ai-box">
     <div class="ttl"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>AI-анализ работы · ${$('fMonth').value}</div>
@@ -640,25 +843,235 @@ function buildPanes(t,m){
     <div class="sec-label">Рекомендация по «Педагогу месяца»</div><p>${a.rec}</p>
   </div></div>`;
 
-  // SALARY
-  let salPane=`<div class="pane" id="pane-sal">`;
-  if(!sal){ salPane+=`<p style="color:var(--muted)">За ${$('fMonth').value} расчёта нет.</p>`; }
-  else{
-    salPane+=`<div class="sal-hero"><div class="k">Ожидаемая ЗП · ${$('fMonth').value}</div>
-      <div class="v">${money(sal.total)}</div><div class="sub">прогноз по текущим данным месяца · ${catName(t.cat)}</div></div>`;
-    salPane+=`<h4>Из чего складывается</h4>`;
-    if(sal.newCnt) salPane+=`<div class="sal-line"><span>Новенькие · ${sal.newCnt} × ${money(RATES.new[t.cat])}</span><span>${money(sal.newSum)}</span></div>`;
-    if(sal.plainReg) salPane+=`<div class="sal-line"><span>Постоянные · ${sal.plainReg} × ${money(RATES.reg[t.cat])}</span><span>${money(sal.regSum)}</span></div>`;
-    if(sal.contCnt) salPane+=`<div class="sal-line"><span>Постоянные, продолжающая · ${sal.contCnt} × ${money(RATES.regCont[3])}</span><span>${money(sal.contSum)}</span></div>`;
-    salPane+=`<div class="sal-line"><span><b>Базовая часть</b></span><span><b>${money(sal.base)}</b></span></div>`;
-    salPane+=`<div class="sal-line"><span>Бонус удержания ${sal.retOk?`(+${RETENTION_BONUS[t.cat]*100}%, ушло ≤2)`:'(не начислен, ушло >2)'}</span><span class="${sal.retOk?'pos':''}">${sal.retOk?'+ '+money(sal.retBonus):money(0)}</span></div>`;
-    salPane+=`<div class="sal-line"><span>Бонус «Педагог месяца» ${sal.tomBonus?'':'(не присвоен)'}</span><span class="${sal.tomBonus?'pos':''}">${sal.tomBonus?'+ '+money(sal.tomBonus):money(0)}</span></div>`;
-    salPane+=`<div class="sal-line total"><span>Итого к выплате</span><span>${money(sal.total)}</span></div>`;
-    salPane+=`<p class="note">Виден педагогу, владельцу и управляющему. Ставки и бонусы — по системе оплаты Эхо Гор 2025–2026.</p>`;
-  }
-  salPane+=`</div>`;
+  let salPane=`<div class="pane" id="pane-sal">`+salaryHtml(t,m,sal)+`</div>`;
+  let finesPane=`<div class="pane" id="pane-fines">`+finesHtml(t)+`</div>`;
+  return info+kpiPane+groups+std+train+att+rev+ai+finesPane+salPane;
+}
 
-  return info+kpiPane+groups+std+train+att+rev+ai+salPane;
+/* ===== FINES HTML (карточка педагога) ===== */
+function finesHtml(t){
+  const mn=$('fMonth').value;
+  const all=t.fines||{};
+  // собираем все штрафы по всем месяцам
+  let allRows=[];
+  Object.keys(all).forEach(month=>{(all[month]||[]).forEach(f=>allRows.push({...f,month}));});
+  const monthSum=(all[mn]||[]).reduce((s,f)=>s+f.sum,0);
+  const totalSum=allRows.reduce((s,f)=>s+f.sum,0);
+  let h=`<div class="grid2" style="margin-bottom:8px">
+    <div class="kpi"><div class="v" style="color:var(--red)">${money(monthSum)}</div><div class="k">Штрафы за ${mn}</div></div>
+    <div class="kpi"><div class="v" style="color:var(--red)">${money(totalSum)}</div><div class="k">Всего штрафов (история)</div></div>
+  </div>`;
+  h+=`<div class="modal-foot" style="justify-content:flex-start;margin:6px 0 14px"><button class="btn-sm" onclick="openFine(${t.id})" style="border-color:var(--red);color:var(--red)">+ Начислить штраф</button></div>`;
+  if(!allRows.length){h+=`<p class="note">Штрафов нет. Чистая история.</p>`;return h;}
+  // сортируем: сначала выбранный месяц, потом остальные
+  h+=`<h4>История штрафов</h4>`;
+  allRows.sort((a,b)=>(b.month===mn?1:0)-(a.month===mn?1:0));
+  h+=allRows.map(f=>`<div class="row-item">
+    <div><div class="ttl" style="color:var(--red)">${f.reason} · ${money(f.sum)}</div>
+    <div class="det">${f.month} · ${f.date}${f.note?' · '+f.note:''} · начислил: ${f.by||'—'}</div></div>
+    <div><span class="badge ${f.month===mn?'b-red':'b-gray'}">${f.month===mn?'текущий месяц':f.month}</span></div>
+  </div>`).join('');
+  h+=`<p class="note">Штрафы вычитаются из итоговой ЗП автоматически. Начисляют владелец и управляющий.</p>`;
+  return h;
+}
+
+/* ===== SALARY HTML (shared by card tab + payroll modal) ===== */
+function salaryHtml(t,m,sal){
+  if(!sal)return `<p class="note">За ${$('fMonth').value} расчёта нет — нет учеников в этом месяце.</p>`;
+  let h=`<div class="sal-hero"><div class="k">Ожидаемая ЗП · ${$('fMonth').value}</div><div class="v">${money(sal.total)}</div><div class="sub">прогноз в реальном времени · ${catName(t.cat)} · обновляется по ходу месяца</div></div>`;
+  // detailed table by group
+  h+=`<h4>Детализация по группам</h4><table class="sal-table"><thead><tr><th>Группа</th><th class="r">Новенькие</th><th class="r">Постоянные</th><th class="r">Продолж.</th><th class="r">Сумма</th></tr></thead><tbody>`;
+  t.groups.forEach(g=>{
+    const c=t.cat;
+    const contInG=c===3?(g.regCont||0):0;
+    const plainInG=Math.max(0,(g.regCnt||0));
+    const gnew=g.newCnt*RATES.new[c];
+    const greg=plainInG*RATES.reg[c];
+    const gcont=c===3?contInG*RATES.regCont[3]:0;
+    h+=`<tr><td>${g.name}</td><td class="r">${g.newCnt}×${RATES.new[c]}</td><td class="r">${plainInG}×${RATES.reg[c]}</td><td class="r">${c===3?contInG+'×'+RATES.regCont[3]:'—'}</td><td class="r"><b>${money(gnew+greg+gcont)}</b></td></tr>`;
+  });
+  h+=`</tbody></table>`;
+  h+=`<h4>Итоговый расчёт</h4>`;
+  if(sal.newCnt)h+=`<div class="sal-line"><span>Новенькие · ${sal.newCnt} × ${money(RATES.new[t.cat])}</span><span>${money(sal.newSum)}</span></div>`;
+  if(sal.plainReg)h+=`<div class="sal-line"><span>Постоянные · ${sal.plainReg} × ${money(RATES.reg[t.cat])}</span><span>${money(sal.regSum)}</span></div>`;
+  if(sal.contCnt)h+=`<div class="sal-line"><span>Постоянные, продолжающая · ${sal.contCnt} × ${money(RATES.regCont[3])}</span><span>${money(sal.contSum)}</span></div>`;
+  h+=`<div class="sal-line"><span><b>Базовая часть</b></span><span><b>${money(sal.base)}</b></span></div>`;
+  h+=`<div class="sal-line"><span>Бонус удержания ${sal.retOk?`(+${RETENTION_BONUS[t.cat]*100}%, ушло ≤2)`:'(не начислен, ушло >2)'}</span><span class="${sal.retOk?'pos':''}">${sal.retOk?'+ '+money(sal.retBonus):money(0)}</span></div>`;
+  h+=`<div class="sal-line"><span>Бонус «Педагог месяца» ${sal.tomBonus?'':'(не присвоен)'}</span><span class="${sal.tomBonus?'pos':''}">${sal.tomBonus?'+ '+money(sal.tomBonus):money(0)}</span></div>`;
+  if(sal.fineList.length){
+    sal.fineList.forEach(f=>{h+=`<div class="sal-line"><span style="color:var(--red)">Штраф · ${f.reason} <span style="color:var(--muted);font-size:13px">(${f.date}${f.note?' · '+f.note:''})</span></span><span style="color:var(--red);font-weight:700">− ${money(f.sum)}</span></div>`;});
+  }
+  h+=`<div class="sal-line"><span>Штрафы итого ${sal.finesSum?'':'(нет)'}</span><span style="color:var(--red);font-weight:700">${sal.finesSum?'− '+money(sal.finesSum):money(0)}</span></div>`;
+  h+=`<div class="sal-line total"><span>Итого к выплате</span><span>${money(sal.total)}</span></div>`;
+  h+=`<div class="modal-foot" style="justify-content:flex-start"><button class="btn-gold" onclick="toast('ЗП начислена: ${t.name} — ${money(sal.total)}')">Начислить ЗП</button><button class="btn-sm" onclick="switchTab('fines')" style="border-color:var(--red);color:var(--red)">Управлять штрафами →</button></div>`;
+  h+=`<p class="note">Ставки и бонусы — по системе оплаты Эхо Гор 2025–2026. Виден педагогу, владельцу и управляющему.</p>`;
+  return h;
+}
+
+/* ===== ADD / EDIT FORM ===== */
+let editId=null;
+function openForm(id){
+  editId=(typeof id==='number')?id:null;
+  if(editId){
+    const t=TEACHERS.find(x=>x.id===editId);
+    $('formTitle').textContent='Редактирование: '+t.name;
+    $('formAva').textContent=t.initials;
+    $('fName').value=t.name;$('fPhone').value=t.phone;$('fSpec').value=t.spec;
+    $('fBr').value=t.branch;$('fCt').value=t.cat;$('fRl').value=t.role;$('fSt').value=t.status;
+    $('fLogin').value=t.login||t.phone;$('fPass').value=t.pass||'';
+  }else{
+    $('formTitle').textContent='Новый преподаватель';$('formAva').textContent='+';
+    ['fName','fPhone','fSpec','fLogin','fPass'].forEach(i=>$(i).value='');
+  }
+  $('formOv').classList.add('open');document.body.style.overflow='hidden';
+}
+function genPass(){
+  const chars='abcdefghjkmnpqrstuvwxyz23456789';let p='';
+  for(let i=0;i<8;i++)p+=chars[Math.floor(Math.random()*chars.length)];
+  $('fPass').value=p;toast('Пароль сгенерирован: '+p);
+}
+function closeForm(){$('formOv').classList.remove('open');document.body.style.overflow='';}
+function saveForm(){
+  const name=$('fName').value.trim();
+  if(!name){toast('Введите ФИО');return;}
+  if(!$('fPhone').value.trim()){toast('Введите телефон');return;}
+  const parts=name.split(' ');const initials=(parts[0][0]||'')+(parts[1]?parts[1][0]:'');
+  if(editId){
+    const t=TEACHERS.find(x=>x.id===editId);
+    t.name=name;t.phone=$('fPhone').value;t.spec=$('fSpec').value;t.branch=$('fBr').value;
+    t.cat=+$('fCt').value;t.role=$('fRl').value;t.status=$('fSt').value;t.initials=initials.toUpperCase();
+    t.login=$('fLogin').value.trim()||$('fPhone').value.trim();t.pass=$('fPass').value;
+    toast('Сохранено: '+name);
+  }else{
+    const id=Math.max(...TEACHERS.map(t=>t.id))+1;
+    const cat=+$('fCt').value;
+    TEACHERS.push({id,name,initials:initials.toUpperCase(),phone:$('fPhone').value,spec:$('fSpec').value||'—',
+      branch:$('fBr').value,cat,role:$('fRl').value,status:$('fSt').value,
+      login:$('fLogin').value.trim()||$('fPhone').value.trim(),pass:$('fPass').value,
+      birth:'—',hired:$('fHired').value||'—',years:'новый',thanks:0,ltvMonths:0,fines:{},leavers:{},
+      byMonth:Object.fromEntries(MONTHS.map(mn=>[mn,null])),
+      groups:[],standards:[
+        {nm:'Приход вовремя (за 20 мин до урока)',det:'Нет данных',s:'n',type:'photo'},
+        {nm:'Отметки в журнале проставлены',det:'Нет данных',s:'n',type:'journal'},
+        {nm:'План работы подготовлен заранее',det:'Нет данных',s:'n',type:'plan'},
+        {nm:'Оценка после открытого урока',det:'Ещё не проводился',s:'n',type:'open'},
+        {nm:'Оценка после отчётного концерта',det:'Ещё не участвовал',s:'n',type:'concert'},
+      ],
+      training:[],attest:[{date:'—',dir:'—',res:'Аттестаций ещё не было',mark:'—',note:'Новый сотрудник'}],
+      reviews:[{who:'—',src:'—',stars:0,text:'Отзывов пока нет.'}],
+      ai:{pos:['—'],neg:['—'],verdict:'Новый сотрудник, данных пока нет.',rec:'Запустить программу обучения и набор группы.'}});
+    toast('Добавлен преподаватель: '+name);
+  }
+  closeForm();renderAll();
+}
+function archive(id){
+  const t=TEACHERS.find(x=>x.id===id);
+  if(confirm('Архивировать преподавателя «'+t.name+'»? Это действие можно отменить в разделе «Архив».')){
+    const i=TEACHERS.findIndex(x=>x.id===id);TEACHERS.splice(i,1);toast('В архив: '+t.name);renderAll();
+  }
+}
+
+/* ===== STANDARDS ACTIONS ===== */
+function markArrival(name){toast('📷 Камера: фото прихода для '+name+' — штамп времени поставит сервер');}
+function uploadPlan(name){toast('📎 Выбор файла плана работы для '+name);}
+
+/* ===== FINES ===== */
+let fineId=null;
+function openFinesLog(){
+  $('logMonth').innerHTML='<option value="">Все месяцы</option>'+MONTHS.map(m=>`<option ${m===$('fMonth').value?'selected':''}>${m}</option>`).join('');
+  $('logWho').innerHTML='<option value="">Все преподаватели</option>'+TEACHERS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  renderFinesLog();
+  $('finesLogOv').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeFinesLog(){$('finesLogOv').classList.remove('open');document.body.style.overflow='';}
+function renderFinesLog(){
+  const fMonth=$('logMonth').value;const fWho=$('logWho').value;
+  let rows=[];
+  TEACHERS.forEach(t=>{
+    if(fWho&&+fWho!==t.id)return;
+    const all=t.fines||{};
+    Object.keys(all).forEach(month=>{
+      if(fMonth&&fMonth!==month)return;
+      (all[month]||[]).forEach(f=>rows.push({...f,month,tName:t.name,tCat:t.cat,tId:t.id}));
+    });
+  });
+  const total=rows.reduce((s,f)=>s+f.sum,0);
+  let h=`<div class="kpi" style="margin-bottom:14px;background:var(--red-soft)"><div class="v" style="color:var(--red)">${money(total)}</div><div class="k">Сумма штрафов по фильтру · ${rows.length} шт.</div></div>`;
+  h+=`<div class="modal-foot" style="justify-content:flex-start;margin-bottom:14px"><button class="btn-sm" onclick="closeFinesLog();openFineFromLog()" style="border-color:var(--red);color:var(--red)">+ Начислить новый штраф</button></div>`;
+  if(!rows.length){h+=`<p class="note">Штрафов по выбранному фильтру нет.</p>`;$('finesLogBody').innerHTML=h;return;}
+  h+=rows.map(f=>`<div class="row-item"><div>
+    <div class="ttl" style="color:var(--red)">${f.tName} · ${f.reason} · ${money(f.sum)}</div>
+    <div class="det">${catName(f.tCat)} · ${f.month} · ${f.date}${f.note?' · '+f.note:''} · начислил: ${f.by||'—'}</div></div></div>`).join('');
+  $('finesLogBody').innerHTML=h;
+}
+function openFineFromLog(){
+  // открыть форму штрафа для выбранного (или первого) педагога
+  const id=$('logWho').value?+$('logWho').value:TEACHERS[0].id;
+  openFine(id,$('logMonth').value||undefined);
+}
+function openFine(id,mn){
+  fineId=id;
+  const t=TEACHERS.find(x=>x.id===id);
+  $('fineWho').textContent=t.name+' · '+catName(t.cat);
+  $('fineMonth').innerHTML=MONTHS.map(m=>`<option ${m===(mn||$('fMonth').value)?'selected':''}>${m}</option>`).join('');
+  $('fineSum').value='';$('fineNote').value='';$('fineReason').value='Опоздание';
+  $('fineOv').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeFine(){$('fineOv').classList.remove('open');document.body.style.overflow='';}
+function saveFine(){
+  const sum=parseInt($('fineSum').value,10);
+  if(!sum||sum<=0){toast('Введите сумму штрафа');return;}
+  const t=TEACHERS.find(x=>x.id===fineId);
+  const mn=$('fineMonth').value;
+  const d=new Date();const date=String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();
+  if(!t.fines)t.fines={};
+  if(!t.fines[mn])t.fines[mn]=[];
+  t.fines[mn].push({date,reason:$('fineReason').value,sum,note:$('fineNote').value.trim(),by:$('fineBy').value});
+  toast('Штраф начислен: '+t.name+' — '+money(sum)+' ('+$('fineReason').value+')');
+  closeFine();
+  renderAll();
+  if($('payOv').classList.contains('open'))renderPayroll();
+  if($('finesLogOv').classList.contains('open'))renderFinesLog();
+  if($('overlay').classList.contains('open')){const m=monthData(t);$('panes').innerHTML=buildPanes(t,m);switchTab('fines');}
+}
+
+/* ===== PAYROLL MODAL ===== */
+function openPayroll(){
+  $('payWho').innerHTML=TEACHERS.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  $('payMonth').innerHTML=MONTHS.map((mn,i)=>`<option ${i===MONTHS.length-1?'selected':''}>${mn}</option>`).join('');
+  renderPayroll();
+  $('payOv').classList.add('open');document.body.style.overflow='hidden';
+}
+function closePayroll(){$('payOv').classList.remove('open');document.body.style.overflow='';}
+function renderPayroll(){
+  const t=TEACHERS.find(x=>x.id===+$('payWho').value);
+  const mn=$('payMonth').value;const m=monthData(t,mn);const sal=salary(t,m,mn);
+  $('payBody').innerHTML=salaryHtmlForMonth(t,m,sal,mn);
+}
+function salaryHtmlForMonth(t,m,sal,mn){
+  if(!sal)return `<p class="note">За ${mn} расчёта нет — нет учеников в этом месяце.</p>`;
+  let h=`<div class="sal-hero"><div class="k">ЗП к начислению · ${mn}</div><div class="v">${money(sal.total)}</div><div class="sub">${t.name} · ${catName(t.cat)}</div></div>`;
+  h+=`<h4>Детализация по группам</h4><table class="sal-table"><thead><tr><th>Группа</th><th class="r">Новенькие</th><th class="r">Постоянные</th><th class="r">Продолж.</th><th class="r">Сумма</th></tr></thead><tbody>`;
+  t.groups.forEach(g=>{
+    const c=t.cat;const contInG=c===3?(g.regCont||0):0;const plainInG=Math.max(0,(g.regCnt||0));
+    const gnew=g.newCnt*RATES.new[c];const greg=plainInG*RATES.reg[c];const gcont=c===3?contInG*RATES.regCont[3]:0;
+    h+=`<tr><td>${g.name}</td><td class="r">${g.newCnt}×${RATES.new[c]}</td><td class="r">${plainInG}×${RATES.reg[c]}</td><td class="r">${c===3?contInG+'×'+RATES.regCont[3]:'—'}</td><td class="r"><b>${money(gnew+greg+gcont)}</b></td></tr>`;
+  });
+  h+=`</tbody></table><h4>Итоговый расчёт</h4>`;
+  if(sal.newCnt)h+=`<div class="sal-line"><span>Новенькие · ${sal.newCnt} × ${money(RATES.new[t.cat])}</span><span>${money(sal.newSum)}</span></div>`;
+  if(sal.plainReg)h+=`<div class="sal-line"><span>Постоянные · ${sal.plainReg} × ${money(RATES.reg[t.cat])}</span><span>${money(sal.regSum)}</span></div>`;
+  if(sal.contCnt)h+=`<div class="sal-line"><span>Постоянные, продолжающая · ${sal.contCnt} × ${money(RATES.regCont[3])}</span><span>${money(sal.contSum)}</span></div>`;
+  h+=`<div class="sal-line"><span><b>Базовая часть</b></span><span><b>${money(sal.base)}</b></span></div>`;
+  h+=`<div class="sal-line"><span>Бонус удержания ${sal.retOk?`(+${RETENTION_BONUS[t.cat]*100}%)`:'(не начислен)'}</span><span class="${sal.retOk?'pos':''}">${sal.retOk?'+ '+money(sal.retBonus):money(0)}</span></div>`;
+  h+=`<div class="sal-line"><span>Бонус «Педагог месяца»</span><span class="${sal.tomBonus?'pos':''}">${sal.tomBonus?'+ '+money(sal.tomBonus):money(0)}</span></div>`;
+  if(sal.fineList.length){
+    sal.fineList.forEach(f=>{h+=`<div class="sal-line"><span style="color:var(--red)">Штраф · ${f.reason} <span style="color:var(--muted);font-size:13px">(${f.date}${f.by?' · '+f.by:''})</span></span><span style="color:var(--red);font-weight:700">− ${money(f.sum)}</span></div>`;});
+  }
+  h+=`<div class="sal-line"><span>Штрафы итого ${sal.finesSum?'':'(нет)'}</span><span style="color:var(--red);font-weight:700">${sal.finesSum?'− '+money(sal.finesSum):money(0)}</span></div>`;
+  h+=`<div class="sal-line total"><span>Итого к выплате</span><span>${money(sal.total)}</span></div>`;
+  h+=`<div class="modal-foot" style="justify-content:flex-start"><button class="btn-gold" onclick="toast('ЗП начислена: ${t.name} — ${money(sal.total)} за ${mn}')">Начислить и провести</button><button class="btn-sm" onclick="openFine(${t.id},'${mn}')" style="border-color:var(--red);color:var(--red)">Начислить штраф</button></div>`;
+  h+=`<p class="note">Считается автоматически из учеников групп. По системе оплаты Эхо Гор 2025–2026.</p>`;
+  return h;
 }
 
 /* ===== TOAST ===== */
@@ -667,10 +1080,11 @@ function toast(msg){
   el.className='toast';el.innerHTML=`<span class="dot"></span><span>${msg}</span>`;
   c.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(()=>el.remove(),250)},2600);
 }
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCard()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeCard();closeForm();closePayroll();closeDetail();closeFine();closeFinesLog();}});
 
 /* ===== INIT ===== */
 $('fMonth').innerHTML=MONTHS.map((m,i)=>`<option ${i===MONTHS.length-1?'selected':''}>${m}</option>`).join('');
+renderColMenu();
 renderAll();
 </script>
 </body>
