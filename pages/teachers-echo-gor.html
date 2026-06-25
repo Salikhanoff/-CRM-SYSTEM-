@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Преподаватели — Эхо Гор CRM</title>
+<style>
+  :root{
+    --bg:#F3F4F6; --card:#FFFFFF; --ink:#1F2430; --muted:#7B8294;
+    --line:#E6E8EE; --gold:#C9A24B; --gold-soft:#FBF4E2; --gold-ink:#A8842F;
+    --green:#2E9E6B; --green-soft:#E7F4EC; --red:#D8623B; --red-soft:#FBEAE3;
+    --blue:#4B6FB0; --shadow:0 10px 30px rgba(31,36,48,.06); --r:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .app{display:flex;min-height:100vh}
+  .side{width:280px;flex-shrink:0;padding:24px 20px;display:flex;flex-direction:column;gap:8px}
+  .side .intro{background:var(--card);border-radius:var(--r);padding:18px 20px;color:var(--muted);
+    font-size:14px;box-shadow:var(--shadow);margin-bottom:8px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:13px 18px;border-radius:999px;
+    color:var(--muted);text-decoration:none;font-weight:600;font-size:15px;transition:.15s;cursor:pointer}
+  .nav a:hover{background:#EAECF1}
+  .nav a.active{background:var(--gold-soft);color:var(--gold-ink)}
+  .nav a svg{width:18px;height:18px;flex-shrink:0}
+  .rbac{margin-top:auto;background:var(--green-soft);border-radius:var(--r);padding:18px 20px}
+  .rbac .tag{color:var(--green);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .rbac b{display:block;margin:6px 0 4px;font-size:16px}
+  .rbac p{color:var(--muted);font-size:13px}
+
+  .main{flex:1;padding:40px 48px;max-width:1500px}
+  h1{font-size:38px;font-weight:800;letter-spacing:-.02em}
+  .lead{color:var(--muted);max-width:760px;margin:14px 0 28px;font-size:16px}
+
+  .dash-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+  .filters{display:flex;gap:10px;flex-wrap:wrap}
+  select{background:var(--card);border:1px solid var(--line);border-radius:999px;
+    padding:10px 16px;font-size:14px;color:var(--ink);font-weight:600;cursor:pointer;outline:none}
+  select:focus{border-color:var(--gold)}
+  select.month{background:var(--gold-soft);border-color:#EAD9A8;color:var(--gold-ink)}
+  .tiles{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:24px}
+  .tile{background:var(--card);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);cursor:pointer;
+    transition:.15s;border:1px solid transparent}
+  .tile:hover{transform:translateY(-2px);border-color:var(--gold)}
+  .tile .lbl{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .tile .val{font-size:30px;font-weight:800;margin-top:6px}
+  .tile.alert .val{color:var(--red)}
+  .tile .sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+  /* teacher of month banner */
+  .tom{background:linear-gradient(120deg,#FBF4E2 0%,#fff 60%);border:1px solid #EFE2C0;border-radius:22px;
+    padding:22px 26px;margin-bottom:24px;display:flex;align-items:center;gap:22px;box-shadow:var(--shadow);flex-wrap:wrap}
+  .tom .crown{width:60px;height:60px;border-radius:50%;background:var(--gold);display:flex;align-items:center;
+    justify-content:center;flex-shrink:0;box-shadow:0 6px 16px rgba(201,162,75,.4)}
+  .tom .crown svg{width:30px;height:30px;color:#fff}
+  .tom .info{flex:1;min-width:200px}
+  .tom .elbl{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink)}
+  .tom .nm{font-size:24px;font-weight:800;margin-top:2px}
+  .tom .ai-tag{font-size:13px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:6px}
+  .tom .ai-tag svg{width:14px;height:14px;color:var(--gold-ink)}
+  .tom .btns{display:flex;gap:10px;flex-wrap:wrap}
+  .btn-sm{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 18px;font-weight:700;
+    font-size:14px;cursor:pointer;transition:.12s}
+  .btn-sm:hover{border-color:var(--gold);color:var(--gold-ink)}
+  .btn-sm.primary{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .btn-sm.primary:hover{filter:brightness(1.05);color:#fff}
+
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:20px;margin-bottom:14px}
+  .tcard{background:var(--card);border-radius:24px;padding:28px;box-shadow:var(--shadow);transition:.15s;position:relative}
+  .tcard:hover{transform:translateY(-3px)}
+  .tcard.winner{border:2px solid var(--gold)}
+  .tcard .wbadge{position:absolute;top:18px;right:18px;background:var(--gold);color:#fff;font-size:11px;
+    font-weight:800;padding:5px 12px;border-radius:999px;display:flex;align-items:center;gap:5px}
+  .tcard .wbadge svg{width:12px;height:12px}
+  .tcard .top{display:flex;flex-direction:column;align-items:center;text-align:center}
+  .ava{width:96px;height:96px;border-radius:50%;background:#DfE2EA;display:flex;align-items:center;
+    justify-content:center;font-size:32px;font-weight:800;color:#9aa1b2}
+  .tcard h3{margin:16px 0 0;font-size:22px;font-weight:800}
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:22px 0}
+  .st{background:#F6F7F9;border-radius:14px;padding:14px 16px}
+  .st .k{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .st .v{font-size:22px;font-weight:800;margin-top:4px}
+  .open-link{background:none;border:none;color:var(--gold-ink);font-weight:800;font-size:15px;cursor:pointer;padding:0}
+  .open-link:hover{text-decoration:underline}
+
+  .count-row{display:flex;justify-content:space-between;align-items:center;margin:26px 0 14px}
+  .count-row .cnt{color:var(--muted);font-weight:600}
+  .btn-gold{background:var(--gold);color:#fff;border:none;border-radius:999px;padding:14px 26px;
+    font-weight:800;font-size:15px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s;
+    box-shadow:0 6px 16px rgba(201,162,75,.35)}
+  .btn-gold:hover{filter:brightness(1.05)}
+
+  .tbl-wrap{background:var(--card);border-radius:20px;box-shadow:var(--shadow);overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:900px}
+  thead th{text-align:left;padding:18px 24px;font-size:12px;font-weight:800;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--muted)}
+  tbody td{padding:18px 24px;border-top:1px solid var(--line);font-size:15px;vertical-align:middle}
+  tbody tr{cursor:pointer;transition:.12s}
+  tbody tr:hover{background:#FAFBFC}
+  .who b{display:block;font-size:16px}
+  .who span{font-size:13px;color:var(--muted)}
+  .badge{display:inline-block;padding:5px 12px;border-radius:999px;font-size:12px;font-weight:800}
+  .b-role{color:var(--gold-ink);background:var(--gold-soft)}
+  .b-green{color:var(--green);background:var(--green-soft)}
+  .b-red{color:var(--red);background:var(--red-soft)}
+  .b-blue{color:var(--blue);background:#E9EEF7}
+  .b-gray{color:var(--muted);background:#EEF0F4}
+  .acts{display:flex;gap:8px;justify-content:flex-end}
+  .icn{width:38px;height:38px;border:1px solid var(--line);border-radius:11px;background:#fff;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--muted);transition:.12s}
+  .icn:hover{border-color:var(--gold);color:var(--gold-ink)}
+  .icn svg{width:16px;height:16px}
+  .meter{height:7px;border-radius:4px;background:#EEF0F4;overflow:hidden;width:80px}
+  .meter span{display:block;height:100%;border-radius:4px;background:var(--green)}
+  .meter.warn span{background:var(--gold)}
+  .meter.bad span{background:var(--red)}
+
+  .overlay{position:fixed;inset:0;background:rgba(20,24,33,.55);display:none;z-index:50;
+    backdrop-filter:blur(3px);padding:40px 20px;overflow-y:auto}
+  .overlay.open{display:flex;align-items:flex-start;justify-content:center}
+  .sheet{background:var(--bg);width:100%;max-width:920px;border-radius:24px;overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.4);animation:rise .25s ease}
+  @keyframes rise{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .sheet-head{background:var(--card);padding:30px 34px;display:flex;gap:22px;align-items:center;position:relative}
+  .sheet-head .ava{width:84px;height:84px;font-size:28px}
+  .sheet-head h2{font-size:26px;font-weight:800}
+  .sheet-head .meta{color:var(--muted);font-size:14px;margin-top:4px}
+  .close{position:absolute;top:22px;right:24px;width:40px;height:40px;border:none;background:#EEF0F4;
+    border-radius:12px;font-size:20px;cursor:pointer;color:var(--muted);line-height:1}
+  .close:hover{background:#E2E5EC}
+  .tabs{display:flex;gap:4px;background:var(--card);padding:0 34px;overflow-x:auto;border-bottom:1px solid var(--line)}
+  .tab{padding:15px 16px;border:none;background:none;font-weight:700;font-size:14px;color:var(--muted);
+    cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:.12s}
+  .tab:hover{color:var(--ink)}
+  .tab.active{color:var(--gold-ink);border-color:var(--gold)}
+  .pane{display:none;padding:28px 34px 36px}
+  .pane.active{display:block}
+  .pane h4{font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+    margin:24px 0 12px}
+  .pane h4:first-child{margin-top:0}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .info{background:var(--card);border-radius:14px;padding:14px 16px}
+  .info .k{font-size:12px;color:var(--muted);font-weight:600}
+  .info .v{font-size:16px;font-weight:700;margin-top:3px}
+  .kpi{background:var(--card);border-radius:14px;padding:16px 18px;text-align:center}
+  .kpi .v{font-size:28px;font-weight:800}
+  .kpi .k{font-size:12px;color:var(--muted);margin-top:4px;font-weight:600}
+  .kpi.final{background:var(--gold-soft)}
+  .kpi.final .v{color:var(--gold-ink)}
+
+  /* KPI breakdown bars */
+  .kbar{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:10px}
+  .kbar .hd{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .kbar .nm{font-weight:700}
+  .kbar .wt{font-size:12px;color:var(--muted)}
+  .kbar .sc{font-weight:800}
+  .kbar .track{height:9px;border-radius:5px;background:#EEF0F4;overflow:hidden}
+  .kbar .fill{height:100%;border-radius:5px}
+
+  .row-item{background:var(--card);border-radius:14px;padding:14px 18px;display:flex;
+    justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:10px}
+  .row-item .ttl{font-weight:700}
+  .row-item .det{font-size:13px;color:var(--muted);margin-top:2px}
+  .train-item{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:10px}
+  .train-item .hd{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+  .train-item .nm{font-weight:700}
+  .sec-label{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;
+    color:var(--gold-ink);margin:18px 0 10px}
+
+  /* standards checklist */
+  .std{background:var(--card);border-radius:14px;padding:14px 18px;margin-bottom:10px;display:flex;
+    align-items:center;gap:14px}
+  .std .ck{width:26px;height:26px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;
+    justify-content:center;font-size:14px;font-weight:800;color:#fff}
+  .std .ck.y{background:var(--green)} .std .ck.n{background:var(--red)} .std .ck.p{background:var(--gold)}
+  .std .body{flex:1}
+  .std .nm{font-weight:700}
+  .std .det{font-size:13px;color:var(--muted);margin-top:2px}
+
+  .ai-box{background:linear-gradient(135deg,#FBF4E2,#fff);border:1px solid #EFE2C0;border-radius:18px;padding:22px 24px}
+  .ai-box .ttl{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;margin-bottom:14px}
+  .ai-box .ttl svg{width:22px;height:22px;color:var(--gold-ink)}
+  .pill-list{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px}
+  .pill{padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600}
+  .ai-box p{font-size:15px;color:#5a5446;margin-top:6px}
+
+  .review{background:var(--card);border-radius:14px;padding:16px 18px;margin-bottom:10px}
+  .review .hd{display:flex;justify-content:space-between;align-items:center}
+  .review .stars{color:var(--gold);font-size:15px;letter-spacing:1px}
+  .review .src{font-size:12px;color:var(--muted)}
+  .review p{margin-top:8px;font-size:14px}
+
+  /* salary */
+  .sal-hero{background:linear-gradient(135deg,var(--gold-soft),#fff);border:1px solid #EFE2C0;border-radius:18px;
+    padding:24px;text-align:center;margin-bottom:18px}
+  .sal-hero .k{font-size:13px;font-weight:700;color:var(--gold-ink);letter-spacing:.05em;text-transform:uppercase}
+  .sal-hero .v{font-size:42px;font-weight:800;color:var(--ink);margin-top:6px}
+  .sal-hero .sub{color:var(--muted);font-size:13px;margin-top:6px}
+  .sal-line{display:flex;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line);font-size:15px}
+  .sal-line:first-of-type{border:none}
+  .sal-line.total{font-weight:800;font-size:17px;border-top:2px solid var(--gold)}
+  .sal-line .pos{color:var(--green);font-weight:700}
+  .note{color:var(--muted);font-size:13px;margin-top:10px}
+
+  .toasts{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:90}
+  .toast{background:var(--ink);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;font-size:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;animation:rise .2s}
+  .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+
+  @media(max-width:1200px){.tiles{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:900px){
+    .side{display:none}.main{padding:24px 18px}
+    .tiles{grid-template-columns:repeat(2,1fr)}h1{font-size:28px}
+    .grid2,.grid3{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="intro">Вся сеть, финансы, филиалы, люди, риски и точки роста в одном executive-центре.</div>
+    <nav class="nav">
+      <a onclick="toast('Раздел: Dashboard')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg>Dashboard</a>
+      <a onclick="toast('Раздел: Филиалы')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg>Филиалы</a>
+      <a onclick="toast('Раздел: Ученики')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>Ученики</a>
+      <a class="active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg>Преподаватели</a>
+      <a onclick="toast('Раздел: Зарплаты')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 7h20v12H2zM2 11h20"/></svg>Зарплаты</a>
+      <a onclick="toast('Раздел: Журнал посещаемости')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Журнал посещаемости</a>
+      <a onclick="toast('Раздел: Расписание')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Расписание</a>
+      <a onclick="toast('Раздел: Бухгалтерия')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/></svg>Бухгалтерия</a>
+      <a onclick="toast('Раздел: Выступления')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/></svg>Выступления</a>
+      <a onclick="toast('Раздел: Товары и склад')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18"/></svg>Товары и склад</a>
+      <a onclick="toast('Раздел: Документолог')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>Документолог</a>
+      <a onclick="toast('Раздел: Маркетинг')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>Маркетинг</a>
+      <a onclick="toast('Раздел: Концерты')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/></svg>Концерты</a>
+      <a onclick="toast('Раздел: Афиша СНГ')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></svg>Афиша СНГ</a>
+      <a onclick="toast('Раздел: Объявления')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 11l18-5v12L3 14v-3z"/></svg>Объявления</a>
+      <a onclick="toast('Раздел: Аналитика')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18M7 16l4-4 3 3 5-6"/></svg>Аналитика</a>
+      <a onclick="toast('Раздел: AI Assistant')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>AI Assistant</a>
+      <a onclick="toast('Раздел: Настройки сети')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1l-.4-2.5h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5z"/></svg>Настройки сети</a>
+    </nav>
+    <div class="rbac">
+      <span class="tag">Полный доступ</span>
+      <b>Network Owner RBAC</b>
+      <p>Видит все филиалы, финансы, роли, настройки, audit log и AI-аналитику сети.</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <h1>Преподаватели сети</h1>
+    <p class="lead">Статистика и развитие педагогического состава. Выберите месяц, чтобы пересчитать KPI, удержание и зарплату. Нажмите на преподавателя — карточка с KPI, обучением, аттестацией, отзывами и ожидаемой ЗП.</p>
+
+    <div class="dash-bar">
+      <div class="filters">
+        <select id="fMonth" class="month" onchange="applyFilters()"></select>
+        <select id="fBranch" onchange="applyFilters()">
+          <option value="">Вся сеть</option>
+          <option>Эхо Гор Чокина 109/1</option>
+          <option>Сатпаева 210/1</option>
+        </select>
+        <select id="fCat" onchange="applyFilters()">
+          <option value="">Все категории</option>
+          <option>1 категория</option><option>2 категория</option><option>3 категория</option>
+        </select>
+        <select id="fStatus" onchange="applyFilters()">
+          <option value="">Любой статус</option>
+          <option>Активен</option><option>Стажер</option>
+        </select>
+        <select id="fFlag" onchange="applyFilters()">
+          <option value="">Без меток</option>
+          <option value="low">Низкое удержание</option>
+          <option value="journal">Не закрыл журнал</option>
+          <option value="winner">Педагог месяца</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Teacher of the month -->
+    <div class="tom" id="tomBanner"></div>
+
+    <div class="tiles">
+      <div class="tile" onclick="toast('Список: все преподаватели')"><div class="lbl">Всего</div><div class="val">2</div><div class="sub">в сети</div></div>
+      <div class="tile" onclick="toast('Активных: 1')"><div class="lbl">Активные</div><div class="val">1</div><div class="sub">работают</div></div>
+      <div class="tile" onclick="toast('На стажировке: 1')"><div class="lbl">Стажёры</div><div class="val">1</div><div class="sub">статус «Стажер»</div></div>
+      <div class="tile alert" onclick="toast('Не закрыли журнал: 1')"><div class="lbl">Не закрыли журнал</div><div class="val">1</div><div class="sub">входит в стандарты</div></div>
+      <div class="tile" id="tileRet" onclick="toast('Среднее удержание за месяц')"><div class="lbl">Ср. удержание</div><div class="val">33.9%</div><div class="sub">м/м</div></div>
+      <div class="tile" id="tileKpi" onclick="toast('Средний KPI за месяц')"><div class="lbl">Ср. KPI</div><div class="val">58</div><div class="sub">из 100</div></div>
+    </div>
+
+    <div class="cards" id="spotlight"></div>
+
+    <div class="count-row">
+      <span class="cnt" id="cnt">2 преподавателей в сети</span>
+      <button class="btn-gold" onclick="toast('Форма добавления преподавателя')">+ Добавить преподавателя</button>
+    </div>
+
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>Преподаватель</th><th>Специализация</th><th>Филиал</th>
+          <th>Категория</th><th>Удержание</th><th>KPI</th><th>Ожид. ЗП</th><th>Права</th><th style="text-align:right">Действия</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeCard()">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="ava" id="cAva"></div>
+      <div><h2 id="cName"></h2><div class="meta" id="cMeta"></div></div>
+      <button class="close" onclick="closeCard()">×</button>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div id="panes"></div>
+  </div>
+</div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ===== CONFIG ===== */
+const KPI_WEIGHTS = {ret:35, funnel:30, reviews:17.5, standards:17.5}; // % веса итогового KPI
+const RATES = { // ставки за ученика, тг/мес
+  new:{1:1250,2:1500,3:1500},
+  reg:{1:2500,2:3000,3:3000},
+  regCont:{3:3500},
+};
+const RETENTION_BONUS = {1:0.20,2:0.20,3:0.30}; // ≤2 ушедших из группы
+const TEACHER_OF_MONTH_BONUS = 20000;
+
+/* ===== MONTHS (демо-данные по месяцам) ===== */
+const MONTHS = ['Январь 2026','Февраль 2026','Март 2026','Апрель 2026','Май 2026','Июнь 2026'];
+
+/* ===== TEACHERS ===== */
+const TEACHERS = [
+  {
+    id:1, name:'Аслан Плиев', initials:'АП', phone:'+7 701 441 11 22',
+    spec:'Лезгинка, ансамблевая подготовка', branch:'Эхо Гор Чокина 109/1',
+    cat:3, role:'Преподаватель', status:'Активен',
+    birth:'14.03.1991', hired:'02.09.2021', years:'4 г. 9 мес.',
+    thanks:57, ltvMonths:7,
+    // помесячные метрики: удержание, воронка(приход→покупка %), ср.оценка отзывов(0-5), стандарты(0-100), новых ушло, фото-приход вовремя
+    byMonth:{
+      'Январь 2026':{ret:62,funnel:55,rev:4.6,std:90,openJ:0,students:26,newCnt:4,regCnt:22,regCont:8,left:1},
+      'Февраль 2026':{ret:64,funnel:58,rev:4.7,std:92,openJ:0,students:28,newCnt:5,regCnt:23,regCont:9,left:1},
+      'Март 2026':{ret:66,funnel:60,rev:4.7,std:95,openJ:0,students:29,newCnt:4,regCnt:25,regCont:10,left:2},
+      'Апрель 2026':{ret:67,funnel:62,rev:4.8,std:96,openJ:0,students:30,newCnt:5,regCnt:25,regCont:11,left:1},
+      'Май 2026':{ret:67.7,funnel:64,rev:4.8,std:98,openJ:0,students:31,newCnt:6,regCnt:25,regCont:12,left:2},
+      'Июнь 2026':{ret:69,funnel:66,rev:4.9,std:100,openJ:0,students:31,newCnt:6,regCnt:25,regCont:12,left:1},
+    },
+    groups:[
+      {name:'Лезгинка · взрослые (вечер)',st:14,free:2,fill:88,ret:71},
+      {name:'Ансамбль «Эхо»',st:12,free:0,fill:100,ret:74},
+      {name:'Лезгинка · дети 8–11',st:5,free:5,fill:50,ret:58},
+    ],
+    standards:[
+      {nm:'Приход вовремя (за 20 мин до урока)',det:'Фото прихода прикреплено · 21/22 дн.',s:'y'},
+      {nm:'Отметки в журнале проставлены',det:'Все занятия закрыты',s:'y'},
+      {nm:'План работы подготовлен заранее',det:'Загружен на каждую неделю',s:'y'},
+      {nm:'Оценка после открытого урока',det:'Проведён 18.05, оценка 9/10',s:'y'},
+      {nm:'Оценка после отчётного концерта',det:'Концерт в июне — в процессе',s:'p'},
+    ],
+    training:[
+      {dir:'Начальные детские группы',st:'Аттестован',base:1},
+      {dir:'Начальные взрослые группы',st:'Аттестован',base:1},
+      {dir:'Продолжающие группы',st:'Аттестован',base:1},
+      {dir:'Ансамбль',st:'Аттестован',base:1},
+      {dir:'Лезгинка',st:'Аттестован',base:0},
+      {dir:'Вайнахский',st:'В процессе',base:0},
+      {dir:'Постановочная работа',st:'В процессе',base:0},
+    ],
+    attest:[
+      {date:'12.05.2026',dir:'Постановочная работа',res:'Промежуточный',mark:'—',note:'Сдаёт финальную постановку до 30.06'},
+      {date:'03.11.2025',dir:'Лезгинка',res:'Аттестован',mark:'9/10',note:'Отличная техника'},
+    ],
+    reviews:[
+      {who:'Родитель, гр. дети 8–11',src:'Личный кабинет',stars:5,text:'Сын с радостью бежит на занятия, заметный прогресс. Дисциплина без давления.'},
+      {who:'Ученик, ансамбль',src:'Личный кабинет',stars:5,text:'Лучший наставник по технике лезгинки.'},
+    ],
+    ai:{pos:['Дисциплина','Техника','Терпение','Удержание'],neg:['Заполняемость детской группы','Незавершённая аттестация'],
+      verdict:'Сильный педагог 3 категории, стабильно высокий KPI и удержание. Динамика положительная.',
+      rec:'Подтвердить как кандидата в «Педагоги месяца». Дать ассистента на детскую группу.'},
+  },
+  {
+    id:2, name:'Хамит Муратович', initials:'ХМ', phone:'+7 (702) 123 46 58',
+    spec:'High Heels', branch:'Сатпаева 210/1',
+    cat:1, role:'Преподаватель', status:'Стажер',
+    birth:'09.07.1999', hired:'10.06.2026', years:'15 дней',
+    thanks:0, ltvMonths:1,
+    byMonth:{
+      'Январь 2026':null,'Февраль 2026':null,'Март 2026':null,'Апрель 2026':null,'Май 2026':null,
+      'Июнь 2026':{ret:0,funnel:20,rev:0,std:40,openJ:1,students:1,newCnt:1,regCnt:0,regCont:0,left:0},
+    },
+    groups:[{name:'High Heels · вводная',st:1,free:11,fill:8,ret:0}],
+    standards:[
+      {nm:'Приход вовремя (за 20 мин до урока)',det:'Фото прихода не прикреплено 6/15 дн.',s:'p'},
+      {nm:'Отметки в журнале проставлены',det:'Журнал за сегодня не закрыт',s:'n'},
+      {nm:'План работы подготовлен заранее',det:'Загружен частично',s:'p'},
+      {nm:'Оценка после открытого урока',det:'Ещё не проводился',s:'n'},
+      {nm:'Оценка после отчётного концерта',det:'Ещё не участвовал',s:'n'},
+    ],
+    training:[
+      {dir:'Начальные взрослые группы',st:'В процессе',base:1},
+      {dir:'Начальные детские группы',st:'Не начато',base:1},
+      {dir:'Женская техника',st:'В процессе',base:0},
+    ],
+    attest:[{date:'—',dir:'—',res:'Аттестаций ещё не было',mark:'—',note:'Стажёр принят 10.06.2026'}],
+    reviews:[{who:'—',src:'—',stars:0,text:'Отзывов пока нет. Группа набирается.'}],
+    ai:{pos:['Энергичность (отмечено наставником)'],neg:['Не закрыт журнал','Нет набора учеников'],
+      verdict:'Стажёр на ранней стадии, данных для оценки качества недостаточно.',
+      rec:'Закрепить наставника по набору группы. Проконтролировать заполнение журнала.'},
+  }
+];
+
+/* ===== HELPERS ===== */
+const $=id=>document.getElementById(id);
+const money=n=>Math.round(n).toLocaleString('ru-RU')+' тг';
+const retClass=v=>v>=60?'':v>=40?'warn':'bad';
+const catName=c=>c+' категория';
+const catBadge=c=>'b-gray';
+const stars=n=>'★'.repeat(n)+'☆'.repeat(5-n);
+const fillColor=v=>v>=70?'var(--green)':v>=45?'var(--gold)':'var(--red)';
+
+// нормализация компонентов в баллы 0-100
+function kpiComponents(m){
+  if(!m) return null;
+  return {
+    ret:Math.min(100,m.ret),                 // удержание уже %
+    funnel:Math.min(100,m.funnel),           // воронка уже %
+    reviews:Math.round((m.rev/5)*100),       // оценка 0-5 → 0-100
+    standards:m.std,                         // стандарты 0-100
+  };
+}
+function kpiTotal(comp){
+  if(!comp) return 0;
+  const w=KPI_WEIGHTS;
+  return Math.round(comp.ret*w.ret/100 + comp.funnel*w.funnel/100 +
+                    comp.reviews*w.reviews/100 + comp.standards*w.standards/100);
+}
+// ожидаемая ЗП по системе оплаты
+function salary(t,m){
+  if(!m) return null;
+  const c=t.cat;
+  const newSum=m.newCnt*RATES.new[c];
+  const contCnt = c===3 ? (m.regCont||0) : 0;
+  const plainReg = Math.max(0,(m.regCnt||0)-contCnt);
+  const regSum=plainReg*RATES.reg[c];
+  const contSum= c===3 ? contCnt*RATES.regCont[3] : 0;
+  const base=newSum+regSum+contSum;
+  const retOk = m.left<=2;
+  const retBonus = retOk ? base*RETENTION_BONUS[c] : 0;
+  const isWinner = currentWinnerId===t.id;
+  const tomBonus = isWinner ? TEACHER_OF_MONTH_BONUS : 0;
+  return {newCnt:m.newCnt,newSum,plainReg,regSum,contCnt,contSum,base,retOk,retBonus,tomBonus,
+          total:base+retBonus+tomBonus};
+}
+
+let currentWinnerId=1; // утверждённый педагог месяца (демо)
+
+/* ===== RENDER ===== */
+function monthData(t){return t.byMonth[$('fMonth').value];}
+
+function renderTOM(){
+  // ИИ предлагает по максимальному KPI среди активных в выбранном месяце
+  const active=TEACHERS.map(t=>({t,m:monthData(t)})).filter(x=>x.m);
+  let best=null,bestK=-1;
+  active.forEach(x=>{const k=kpiTotal(kpiComponents(x.m));if(k>bestK){bestK=k;best=x.t;}});
+  const winner=TEACHERS.find(t=>t.id===currentWinnerId)||best;
+  const aiPick=best;
+  $('tomBanner').innerHTML = winner ? `
+    <div class="crown"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 7l5.5 4L12 5l3.5 6L21 7l-2 9H5zm0 2h14v2H5z"/></svg></div>
+    <div class="info">
+      <div class="elbl">Педагог месяца · ${$('fMonth').value}</div>
+      <div class="nm">${winner.name}</div>
+      <div class="ai-tag"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>
+        ИИ предлагает: <b>&nbsp;${aiPick?aiPick.name:'—'}</b> (KPI ${bestK}). Бонус +${money(TEACHER_OF_MONTH_BONUS).replace(' тг','')} тг</div>
+    </div>
+    <div class="btns">
+      <button class="btn-sm primary" onclick="approveTOM(${aiPick?aiPick.id:winner.id})">Утвердить выбор ИИ</button>
+      <button class="btn-sm" onclick="toast('Открыт список — выберите другого педагога')">Выбрать другого</button>
+    </div>` : '<div class="info"><div class="elbl">Педагог месяца</div><div class="nm">Нет данных за месяц</div></div>';
+}
+function approveTOM(id){
+  currentWinnerId=id;
+  const t=TEACHERS.find(x=>x.id===id);
+  toast('Педагог месяца утверждён: '+t.name+' (+20 000 тг)');
+  renderAll();
+}
+
+function renderSpotlight(list){
+  $('spotlight').innerHTML=list.map(t=>{
+    const m=monthData(t); const comp=kpiComponents(m); const k=kpiTotal(comp);
+    const win=currentWinnerId===t.id;
+    return `<div class="tcard ${win?'winner':''}">
+      ${win?`<div class="wbadge"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 16L3 7l5.5 4L12 5l3.5 6L21 7l-2 9H5z"/></svg>Педагог месяца</div>`:''}
+      <div class="top"><div class="ava">${t.initials}</div><h3>${t.name}</h3></div>
+      <div class="stat-grid">
+        <div class="st"><div class="k">Ученики</div><div class="v">${m?m.students:'—'}</div></div>
+        <div class="st"><div class="k">Удержание</div><div class="v">${m?m.ret+'%':'—'}</div></div>
+        <div class="st"><div class="k">KPI</div><div class="v">${m?k:'—'}</div></div>
+        <div class="st"><div class="k">Спасибо</div><div class="v">${t.thanks}</div></div>
+      </div>
+      <button class="open-link" onclick="openCard(${t.id})">Открыть карточку ›</button>
+    </div>`;}).join('');
+}
+function renderTable(list){
+  $('tbody').innerHTML=list.map(t=>{
+    const m=monthData(t); const k=kpiTotal(kpiComponents(m)); const sal=salary(t,m);
+    return `<tr onclick="openCard(${t.id})">
+      <td class="who"><b>${t.name}</b><span>${t.phone} · ${m?m.students:0} уч.</span></td>
+      <td>${t.spec}</td><td>${t.branch}</td>
+      <td><span class="badge ${catBadge(t.cat)}">${catName(t.cat)}</span></td>
+      <td>${m?`<div class="meter ${retClass(m.ret)}"><span style="width:${m.ret}%"></span></div><small style="color:var(--muted)">${m.ret}%</small>`:'—'}</td>
+      <td><b>${m?k:'—'}</b></td>
+      <td>${sal?money(sal.total):'—'}</td>
+      <td><span class="badge b-role">${t.role}</span></td>
+      <td onclick="event.stopPropagation()"><div class="acts">
+        <button class="icn" title="Редактировать" onclick="toast('Редактирование: ${t.name}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4z"/></svg></button>
+        <button class="icn" title="Архивировать" onclick="toast('Архивировать: ${t.name}')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+      </div></td>
+    </tr>`;}).join('');
+  $('cnt').textContent=list.length+' преподавателей в сети';
+}
+function renderTiles(list){
+  const withM=list.map(t=>({t,m:monthData(t)})).filter(x=>x.m);
+  const avgRet=withM.length?(withM.reduce((s,x)=>s+x.m.ret,0)/withM.length):0;
+  const avgKpi=withM.length?(withM.reduce((s,x)=>s+kpiTotal(kpiComponents(x.m)),0)/withM.length):0;
+  $('tileRet').querySelector('.val').textContent=avgRet.toFixed(1)+'%';
+  $('tileKpi').querySelector('.val').textContent=Math.round(avgKpi);
+}
+
+/* ===== FILTERS ===== */
+function applyFilters(){
+  const b=$('fBranch').value,c=$('fCat').value,s=$('fStatus').value,fl=$('fFlag').value;
+  let list=TEACHERS.filter(t=>{
+    const m=monthData(t);
+    return (!b||t.branch===b)&&(!c||catName(t.cat)===c)&&(!s||t.status===s)&&
+      (!fl||
+        (fl==='low'&&m&&m.ret<40)||
+        (fl==='journal'&&m&&m.openJ>0)||
+        (fl==='winner'&&t.id===currentWinnerId));
+  });
+  renderSpotlight(list);renderTable(list);renderTiles(list);renderTOM();
+}
+function renderAll(){applyFilters();}
+
+/* ===== CARD ===== */
+function openCard(id){
+  const t=TEACHERS.find(x=>x.id===id); const m=monthData(t);
+  $('cAva').textContent=t.initials;
+  $('cName').textContent=t.name;
+  $('cMeta').textContent=`${t.spec} · ${t.branch} · ${catName(t.cat)} · ${$('fMonth').value}`;
+  const TABS=[['info','Общая'],['kpi','KPI'],['groups','Группы'],['std','Стандарты'],
+    ['train','Обучение'],['att','Аттестация'],['rev','Отзывы'],['ai','AI-анализ'],['sal','Ожидаемая ЗП']];
+  $('tabs').innerHTML=TABS.map((x,i)=>`<button class="tab ${i===0?'active':''}" onclick="switchTab('${x[0]}')">${x[1]}</button>`).join('');
+  $('panes').innerHTML=buildPanes(t,m);
+  $('overlay').classList.add('open');document.body.style.overflow='hidden';
+}
+function closeCard(){$('overlay').classList.remove('open');document.body.style.overflow='';}
+function switchTab(key){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.getAttribute('onclick').includes(`'${key}'`)));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('active',p.id==='pane-'+key));
+}
+
+function buildPanes(t,m){
+  const comp=kpiComponents(m); const k=kpiTotal(comp); const sal=salary(t,m);
+  // INFO
+  let info=`<div class="pane active" id="pane-info"><h4>Основная информация</h4><div class="grid3">
+    <div class="info"><div class="k">Телефон</div><div class="v">${t.phone}</div></div>
+    <div class="info"><div class="k">Дата рождения</div><div class="v">${t.birth}</div></div>
+    <div class="info"><div class="k">Принят на работу</div><div class="v">${t.hired}</div></div>
+    <div class="info"><div class="k">Стаж работы</div><div class="v">${t.years}</div></div>
+    <div class="info"><div class="k">LTV учеников</div><div class="v">${t.ltvMonths} мес.</div></div>
+    <div class="info"><div class="k">Категория</div><div class="v">${catName(t.cat)}</div></div>
+    <div class="info"><div class="k">Роль</div><div class="v">${t.role}</div></div>
+    <div class="info"><div class="k">Статус</div><div class="v">${t.status}</div></div>
+    <div class="info"><div class="k">Специализация</div><div class="v">${t.spec}</div></div>
+  </div></div>`;
+
+  // KPI
+  let kpiPane=`<div class="pane" id="pane-kpi">`;
+  if(!comp){ kpiPane+=`<p style="color:var(--muted)">За ${$('fMonth').value} данных нет — педагог в этом месяце не работал.</p>`; }
+  else{
+    const rows=[
+      ['Удержание из мес. в мес.',comp.ret,KPI_WEIGHTS.ret],
+      ['Воронка ПУ (приход → покупка)',comp.funnel,KPI_WEIGHTS.funnel],
+      ['Отзывы родителей',comp.reviews,KPI_WEIGHTS.reviews],
+      ['Выполнение стандартов',comp.standards,KPI_WEIGHTS.standards],
+    ];
+    kpiPane+=`<div class="kpi final" style="margin-bottom:18px"><div class="v">${k}</div><div class="k">Итоговый KPI за ${$('fMonth').value} · из 100</div></div>`;
+    kpiPane+=rows.map(r=>`<div class="kbar"><div class="hd"><span class="nm">${r[0]}</span>
+      <span><span class="wt">вес ${r[2]}% · </span><span class="sc">${r[1]}</span></span></div>
+      <div class="track"><div class="fill" style="width:${r[1]}%;background:${fillColor(r[1])}"></div></div></div>`).join('');
+    kpiPane+=`<p class="note">Итог = удержание×${KPI_WEIGHTS.ret}% + воронка×${KPI_WEIGHTS.funnel}% + отзывы×${KPI_WEIGHTS.reviews}% + стандарты×${KPI_WEIGHTS.standards}%. Влияет на категорию, звание «Педагог месяца» и бонусы.</p>`;
+  }
+  kpiPane+=`</div>`;
+
+  // GROUPS
+  let groups=`<div class="pane" id="pane-groups"><h4>Закреплённые группы</h4>`+
+    t.groups.map(g=>`<div class="row-item">
+      <div><div class="ttl">${g.name}</div><div class="det">${g.st} учеников · свободно ${g.free} · удержание ${g.ret}%</div></div>
+      <div style="text-align:right"><div class="meter ${retClass(g.fill)}" style="margin-left:auto"><span style="width:${g.fill}%"></span></div>
+      <small style="color:var(--muted)">заполн. ${g.fill}%</small></div></div>`).join('')+`</div>`;
+
+  // STANDARDS
+  const sLabel={y:'✓',n:'✕',p:'~'};
+  let std=`<div class="pane" id="pane-std"><h4>Базовые стандарты · ${$('fMonth').value}</h4>`+
+    t.standards.map(x=>`<div class="std"><div class="ck ${x.s}">${sLabel[x.s]}</div>
+      <div class="body"><div class="nm">${x.nm}</div><div class="det">${x.det}</div></div></div>`).join('')+
+    `<p class="note">Выполнение стандартов даёт процент (компонент KPI, вес ${KPI_WEIGHTS.standards}%) и влияет на бонусы и звание «Педагог месяца». ✓ выполнено · ~ частично · ✕ нет.</p></div>`;
+
+  // TRAINING
+  function tb(s){return s==='Аттестован'?'b-green':s==='В процессе'?'b-role':'b-gray';}
+  const base=t.training.filter(x=>x.base),extra=t.training.filter(x=>!x.base);
+  let train=`<div class="pane" id="pane-train"><div class="sec-label">Базовая программа</div>`+
+    base.map(x=>`<div class="train-item"><div class="hd"><span class="nm">${x.dir}</span><span class="badge ${tb(x.st)}">${x.st}</span></div></div>`).join('')+
+    `<div class="sec-label">Дополнительные направления</div>`+
+    extra.map(x=>`<div class="train-item"><div class="hd"><span class="nm">${x.dir}</span><span class="badge ${tb(x.st)}">${x.st}</span></div></div>`).join('')+`</div>`;
+
+  // ATTEST
+  let att=`<div class="pane" id="pane-att"><h4>История аттестаций</h4>`+
+    t.attest.map(a=>`<div class="row-item"><div><div class="ttl">${a.dir} ${a.mark!=='—'?'· '+a.mark:''}</div><div class="det">${a.note}</div></div>
+      <div style="text-align:right"><span class="badge ${a.res==='Аттестован'?'b-green':'b-gray'}">${a.res}</span><div class="det">${a.date}</div></div></div>`).join('')+
+    `<p class="note">История сохраняется бессрочно.</p></div>`;
+
+  // REVIEWS
+  let rev=`<div class="pane" id="pane-rev"><h4>Отзывы и оценки</h4>`+
+    t.reviews.map(r=>`<div class="review"><div class="hd"><div><span class="stars">${r.stars?stars(r.stars):''}</span> <span class="src">${r.who} · ${r.src}</span></div></div><p>${r.text}</p></div>`).join('')+`</div>`;
+
+  // AI
+  const a=t.ai;
+  let ai=`<div class="pane" id="pane-ai"><div class="ai-box">
+    <div class="ttl"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>AI-анализ работы · ${$('fMonth').value}</div>
+    <div class="sec-label">Сильные стороны</div><div class="pill-list">${a.pos.map(p=>`<span class="pill b-green">${p}</span>`).join('')}</div>
+    <div class="sec-label">Замечания</div><div class="pill-list">${a.neg.map(p=>`<span class="pill b-red">${p}</span>`).join('')}</div>
+    <div class="sec-label">Заключение</div><p>${a.verdict}</p>
+    <div class="sec-label">Рекомендация по «Педагогу месяца»</div><p>${a.rec}</p>
+  </div></div>`;
+
+  // SALARY
+  let salPane=`<div class="pane" id="pane-sal">`;
+  if(!sal){ salPane+=`<p style="color:var(--muted)">За ${$('fMonth').value} расчёта нет.</p>`; }
+  else{
+    salPane+=`<div class="sal-hero"><div class="k">Ожидаемая ЗП · ${$('fMonth').value}</div>
+      <div class="v">${money(sal.total)}</div><div class="sub">прогноз по текущим данным месяца · ${catName(t.cat)}</div></div>`;
+    salPane+=`<h4>Из чего складывается</h4>`;
+    if(sal.newCnt) salPane+=`<div class="sal-line"><span>Новенькие · ${sal.newCnt} × ${money(RATES.new[t.cat])}</span><span>${money(sal.newSum)}</span></div>`;
+    if(sal.plainReg) salPane+=`<div class="sal-line"><span>Постоянные · ${sal.plainReg} × ${money(RATES.reg[t.cat])}</span><span>${money(sal.regSum)}</span></div>`;
+    if(sal.contCnt) salPane+=`<div class="sal-line"><span>Постоянные, продолжающая · ${sal.contCnt} × ${money(RATES.regCont[3])}</span><span>${money(sal.contSum)}</span></div>`;
+    salPane+=`<div class="sal-line"><span><b>Базовая часть</b></span><span><b>${money(sal.base)}</b></span></div>`;
+    salPane+=`<div class="sal-line"><span>Бонус удержания ${sal.retOk?`(+${RETENTION_BONUS[t.cat]*100}%, ушло ≤2)`:'(не начислен, ушло >2)'}</span><span class="${sal.retOk?'pos':''}">${sal.retOk?'+ '+money(sal.retBonus):money(0)}</span></div>`;
+    salPane+=`<div class="sal-line"><span>Бонус «Педагог месяца» ${sal.tomBonus?'':'(не присвоен)'}</span><span class="${sal.tomBonus?'pos':''}">${sal.tomBonus?'+ '+money(sal.tomBonus):money(0)}</span></div>`;
+    salPane+=`<div class="sal-line total"><span>Итого к выплате</span><span>${money(sal.total)}</span></div>`;
+    salPane+=`<p class="note">Виден педагогу, владельцу и управляющему. Ставки и бонусы — по системе оплаты Эхо Гор 2025–2026.</p>`;
+  }
+  salPane+=`</div>`;
+
+  return info+kpiPane+groups+std+train+att+rev+ai+salPane;
+}
+
+/* ===== TOAST ===== */
+function toast(msg){
+  const c=$('toasts');const el=document.createElement('div');
+  el.className='toast';el.innerHTML=`<span class="dot"></span><span>${msg}</span>`;
+  c.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(()=>el.remove(),250)},2600);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeCard()});
+
+/* ===== INIT ===== */
+$('fMonth').innerHTML=MONTHS.map((m,i)=>`<option ${i===MONTHS.length-1?'selected':''}>${m}</option>`).join('');
+renderAll();
+</script>
+</body>
+</html>
