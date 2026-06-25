@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Расписание — Эхо Гор CRM</title>
+<style>
+  :root{
+    --bg:#F3F4F6; --card:#FFFFFF; --ink:#1F2430; --muted:#7B8294;
+    --line:#E6E8EE; --gold:#C9A24B; --gold-soft:#FBF4E2; --gold-ink:#A8842F;
+    --green:#2E9E6B; --green-soft:#E7F4EC; --red:#D8623B; --red-soft:#FBEAE3;
+    --blue:#4B6FB0; --blue-soft:#E9EEF7; --purple:#7A5BD0; --purple-soft:#EFEAFB;
+    --shadow:0 10px 30px rgba(31,36,48,.06); --r:18px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+  .app{display:flex;min-height:100vh}
+  .side{width:280px;flex-shrink:0;padding:24px 20px;display:flex;flex-direction:column;gap:8px}
+  .side .intro{background:var(--card);border-radius:var(--r);padding:18px 20px;color:var(--muted);
+    font-size:14px;box-shadow:var(--shadow);margin-bottom:8px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:13px 18px;border-radius:999px;
+    color:var(--muted);text-decoration:none;font-weight:600;font-size:15px;transition:.15s;cursor:pointer}
+  .nav a:hover{background:#EAECF1}
+  .nav a.active{background:var(--gold-soft);color:var(--gold-ink)}
+  .nav a svg{width:18px;height:18px;flex-shrink:0}
+  .rbac{margin-top:auto;background:var(--green-soft);border-radius:var(--r);padding:18px 20px}
+  .rbac .tag{color:var(--green);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .rbac b{display:block;margin:6px 0 4px;font-size:16px}
+  .rbac p{color:var(--muted);font-size:13px}
+
+  .main{flex:1;padding:32px 40px;max-width:1600px}
+  .head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:22px}
+  .eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink)}
+  h1{font-size:34px;font-weight:800;letter-spacing:-.02em;margin-top:4px}
+  .head-btns{display:flex;gap:10px;flex-wrap:wrap}
+  .btn-gold{background:var(--gold);color:#fff;border:none;border-radius:999px;padding:13px 22px;
+    font-weight:800;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.15s;
+    box-shadow:0 6px 16px rgba(201,162,75,.35)}
+  .btn-gold:hover{filter:brightness(1.05)}
+  .btn-gold.soft{background:var(--gold-soft);color:var(--gold-ink);box-shadow:none}
+  .btn-gold.soft:hover{background:#F4E8C8}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:13px 20px;
+    font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-ink)}
+  .icn-btn{width:46px;height:46px;border:1px solid var(--line);background:#fff;border-radius:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .icn-btn:hover{border-color:var(--gold);color:var(--gold-ink)}
+
+  /* toolbar */
+  .toolbar{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:14px 18px;
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+  .filters{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .filters .fic{color:var(--muted);display:flex;align-items:center}
+  select{background:#F6F7F9;border:1px solid var(--line);border-radius:12px;padding:9px 14px;font-size:14px;
+    color:var(--ink);font-weight:600;cursor:pointer;outline:none}
+  select:focus{border-color:var(--gold)}
+  .modes{display:flex;background:#F6F7F9;border-radius:12px;padding:4px;gap:2px}
+  .modes button{border:none;background:none;padding:8px 16px;border-radius:9px;font-weight:700;font-size:14px;
+    color:var(--muted);cursor:pointer}
+  .modes button.active{background:var(--gold);color:#fff}
+  .nav-week{display:flex;align-items:center;gap:8px}
+  .nav-week button{width:38px;height:38px;border:1px solid var(--line);background:#fff;border-radius:10px;cursor:pointer;color:var(--muted)}
+  .nav-week .today{width:auto;padding:0 16px;font-weight:700;font-size:14px}
+  .date-pill{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;
+    padding:9px 14px;font-weight:700;font-size:14px}
+
+  .layout{display:grid;grid-template-columns:1fr 320px;gap:18px}
+  @media(max-width:1100px){.layout{grid-template-columns:1fr}}
+
+  /* form panel */
+  .panel{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:24px 26px;margin-bottom:18px;display:none}
+  .panel.open{display:block;animation:rise .2s}
+  @keyframes rise{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .panel h3{font-size:18px;font-weight:800;margin-bottom:18px}
+  .form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:760px){.form-grid{grid-template-columns:1fr}}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field.full{grid-column:1/-1}
+  .field label{font-size:12px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+  .field input,.field select,.field textarea{border:1px solid var(--line);border-radius:12px;padding:11px 14px;
+    font-size:14px;outline:none;background:#F6F7F9;font-family:inherit}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold);background:#fff}
+  .age-row{display:flex;gap:10px}
+  .age-row input{width:100%}
+  .days-pick{display:flex;gap:6px;flex-wrap:wrap}
+  .day-chip{padding:8px 13px;border:1px solid var(--line);border-radius:10px;font-weight:700;font-size:13px;
+    cursor:pointer;background:#F6F7F9;color:var(--muted);user-select:none}
+  .day-chip.on{background:var(--gold);color:#fff;border-color:var(--gold)}
+  .panel-foot{display:flex;gap:10px;margin-top:20px}
+  .conflict{background:var(--red-soft);color:var(--red);border-radius:12px;padding:12px 16px;font-size:14px;
+    font-weight:600;margin-top:16px;display:none}
+  .conflict.show{display:block}
+
+  /* calendar */
+  .cal-wrap{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+  .cal{display:grid;grid-template-columns:64px repeat(7,1fr)}
+  .cal.day-mode{grid-template-columns:64px 1fr}
+  .cal-head{padding:16px 8px;text-align:center;border-bottom:1px solid var(--line);border-left:1px solid var(--line)}
+  .cal-head:first-child{border-left:none}
+  .cal-head .dow{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .cal-head .dnum{font-size:17px;font-weight:800;margin-top:2px}
+  .cal-head.today{background:var(--gold-soft)}
+  .cal-head.today .dnum{color:var(--gold-ink)}
+  .cal-corner{border-bottom:1px solid var(--line)}
+  .time-col{font-size:12px;color:var(--muted);font-weight:600;padding:8px;text-align:right;border-top:1px solid var(--line);height:64px}
+  .slot{border-top:1px solid var(--line);border-left:1px solid var(--line);height:64px;position:relative;cursor:pointer;transition:.1s}
+  .slot:hover{background:#FAFBFC}
+  .slot.today-col{background:rgba(201,162,75,.04)}
+  .lesson{position:absolute;left:3px;right:3px;border-radius:8px;padding:5px 8px;font-size:11px;font-weight:700;
+    overflow:hidden;cursor:pointer;color:#fff;z-index:2}
+  .lesson .t{font-size:10px;opacity:.85;font-weight:600}
+  .lesson.c1{background:var(--gold)} .lesson.c2{background:var(--blue)}
+  .lesson.c3{background:var(--green)} .lesson.c4{background:var(--purple)}
+  .lesson.single{background:var(--red)}
+
+  /* month view */
+  .month{display:grid;grid-template-columns:repeat(7,1fr)}
+  .month .mh{padding:12px;text-align:center;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line);border-left:1px solid var(--line)}
+  .month .mh:first-child{border-left:none}
+  .mcell{min-height:104px;border-top:1px solid var(--line);border-left:1px solid var(--line);padding:6px 8px}
+  .mcell:nth-child(7n+1){border-left:none}
+  .mcell .dn{font-size:13px;font-weight:700;color:var(--muted)}
+  .mcell.today .dn{color:var(--gold-ink)}
+  .mcell .ev{margin-top:4px;font-size:10px;font-weight:700;color:#fff;border-radius:6px;padding:2px 6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+  /* right dashboard */
+  .rail{display:flex;flex-direction:column;gap:18px}
+  .rcard{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:22px}
+  .rcard .rt{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold-ink);margin-bottom:16px}
+  .stat{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .stat:last-child{margin-bottom:0}
+  .stat .ic{width:42px;height:42px;border-radius:12px;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;color:var(--gold-ink);flex-shrink:0}
+  .stat .ic svg{width:20px;height:20px}
+  .stat .v{font-size:24px;font-weight:800;line-height:1}
+  .stat .k{font-size:13px;color:var(--muted);margin-top:2px}
+  .hall{margin-bottom:14px}
+  .hall:last-child{margin-bottom:0}
+  .hall .hl{display:flex;justify-content:space-between;font-size:14px;font-weight:700;margin-bottom:6px}
+  .hall .bar{height:8px;border-radius:4px;background:#EEF0F4;overflow:hidden}
+  .hall .bar span{display:block;height:100%;border-radius:4px;background:var(--gold)}
+
+  /* AI block */
+  .ai{background:linear-gradient(135deg,#FBF4E2,#fff);border:1px solid #EFE2C0}
+  .ai .rt{color:var(--gold-ink);display:flex;align-items:center;gap:8px}
+  .ai .rt svg{width:18px;height:18px}
+  .ai-free{font-size:14px;margin-bottom:14px}
+  .ai-free .h{font-weight:800;margin-bottom:4px}
+  .ai-free .row{color:var(--muted);font-weight:600;padding:2px 0}
+  .ai-q{width:100%;border:1px solid #EAD9A8;border-radius:12px;padding:10px 14px;font-size:13px;background:#fff;
+    text-align:left;cursor:pointer;margin-bottom:8px;font-weight:600;color:var(--ink);font-family:inherit}
+  .ai-q:hover{border-color:var(--gold);color:var(--gold-ink)}
+  .ai-ans{background:#fff;border-radius:12px;padding:14px;font-size:14px;margin-top:6px;display:none;border:1px solid var(--line)}
+  .ai-ans.show{display:block}
+
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(20,24,33,.55);display:none;z-index:50;backdrop-filter:blur(3px);padding:40px 20px;overflow-y:auto}
+  .overlay.open{display:flex;align-items:flex-start;justify-content:center}
+  .sheet{background:var(--bg);width:100%;max-width:620px;border-radius:24px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);animation:rise .25s}
+  .sheet-head{background:var(--card);padding:26px 30px;display:flex;justify-content:space-between;align-items:center}
+  .sheet-head h2{font-size:22px;font-weight:800}
+  .close{width:38px;height:38px;border:none;background:#EEF0F4;border-radius:11px;font-size:19px;cursor:pointer;color:var(--muted)}
+  .sheet-body{padding:24px 30px 30px}
+
+  .lesson-detail .dl{display:flex;justify-content:space-between;padding:11px 0;border-top:1px solid var(--line);font-size:15px}
+  .lesson-detail .dl:first-child{border:none}
+  .lesson-detail .dl .lbl{color:var(--muted)}
+  .badge{display:inline-block;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:800}
+  .b-gold{color:var(--gold-ink);background:var(--gold-soft)}
+
+  .toasts{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:90}
+  .toast{background:var(--ink);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;animation:rise .2s;max-width:360px}
+  .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+  .toast.err .dot{background:var(--red)}
+
+  @media(max-width:900px){.side{display:none}.main{padding:20px 16px}h1{font-size:26px}
+    .cal,.cal.day-mode{overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="intro">Вся сеть, финансы, филиалы, люди, риски и точки роста в одном executive-центре.</div>
+    <nav class="nav">
+      <a href="../index.html"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg>Ученики</a>
+      <a href="teachers-echo-gor.html"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10L12 5 2 10l10 5 10-5zM6 12v5c0 1 3 3 6 3s6-2 6-3v-5"/></svg>Преподаватели</a>
+      <a onclick="toast('Раздел: Зарплаты')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M2 7h20v12H2zM2 11h20"/></svg>Зарплаты</a>
+      <a onclick="toast('Раздел: Журнал посещаемости')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>Журнал посещаемости</a>
+      <a class="active"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Расписание</a>
+      <a onclick="toast('Раздел: Настройки сети')"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1l-.4-2.5h-4l-.4 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 1.7 1l.4 2.5h4l.4-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5z"/></svg>Настройки сети</a>
+    </nav>
+    <div class="rbac">
+      <span class="tag">Полный доступ</span>
+      <b>Network Owner RBAC</b>
+      <p>Видит все филиалы, финансы, роли, настройки, audit log и AI-аналитику сети.</p>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div>
+        <div class="eyebrow">Сеть филиалов</div>
+        <h1>Расписание занятий</h1>
+      </div>
+      <div class="head-btns">
+        <button class="btn-gold soft" onclick="openPanel('lesson')">+ Новый урок</button>
+        <button class="btn-ghost" onclick="openPanel('group')">+ Создать группу</button>
+        <button class="icn-btn" onclick="render();toast('Расписание обновлено')" title="Обновить"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="18" height="18"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.5 9a9 9 0 0 1 14.8-3.4L23 10M1 14l4.7 4.4A9 9 0 0 0 20.5 15"/></svg></button>
+      </div>
+    </div>
+
+    <!-- toolbar -->
+    <div class="toolbar">
+      <div class="filters">
+        <span class="fic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M22 3H2l8 9.5V19l4 2v-8.5z"/></svg></span>
+        <select id="fBranch" onchange="render()"><option value="">Все филиалы</option><option>Эхо Гор Чокина 109/1</option><option>Сатпаева 210/1</option></select>
+        <select id="fTeacher" onchange="render()"><option value="">Все преподаватели</option><option>Аслан Плиев</option><option>Хамит Муратович</option></select>
+        <select id="fHall" onchange="render()"><option value="">Все залы</option><option>Главный зал</option><option>Малый зал</option><option>Зеркальный зал</option></select>
+        <select id="fGroup" onchange="render()"><option value="">Все группы</option></select>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div class="modes">
+          <button id="mDay" onclick="setMode('day')">День</button>
+          <button id="mWeek" class="active" onclick="setMode('week')">Неделя</button>
+          <button id="mMonth" onclick="setMode('month')">Месяц</button>
+        </div>
+        <div class="nav-week">
+          <button onclick="shift(-1)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <button class="today" onclick="goToday()">Сегодня</button>
+          <button onclick="shift(1)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M9 18l6-6-6-6"/></svg></button>
+        </div>
+        <div class="date-pill"><svg fill="none" stroke="var(--gold-ink)" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg><span id="rangeLabel">22 – 28 июн 2026</span></div>
+      </div>
+    </div>
+
+    <!-- create group panel -->
+    <div class="panel" id="panel-group">
+      <h3>Создать группу</h3>
+      <div class="form-grid">
+        <div class="field"><label>Название *</label><input id="gName" placeholder="Название группы"></div>
+        <div class="field"><label>Филиал *</label><select id="gBranch"><option>Эхо Гор Чокина 109/1</option><option>Сатпаева 210/1</option></select></div>
+        <div class="field"><label>Преподаватель *</label><select id="gTeacher"><option>Аслан Плиев</option><option>Хамит Муратович</option></select></div>
+        <div class="field"><label>Зал *</label><select id="gHall"><option>Главный зал</option><option>Малый зал</option><option>Зеркальный зал</option></select></div>
+        <div class="field"><label>Возраст от–до</label><div class="age-row"><input id="gAgeFrom" type="number" placeholder="5"><input id="gAgeTo" type="number" placeholder="12"></div></div>
+        <div class="field"><label>Уровень</label><select id="gLevel"><option>Начинающие</option><option>Продолжающие</option><option>Ансамбль</option></select></div>
+        <div class="field"><label>Дни занятий *</label><div class="days-pick" id="gDays"></div></div>
+        <div class="field"><label>Время *</label><input id="gTime" placeholder="18:30–20:00"></div>
+      </div>
+      <div class="conflict" id="gConflict"></div>
+      <div class="panel-foot">
+        <button class="btn-gold" onclick="createGroup()">Создать</button>
+        <button class="btn-ghost" onclick="closePanel('group')">Отмена</button>
+      </div>
+    </div>
+
+    <!-- new lesson panel -->
+    <div class="panel" id="panel-lesson">
+      <h3>Новый урок <span style="font-weight:600;color:var(--muted);font-size:14px">— разовое занятие, замена или дополнительный урок</span></h3>
+      <div class="form-grid">
+        <div class="field"><label>Филиал *</label><select id="lBranch"><option>Эхо Гор Чокина 109/1</option><option>Сатпаева 210/1</option></select></div>
+        <div class="field"><label>Группа</label><select id="lGroup"><option value="">— разовое (без группы)</option></select></div>
+        <div class="field"><label>Педагог *</label><select id="lTeacher"><option>Аслан Плиев</option><option>Хамит Муратович</option></select></div>
+        <div class="field"><label>Зал *</label><select id="lHall"><option>Главный зал</option><option>Малый зал</option><option>Зеркальный зал</option></select></div>
+        <div class="field"><label>Дата *</label><input id="lDate" type="date"></div>
+        <div class="field"><label>Время *</label><input id="lTime" placeholder="19:00–20:00"></div>
+        <div class="field full"><label>Комментарий</label><input id="lNote" placeholder="Например: замена, мастер-класс"></div>
+      </div>
+      <div class="conflict" id="lConflict"></div>
+      <div class="panel-foot">
+        <button class="btn-gold" onclick="createLesson()">Создать урок</button>
+        <button class="btn-ghost" onclick="closePanel('lesson')">Отмена</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="cal-wrap" id="calWrap"></div>
+      <div class="rail">
+        <div class="rcard">
+          <div class="rt">Сегодня</div>
+          <div class="stat"><div class="ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div><div><div class="v" id="sLessons">0</div><div class="k">Занятий</div></div></div>
+          <div class="stat"><div class="ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/></svg></div><div><div class="v" id="sStudents">0</div><div class="k">Учеников на занятиях</div></div></div>
+          <div class="stat"><div class="ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h4l3 8 4-16 3 8h4"/></svg></div><div><div class="v" id="sFill">0%</div><div class="k">Заполняемость</div></div></div>
+          <div class="stat"><div class="ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 12-9 12s-9-5-9-12a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div><div><div class="v" id="sFree">0</div><div class="k">Свободных мест</div></div></div>
+        </div>
+        <div class="rcard">
+          <div class="rt">Загрузка залов сегодня</div>
+          <div id="hallsLoad"></div>
+        </div>
+        <div class="rcard ai">
+          <div class="rt"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2l2 6 6 2-6 2-2 6-2-6-6-2 6-2z"/></svg>AI: свободные окна студии</div>
+          <div class="ai-free" id="aiFree"></div>
+          <button class="ai-q" onclick="aiAnswer('child')">Где открыть детскую группу?</button>
+          <button class="ai-q" onclick="aiAnswer('evening')">Где взрослая группа вечером?</button>
+          <button class="ai-q" onclick="aiAnswer('hall')">Когда свободен Главный зал?</button>
+          <button class="ai-q" onclick="aiAnswer('teacher')">У кого из педагогов есть окна?</button>
+          <div class="ai-ans" id="aiAns"></div>
+        </div>
+      </div>
+    </div>
+
+    <p style="color:var(--muted);font-size:13px;margin-top:18px;max-width:760px">Расписание — база сети: от него работают абонементы (расчёт занятий в месяце), пробные уроки (выбор доступного занятия), журнал посещаемости (авто-создание дат), карточки групп и педагогов. Связь данных активируется на сервере.</p>
+  </main>
+</div>
+
+<!-- lesson detail modal -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+  <div class="sheet">
+    <div class="sheet-head"><h2 id="mTitle">Занятие</h2><button class="close" onclick="closeModal()">×</button></div>
+    <div class="sheet-body" id="mBody"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ===== CONFIG ===== */
+const DOW=['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+const MONTHS_RU=['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const HALLS=['Главный зал','Малый зал','Зеркальный зал'];
+const HOURS=[];for(let h=9;h<=21;h++)HOURS.push(h);
+
+/* ===== STATE ===== */
+let mode='week';
+let anchor=new Date(2026,5,25); // 25 июня 2026 (как на скриншоте)
+const TODAY=new Date(2026,5,25);
+
+/* ===== DATA: группы (повторяющиеся занятия) ===== */
+let GROUPS=[
+  {id:1,name:'Лезгинка · дети 8–11',branch:'Эхо Гор Чокина 109/1',teacher:'Аслан Плиев',hall:'Главный зал',level:'Начинающие',ageFrom:8,ageTo:11,days:[0,2,4],start:'16:00',end:'17:00',cap:12,students:5,color:'c1'},
+  {id:2,name:'Лезгинка · взрослые',branch:'Эхо Гор Чокина 109/1',teacher:'Аслан Плиев',hall:'Главный зал',level:'Продолжающие',ageFrom:16,ageTo:40,days:[0,2,4],start:'18:30',end:'20:00',cap:16,students:14,color:'c1'},
+  {id:3,name:'Ансамбль «Эхо»',branch:'Эхо Гор Чокина 109/1',teacher:'Аслан Плиев',hall:'Зеркальный зал',level:'Ансамбль',ageFrom:14,ageTo:30,days:[1,3],start:'19:00',end:'21:00',cap:12,students:12,color:'c3'},
+  {id:4,name:'High Heels · вводная',branch:'Сатпаева 210/1',teacher:'Хамит Муратович',hall:'Малый зал',level:'Начинающие',ageFrom:16,ageTo:35,days:[1,4],start:'19:00',end:'20:00',cap:12,students:1,color:'c2'},
+];
+/* разовые уроки: ключ — дата YYYY-MM-DD */
+let LESSONS=[];
+let nextGroupId=5, nextLessonId=1;
+
+/* ===== HELPERS ===== */
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+const startOfWeek=d=>{const x=new Date(d);const wd=(x.getDay()+6)%7;return addDays(x,-wd);};
+const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m;};
+const sameDay=(a,b)=>a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();
+function filt(){return{br:$('fBranch').value,te:$('fTeacher').value,ha:$('fHall').value,gr:$('fGroup').value};}
+function passFilter(o){const f=filt();return(!f.br||o.branch===f.br)&&(!f.te||o.teacher===f.te)&&(!f.ha||o.hall===f.ha)&&(!f.gr||String(o.id)===f.gr||o.name===f.gr);}
+
+/* занятия на конкретную дату (из групп по дню недели + разовые) */
+function lessonsOn(date){
+  const wd=(date.getDay()+6)%7;
+  const out=[];
+  GROUPS.forEach(g=>{if(g.days.includes(wd)&&passFilter(g))out.push({...g,kind:'group',date:ymd(date)});});
+  LESSONS.forEach(l=>{if(l.date===ymd(date)&&passFilter(l))out.push({...l,kind:'single'});});
+  return out;
+}
+
+/* ===== RENDER ===== */
+function setMode(m){mode=m;['Day','Week','Month'].forEach(x=>$('m'+x).classList.toggle('active',x.toLowerCase()===m));render();}
+function shift(dir){const step=mode==='day'?1:mode==='month'?30:7;anchor=addDays(anchor,dir*step);render();}
+function goToday(){anchor=new Date(TODAY);render();}
+
+function fmtRange(){
+  if(mode==='day')return `${anchor.getDate()} ${MONTHS_RU[anchor.getMonth()]} ${anchor.getFullYear()}`;
+  if(mode==='month')return `${MONTHS_RU[anchor.getMonth()]} ${anchor.getFullYear()}`;
+  const s=startOfWeek(anchor),e=addDays(s,6);
+  return `${s.getDate()} – ${e.getDate()} ${MONTHS_RU[e.getMonth()]} ${e.getFullYear()}`;
+}
+
+function render(){
+  syncGroupSelects();
+  $('rangeLabel').textContent=fmtRange();
+  if(mode==='month')renderMonth();else renderWeekDay();
+  renderRail();
+  renderAIFree();
+}
+
+function renderWeekDay(){
+  const days=mode==='day'?[new Date(anchor)]:Array.from({length:7},(_,i)=>addDays(startOfWeek(anchor),i));
+  let h=`<div class="cal ${mode==='day'?'day-mode':''}">`;
+  h+=`<div class="cal-corner"></div>`;
+  days.forEach(d=>{const t=sameDay(d,TODAY);h+=`<div class="cal-head ${t?'today':''}"><div class="dow">${DOW[(d.getDay()+6)%7]}</div><div class="dnum">${d.getDate()} ${MONTHS_RU[d.getMonth()]}</div></div>`;});
+  HOURS.forEach(hr=>{
+    h+=`<div class="time-col">${pad(hr)}:00</div>`;
+    days.forEach(d=>{
+      const t=sameDay(d,TODAY);
+      const dayLessons=lessonsOn(d).filter(l=>toMin(l.start)>=hr*60&&toMin(l.start)<(hr+1)*60);
+      let inner='';
+      dayLessons.forEach(l=>{
+        const top=(toMin(l.start)-hr*60)/60*64;
+        const height=Math.max(28,(toMin(l.end)-toMin(l.start))/60*64-4);
+        const cls=l.kind==='single'?'single':l.color;
+        inner+=`<div class="lesson ${cls}" style="top:${top}px;height:${height}px" onclick="event.stopPropagation();showLesson('${l.kind}',${l.id},'${l.date}')">${l.name}<div class="t">${l.start}–${l.end} · ${l.hall}</div></div>`;
+      });
+      h+=`<div class="slot ${t?'today-col':''}" onclick="quickAdd('${ymd(d)}',${hr})">${inner}</div>`;
+    });
+  });
+  h+=`</div>`;
+  $('calWrap').innerHTML=h;
+}
+
+function renderMonth(){
+  const first=new Date(anchor.getFullYear(),anchor.getMonth(),1);
+  const start=startOfWeek(first);
+  let h=`<div class="month">`;
+  DOW.forEach(d=>h+=`<div class="mh">${d}</div>`);
+  for(let i=0;i<42;i++){
+    const d=addDays(start,i);
+    const inMonth=d.getMonth()===anchor.getMonth();
+    const t=sameDay(d,TODAY);
+    const evs=lessonsOn(d);
+    let ev='';
+    evs.slice(0,3).forEach(l=>{const cls=l.kind==='single'?'single':l.color;ev+=`<div class="ev lesson ${cls}" style="position:static" onclick="event.stopPropagation();showLesson('${l.kind}',${l.id},'${ymd(d)}')">${l.start} ${l.name}</div>`;});
+    if(evs.length>3)ev+=`<div style="font-size:10px;color:var(--muted);margin-top:3px">+${evs.length-3} ещё</div>`;
+    h+=`<div class="mcell ${t?'today':''}" style="${inMonth?'':'opacity:.4'}"><div class="dn">${d.getDate()}</div>${ev}</div>`;
+  }
+  h+=`</div>`;
+  $('calWrap').innerHTML=h;
+}
+
+function renderRail(){
+  const today=lessonsOn(TODAY);
+  const students=today.reduce((s,l)=>s+(l.students||0),0);
+  const cap=today.reduce((s,l)=>s+(l.cap||0),0);
+  $('sLessons').textContent=today.length;
+  $('sStudents').textContent=students;
+  $('sFill').textContent=cap?Math.round(students/cap*100)+'%':'0%';
+  $('sFree').textContent=Math.max(0,cap-students);
+  // halls load
+  let hh='';
+  HALLS.forEach(hall=>{
+    const inHall=today.filter(l=>l.hall===hall);
+    const busyMin=inHall.reduce((s,l)=>s+(toMin(l.end)-toMin(l.start)),0);
+    const dayMin=12*60; // 09-21
+    const pct=Math.round(busyMin/dayMin*100);
+    hh+=`<div class="hall"><div class="hl"><span>${hall}</span><span>${pct}%</span></div><div class="bar"><span style="width:${pct}%"></span></div></div>`;
+  });
+  $('hallsLoad').innerHTML=hh;
+}
+
+/* ===== AI free windows ===== */
+function freeWindowsFor(hall){
+  // по дням недели смотрим занятость зала за неделю
+  const res={};
+  for(let wd=0;wd<7;wd++){
+    const busy=[];
+    GROUPS.forEach(g=>{if(g.hall===hall&&g.days.includes(wd))busy.push([toMin(g.start),toMin(g.end)]);});
+    busy.sort((a,b)=>a[0]-b[0]);
+    let cur=9*60;const free=[];
+    busy.forEach(b=>{if(b[0]-cur>=60)free.push([cur,b[0]]);cur=Math.max(cur,b[1]);});
+    if(21*60-cur>=60)free.push([cur,21*60]);
+    if(free.length)res[wd]=free;
+  }
+  return res;
+}
+const fmtMin=m=>`${pad(Math.floor(m/60))}:${pad(m%60)}`;
+function renderAIFree(){
+  const hall='Главный зал';
+  const fw=freeWindowsFor(hall);
+  let h=`<div class="h">${hall} свободен:</div>`;
+  const order=[0,2,5];// Пн,Ср,Сб для примера
+  let any=false;
+  Object.keys(fw).forEach(wd=>{fw[wd].forEach(f=>{h+=`<div class="row">${DOW[wd]} ${fmtMin(f[0])}–${fmtMin(f[1])}</div>`;any=true;});});
+  if(!any)h+=`<div class="row">Зал занят всю неделю</div>`;
+  $('aiFree').innerHTML=h;
+}
+function aiAnswer(q){
+  let txt='';
+  if(q==='child'){
+    const fwMain=freeWindowsFor('Главный зал');
+    const morning=[];Object.keys(fwMain).forEach(wd=>fwMain[wd].forEach(f=>{if(f[0]<15*60)morning.push(`${DOW[wd]} ${fmtMin(f[0])}–${fmtMin(Math.min(f[1],15*60))}`);}));
+    txt=`Для детской группы лучше дневные окна (до 15:00). Главный зал свободен: ${morning.slice(0,4).join(', ')||'нет окон'}. Рекомендую филиал Чокина 109/1 — там уже есть детский поток.`;
+  } else if(q==='evening'){
+    txt='Взрослую группу вечером (после 18:00) удобно ставить в Малый зал (Сатпаева 210/1) — он почти свободен по вечерам, кроме Пн и Чт 19:00–20:00. На Чокина вечер Главного зала занят лезгинкой.';
+  } else if(q==='hall'){
+    const fw=freeWindowsFor('Главный зал');let rows=[];Object.keys(fw).forEach(wd=>fw[wd].forEach(f=>rows.push(`${DOW[wd]} ${fmtMin(f[0])}–${fmtMin(f[1])}`)));
+    txt='Главный зал свободен: '+(rows.join(', ')||'занят всю неделю')+'.';
+  } else {
+    txt='Аслан Плиев занят Пн/Ср/Пт вечером и Вт/Чт (ансамбль) — окна днём до 16:00. У Хамита Муратовича свободно почти всё, кроме Пн и Чт 19:00 — можно догрузить группами.';
+  }
+  $('aiAns').textContent=txt;$('aiAns').classList.add('show');
+}
+
+/* ===== CONFLICT CHECK ===== */
+// проверка пересечения для повторяющихся групп по дням недели
+function groupConflict(branch,hall,teacher,days,start,end,ignoreId){
+  const s=toMin(start),e=toMin(end);
+  for(const g of GROUPS){
+    if(ignoreId&&g.id===ignoreId)continue;
+    const shareDay=g.days.some(d=>days.includes(d));
+    if(!shareDay)continue;
+    const gs=toMin(g.start),ge=toMin(g.end);
+    const overlap=s<ge&&gs<e;
+    if(!overlap)continue;
+    if(g.hall===hall)return `Зал «${hall}» уже занят группой «${g.name}» ${g.start}–${g.end}.`;
+    if(g.teacher===teacher)return `Педагог ${teacher} уже ведёт «${g.name}» ${g.start}–${g.end} в это время.`;
+  }
+  return null;
+}
+function lessonConflict(date,branch,hall,teacher,start,end){
+  const s=toMin(start),e=toMin(end);
+  // против разовых
+  for(const l of LESSONS){
+    if(l.date!==date)continue;
+    const ls=toMin(l.start),le=toMin(l.end);
+    if(s<le&&ls<e){
+      if(l.hall===hall)return `Зал «${hall}» занят уроком «${l.name}» ${l.start}–${l.end}.`;
+      if(l.teacher===teacher)return `Педагог ${teacher} занят уроком ${l.start}–${l.end}.`;
+    }
+  }
+  // против групп в этот день недели
+  const wd=(new Date(date).getDay()+6)%7;
+  for(const g of GROUPS){
+    if(!g.days.includes(wd))continue;
+    const gs=toMin(g.start),ge=toMin(g.end);
+    if(s<ge&&gs<e){
+      if(g.hall===hall)return `Зал «${hall}» занят группой «${g.name}» ${g.start}–${g.end}.`;
+      if(g.teacher===teacher)return `Педагог ${teacher} ведёт «${g.name}» ${g.start}–${g.end}.`;
+    }
+  }
+  return null;
+}
+
+/* ===== PANELS ===== */
+let selDays=[];
+function openPanel(which){
+  closePanel('group');closePanel('lesson');
+  if(which==='group'){selDays=[];renderDayChips();$('gConflict').classList.remove('show');}
+  if(which==='lesson'){$('lConflict').classList.remove('show');if(!$('lDate').value)$('lDate').value=ymd(anchor);}
+  $('panel-'+which).classList.add('open');
+  $('panel-'+which).scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function closePanel(which){$('panel-'+which).classList.remove('open');}
+function renderDayChips(){
+  $('gDays').innerHTML=DOW.map((d,i)=>`<span class="day-chip ${selDays.includes(i)?'on':''}" onclick="toggleDay(${i})">${d}</span>`).join('');
+}
+function toggleDay(i){const k=selDays.indexOf(i);if(k>=0)selDays.splice(k,1);else selDays.push(i);renderDayChips();}
+
+function parseTime(str){
+  const m=str.replace(/\s/g,'').match(/^(\d{1,2}:\d{2})[–\-](\d{1,2}:\d{2})$/);
+  if(!m)return null;return{start:m[1],end:m[2]};
+}
+
+function createGroup(){
+  const name=$('gName').value.trim();
+  if(!name)return toast('Введите название группы','err');
+  if(!selDays.length)return toast('Группа без расписания — выберите дни занятий','err');
+  const tm=parseTime($('gTime').value);
+  if(!tm)return toast('Время в формате 18:30–20:00','err');
+  const branch=$('gBranch').value,teacher=$('gTeacher').value,hall=$('gHall').value;
+  const conf=groupConflict(branch,hall,teacher,selDays,tm.start,tm.end);
+  if(conf){const c=$('gConflict');c.textContent='Конфликт: '+conf;c.classList.add('show');return toast(conf,'err');}
+  GROUPS.push({id:nextGroupId++,name,branch,teacher,hall,level:$('gLevel').value,
+    ageFrom:+$('gAgeFrom').value||0,ageTo:+$('gAgeTo').value||0,days:[...selDays],
+    start:tm.start,end:tm.end,cap:12,students:0,color:'c'+(1+Math.floor(Math.random()*4))});
+  toast('Группа создана: '+name+' — появилась в расписании');
+  $('gName').value='';closePanel('group');render();
+}
+
+function createLesson(){
+  const tm=parseTime($('lTime').value);
+  if(!tm)return toast('Время в формате 19:00–20:00','err');
+  const date=$('lDate').value;if(!date)return toast('Укажите дату','err');
+  const branch=$('lBranch').value,teacher=$('lTeacher').value,hall=$('lHall').value;
+  if(!hall)return toast('Урок без зала недопустим','err');
+  if(!teacher)return toast('Урок без педагога недопустим','err');
+  const conf=lessonConflict(date,branch,hall,teacher,tm.start,tm.end);
+  if(conf){const c=$('lConflict');c.textContent='Конфликт: '+conf;c.classList.add('show');return toast(conf,'err');}
+  const gname=$('lGroup').value;
+  LESSONS.push({id:nextLessonId++,name:gname||($('lNote').value||'Разовый урок'),branch,teacher,hall,
+    date,start:tm.start,end:tm.end,note:$('lNote').value,cap:12,students:0});
+  toast('Урок создан на '+date+' '+tm.start);
+  closePanel('lesson');render();
+}
+
+function quickAdd(date,hr){
+  openPanel('lesson');
+  $('lDate').value=date;$('lTime').value=`${pad(hr)}:00–${pad(hr+1)}:00`;
+}
+
+/* ===== LESSON DETAIL ===== */
+function showLesson(kind,id,date){
+  let l;
+  if(kind==='group')l={...GROUPS.find(g=>g.id===id),date};
+  else l=LESSONS.find(x=>x.id===id);
+  if(!l)return;
+  $('mTitle').textContent=l.name;
+  const free=Math.max(0,(l.cap||0)-(l.students||0));
+  $('mBody').innerHTML=`<div class="lesson-detail">
+    <div class="dl"><span class="lbl">Тип</span><span><span class="badge b-gold">${kind==='group'?'Группа (постоянно)':'Разовый урок'}</span></span></div>
+    <div class="dl"><span class="lbl">Дата</span><span>${date}${kind==='group'?' (по расписанию)':''}</span></div>
+    <div class="dl"><span class="lbl">Время</span><span>${l.start}–${l.end}</span></div>
+    <div class="dl"><span class="lbl">Филиал</span><span>${l.branch}</span></div>
+    <div class="dl"><span class="lbl">Зал</span><span>${l.hall}</span></div>
+    <div class="dl"><span class="lbl">Педагог</span><span>${l.teacher}</span></div>
+    ${l.level?`<div class="dl"><span class="lbl">Уровень</span><span>${l.level}</span></div>`:''}
+    <div class="dl"><span class="lbl">Ученики</span><span>${l.students||0} из ${l.cap||0} · свободно ${free}</span></div>
+    ${l.note?`<div class="dl"><span class="lbl">Комментарий</span><span>${l.note}</span></div>`:''}
+  </div>
+  <div class="panel-foot" style="margin-top:18px">
+    <button class="btn-gold soft" onclick="toast('Открыт журнал по занятию')">Журнал</button>
+    <button class="btn-ghost" onclick="toast('Запись на пробный — выбор этого занятия')">На пробный</button>
+    ${kind==='single'?`<button class="btn-ghost" style="border-color:#EBC4B6;color:var(--red)" onclick="delLesson(${id})">Удалить</button>`:''}
+  </div>`;
+  $('overlay').classList.add('open');document.body.style.overflow='hidden';
+}
+function delLesson(id){LESSONS=LESSONS.filter(l=>l.id!==id);closeModal();render();toast('Урок удалён');}
+function closeModal(){$('overlay').classList.remove('open');document.body.style.overflow='';}
+
+/* ===== GROUP SELECTS SYNC ===== */
+function syncGroupSelects(){
+  const opts='<option value="">Все группы</option>'+GROUPS.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  if($('fGroup').children.length!==GROUPS.length+1){const v=$('fGroup').value;$('fGroup').innerHTML=opts;$('fGroup').value=v;}
+  const lopts='<option value="">— разовое (без группы)</option>'+GROUPS.map(g=>`<option>${g.name}</option>`).join('');
+  if($('lGroup').children.length!==GROUPS.length+1)$('lGroup').innerHTML=lopts;
+}
+
+/* ===== TOAST ===== */
+function toast(msg,type){
+  const c=$('toasts');const el=document.createElement('div');
+  el.className='toast'+(type==='err'?' err':'');el.innerHTML=`<span class="dot"></span><span>${msg}</span>`;
+  c.appendChild(el);setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(10px)';setTimeout(()=>el.remove(),250)},3200);
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();closePanel('group');closePanel('lesson');}});
+
+/* ===== INIT ===== */
+render();
+</script>
+</body>
+</html>
