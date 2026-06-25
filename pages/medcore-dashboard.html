@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCore Academy — CRM Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#060D1F;
+  --navy:#0E1A35;
+  --card:#121E38;
+  --card2:#172240;
+  --teal:#00D4AA;
+  --teal-dim:rgba(0,212,170,.12);
+  --teal-glow:rgba(0,212,170,.25);
+  --red:#FF4D6D;
+  --red-dim:rgba(255,77,109,.12);
+  --amber:#F0B429;
+  --amber-dim:rgba(240,180,41,.12);
+  --blue:#4D9FFF;
+  --blue-dim:rgba(77,159,255,.12);
+  --text:#E8F0FF;
+  --muted:rgba(232,240,255,.45);
+  --border:rgba(255,255,255,.07);
+  --border2:rgba(0,212,170,.2);
+  --sh:0 4px 24px rgba(0,0,0,.4);
+  --shlg:0 20px 60px rgba(0,0,0,.55);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--night);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* ECG HERO STRIPE */
+.ecg-stripe{width:100%;height:56px;background:var(--navy);border-bottom:1px solid var(--border);position:relative;overflow:hidden;flex-shrink:0;}
+.ecg-svg{position:absolute;top:0;left:0;width:200%;height:100%;}
+.ecg-path{fill:none;stroke:var(--teal);stroke-width:1.5;opacity:.6;animation:ecg-scroll 4s linear infinite;}
+.ecg-glow{fill:none;stroke:var(--teal);stroke-width:3;opacity:.15;filter:blur(3px);animation:ecg-scroll 4s linear infinite;}
+@keyframes ecg-scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* NAV */
+.nav{background:var(--navy);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;height:56px;position:sticky;top:0;z-index:40;gap:0;}
+.nav-logo-wrap{display:flex;align-items:center;gap:10px;margin-right:32px;flex-shrink:0;}
+.nav-logo-icon{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--teal),#00A8FF);display:flex;align-items:center;justify-content:center;}
+.nav-logo-text{font-family:'Space Grotesk';font-weight:800;font-size:15px;color:var(--text);letter-spacing:-.02em;}
+.nav-logo-text span{color:var(--teal);}
+.nav-tab{font-family:'Inter';font-size:13px;font-weight:600;color:var(--muted);padding:0 14px;height:56px;display:inline-flex;align-items:center;border:none;background:none;cursor:pointer;position:relative;white-space:nowrap;transition:color .15s;}
+.nav-tab:hover{color:var(--text);}
+.nav-tab.active{color:var(--teal);}
+.nav-tab.active::after{content:'';position:absolute;left:14px;right:14px;bottom:0;height:2px;background:var(--teal);border-radius:2px;box-shadow:0 0 8px var(--teal);}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+.founder-pill{display:flex;align-items:center;gap:8px;background:var(--teal-dim);border:1px solid var(--border2);border-radius:999px;padding:5px 12px 5px 5px;}
+.founder-avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--teal),#00A8FF);display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:11px;color:#060D1F;flex-shrink:0;}
+.founder-name{font-size:12px;font-weight:600;color:var(--teal);}
+.founder-role{font-size:10.5px;color:var(--muted);}
+
+/* PAGE */
+.page{max-width:1320px;margin:0 auto;padding:28px 20px 100px;}
+
+/* FILTER BAR */
+.fbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 18px;margin-bottom:18px;}
+.fbar-label{font-family:'Space Grotesk';font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:4px;}
+.fbar select{padding:8px 12px;border:1px solid var(--border);border-radius:9px;font-family:'Inter';font-size:13px;background:var(--card2);color:var(--text);cursor:pointer;}
+.fbar select:focus{outline:1px solid var(--teal);}
+
+/* SECTION */
+.sec{background:var(--card);border:1px solid var(--border);border-radius:20px;margin-bottom:14px;overflow:hidden;transition:border-color .2s;}
+.sec:hover{border-color:rgba(255,255,255,.12);}
+.sec-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;user-select:none;}
+.sec-head:hover .sec-title{color:var(--teal);}
+.sec-title{font-family:'Space Grotesk';font-weight:700;font-size:15px;color:var(--text);display:flex;align-items:center;gap:11px;transition:color .15s;}
+.sec-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.sec-icon.teal{background:var(--teal-dim);color:var(--teal);}
+.sec-icon.red{background:var(--red-dim);color:var(--red);}
+.sec-icon.amber{background:var(--amber-dim);color:var(--amber);}
+.sec-icon.blue{background:var(--blue-dim);color:var(--blue);}
+.sec-icon.dark{background:rgba(255,255,255,.06);color:var(--muted);}
+.tog-btn{font-size:11.5px;font-weight:600;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:999px;padding:5px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:.15s;white-space:nowrap;}
+.tog-btn:hover{background:rgba(255,255,255,.1);color:var(--text);}
+.sec-body{padding:4px 20px 22px;}
+.sec-body.collapsed{display:none;}
+
+/* VITAL CARDS (daily) */
+.vital-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.vital{border-radius:16px;padding:16px 18px;cursor:pointer;transition:transform .15s,box-shadow .15s;border:1px solid transparent;position:relative;overflow:hidden;}
+.vital::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s;}
+.vital:hover{transform:translateY(-2px);}
+.vital:hover::before{opacity:1;}
+.vital.teal{background:var(--teal-dim);border-color:rgba(0,212,170,.2);}
+.vital.teal:hover{box-shadow:0 0 24px rgba(0,212,170,.2);}
+.vital.red{background:var(--red-dim);border-color:rgba(255,77,109,.2);}
+.vital.red:hover{box-shadow:0 0 24px rgba(255,77,109,.2);}
+.vital.amber{background:var(--amber-dim);border-color:rgba(240,180,41,.2);}
+.vital.amber:hover{box-shadow:0 0 24px rgba(240,180,41,.18);}
+.vital.blue{background:var(--blue-dim);border-color:rgba(77,159,255,.2);}
+.vital.blue:hover{box-shadow:0 0 24px rgba(77,159,255,.2);}
+.vital-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.vital-value{font-family:'Space Mono';font-size:28px;font-weight:700;line-height:1;letter-spacing:-.02em;}
+.vital.teal .vital-value{color:var(--teal);}
+.vital.red .vital-value{color:var(--red);}
+.vital.amber .vital-value{color:var(--amber);}
+.vital.blue .vital-value{color:var(--blue);}
+.vital-sub{font-size:11.5px;color:var(--muted);margin-top:6px;}
+.vital-arr{position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:18px;opacity:.3;}
+
+/* AI brief */
+.ai-brief{background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(0,168,255,.06));border:1px solid var(--border2);border-radius:14px;padding:16px 18px;}
+.ai-brief-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--teal);margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.ai-brief-text{font-size:13.5px;line-height:1.65;color:rgba(232,240,255,.8);}
+.ai-brief-text strong{color:var(--teal);}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.kpi{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:15px 16px;transition:border-color .2s;}
+.kpi:hover{border-color:rgba(0,212,170,.2);}
+.kpi-label{font-size:11px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+.kpi-value{font-family:'Space Mono';font-size:22px;font-weight:700;color:var(--text);}
+.kpi-diff{font-size:11.5px;margin-top:4px;}
+.kpi-diff.up{color:var(--teal);}
+.kpi-diff.down{color:var(--red);}
+.kpi-diff.flat{color:var(--muted);}
+
+/* RISKS */
+.risk-list{display:flex;flex-direction:column;gap:7px;}
+.risk-item{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-radius:12px;border:1px solid var(--border);background:var(--card2);cursor:pointer;transition:all .15s;}
+.risk-item:hover{border-color:var(--red);background:var(--red-dim);}
+.risk-left{display:flex;align-items:center;gap:10px;}
+.rdot{width:8px;height:8px;border-radius:50%;}
+.rdot.red{background:var(--red);box-shadow:0 0 6px var(--red);}
+.rdot.amber{background:var(--amber);box-shadow:0 0 6px var(--amber);}
+.rdot.muted{background:rgba(255,255,255,.2);}
+.risk-name{font-size:13.5px;font-weight:600;color:var(--text);}
+.risk-right{display:flex;align-items:center;gap:10px;}
+.risk-count{font-family:'Space Mono';font-size:18px;font-weight:700;}
+.risk-count.red{color:var(--red);}
+.risk-count.amber{color:var(--amber);}
+.risk-count.muted{color:var(--muted);}
+.risk-arr{color:var(--muted);}
+
+/* FUNNEL */
+.funnel-list{display:flex;flex-direction:column;gap:7px;}
+.funnel-row{display:flex;align-items:center;gap:14px;padding:10px 14px;border-radius:10px;background:var(--card2);}
+.funnel-label{font-size:13px;color:var(--muted);min-width:220px;}
+.funnel-bar-wrap{flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden;}
+.funnel-bar{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--teal),#00A8FF);transition:width .8s ease;}
+.funnel-n{font-family:'Space Mono';font-weight:700;font-size:13px;min-width:36px;text-align:right;color:var(--text);}
+.funnel-pct{font-size:12px;color:var(--muted);min-width:38px;text-align:right;}
+
+/* CHARTS */
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.chart-box{background:var(--card2);border-radius:14px;padding:16px;}
+.chart-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:14px;}
+.bar-chart{display:flex;align-items:flex-end;gap:7px;height:80px;}
+.bar-col{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;}
+.bar{width:100%;border-radius:4px 4px 0 0;background:linear-gradient(180deg,var(--teal),rgba(0,212,170,.4));transition:height .5s ease;min-height:2px;cursor:pointer;}
+.bar:hover{filter:brightness(1.2);}
+.bar.red{background:linear-gradient(180deg,var(--red),rgba(255,77,109,.35));}
+.bar.amber{background:linear-gradient(180deg,var(--amber),rgba(240,180,41,.35));}
+.bar-lbl{font-size:9.5px;color:var(--muted);}
+
+/* AI EXEC */
+.ai-exec{background:linear-gradient(135deg,#0A0818,#0E1830);border:1px solid rgba(0,212,170,.15);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden;}
+.ai-exec::before{content:'AI';position:absolute;right:-10px;top:-15px;font-family:'Space Grotesk';font-size:100px;font-weight:800;color:rgba(0,212,170,.04);line-height:1;pointer-events:none;}
+.ai-exec-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(0,212,170,.7);margin-bottom:10px;display:flex;align-items:center;gap:7px;}
+.ai-exec-text{font-size:13.5px;line-height:1.7;color:rgba(232,240,255,.8);}
+.ai-exec-text strong{color:var(--amber);}
+.ai-exec-text p{margin-bottom:10px;}
+.ai-exec-text p:last-child{margin-bottom:0;}
+
+/* GROWTH */
+.growth-list{display:flex;flex-direction:column;gap:8px;}
+.growth-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:var(--card2);border-radius:12px;border:1px solid var(--border);transition:border-color .2s;}
+.growth-item:hover{border-color:rgba(0,212,170,.2);}
+.growth-icon{width:34px;height:34px;border-radius:10px;background:var(--teal-dim);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.growth-title{font-size:13.5px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.growth-sub{font-size:12px;color:var(--muted);}
+.growth-impact{font-size:11.5px;font-weight:700;margin-top:5px;color:var(--teal);}
+
+/* RATINGS */
+.rating-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rating-list{background:var(--card2);border-radius:14px;padding:16px 18px;}
+.rating-list-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:12px;}
+.rating-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.rating-row:last-child{border-bottom:none;}
+.rpos{font-family:'Space Mono';font-weight:700;color:var(--muted);min-width:22px;font-size:12px;}
+.rname{flex:1;font-weight:500;color:var(--text);}
+.rval{font-family:'Space Mono';font-weight:700;font-size:13px;}
+.rval.green{color:var(--teal);}
+.rval.red{color:var(--red);}
+
+/* MONTHLY */
+.monthly-box{background:var(--card2);border-radius:14px;padding:18px 20px;}
+.monthly-stats{display:flex;gap:24px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.ms-item{text-align:center;}
+.ms-val{font-family:'Space Mono';font-size:22px;font-weight:700;}
+.ms-val.up{color:var(--teal);}
+.ms-val.down{color:var(--red);}
+.ms-lbl{font-size:11px;color:var(--muted);margin-top:3px;}
+.monthly-text{font-size:13.5px;line-height:1.68;color:rgba(232,240,255,.78);}
+.monthly-text p{margin-bottom:8px;}
+.monthly-text p:last-child{margin-bottom:0;}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(6,13,31,.8);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-ov.open{opacity:1;pointer-events:auto;}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:22px;max-width:680px;width:100%;max-height:80vh;overflow:hidden;box-shadow:var(--shlg);transform:translateY(10px);transition:transform .25s;display:flex;flex-direction:column;}
+.modal-ov.open .modal{transform:translateY(0);}
+.modal-hd{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0;}
+.modal-hd-left h3{font-family:'Space Grotesk';font-size:18px;font-weight:700;color:var(--text);}
+.modal-hd-left p{font-size:12.5px;color:var(--muted);margin-top:3px;}
+.modal-close{background:rgba(255,255,255,.07);border:1px solid var(--border);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:15px;flex-shrink:0;transition:.15s;}
+.modal-close:hover{background:var(--red-dim);color:var(--red);border-color:var(--red);}
+.modal-scroll{overflow-y:auto;padding:18px 24px 24px;}
+table.mtbl{width:100%;border-collapse:collapse;font-size:13px;}
+table.mtbl th{text-align:left;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--border);}
+table.mtbl td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text);}
+table.mtbl tr:hover td{background:rgba(255,255,255,.03);}
+table.mtbl tr:last-child td{border-bottom:none;}
+.mtag{display:inline-flex;align-items:center;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600;}
+.mtag.red{background:var(--red-dim);color:var(--red);}
+.mtag.teal{background:var(--teal-dim);color:var(--teal);}
+.mtag.amber{background:var(--amber-dim);color:var(--amber);}
+
+/* TOASTS */
+.toasts{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:9px;z-index:70;max-width:320px;}
+.toast{background:var(--card);border:1px solid var(--border2);color:var(--text);padding:11px 16px;border-radius:12px;font-size:13px;display:flex;align-items:center;gap:8px;box-shadow:var(--shlg);animation:tin .25s ease;}
+.toast span.dot{width:7px;height:7px;border-radius:50%;background:var(--teal);box-shadow:0 0 8px var(--teal);flex-shrink:0;}
+@keyframes tin{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.toast.out{animation:tout .2s ease forwards;}
+@keyframes tout{to{opacity:0;transform:translateY(8px);}}
+
+/* BTN */
+.btn{font-family:'Inter';font-size:13.5px;font-weight:600;padding:9px 18px;border-radius:10px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:all .15s;}
+.btn-teal{background:var(--teal);color:#060D1F;}
+.btn-teal:hover{filter:brightness(1.1);}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--muted);border:1px solid var(--border);}
+.btn-ghost:hover{background:rgba(255,255,255,.1);color:var(--text);}
+
+/* DIVIDER */
+hr.div{border:none;border-top:1px solid var(--border);margin:14px 0;}
+
+@media(max-width:860px){.vital-grid,.kpi-grid,.chart-grid,.rating-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:540px){.vital-grid,.kpi-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ECG STRIPE -->
+<div class="ecg-stripe">
+  <svg class="ecg-svg" viewBox="0 0 1400 56" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path class="ecg-glow" d="M0,28 L80,28 L90,28 L95,8 L100,48 L107,4 L112,52 L117,28 L130,28 L200,28 L280,28 L290,28 L295,8 L300,48 L307,4 L312,52 L317,28 L330,28 L400,28 L480,28 L490,28 L495,8 L500,48 L507,4 L512,52 L517,28 L530,28 L600,28 L680,28 L690,28 L695,8 L700,48 L707,4 L712,52 L717,28 L730,28 L800,28 L880,28 L890,28 L895,8 L900,48 L907,4 L912,52 L917,28 L930,28 L1000,28 L1080,28 L1090,28 L1095,8 L1100,48 L1107,4 L1112,52 L1117,28 L1130,28 L1200,28 L1280,28 L1290,28 L1295,8 L1300,48 L1307,4 L1312,52 L1317,28 L1330,28 L1400,28"/>
+    <path class="ecg-path" d="M0,28 L80,28 L90,28 L95,8 L100,48 L107,4 L112,52 L117,28 L130,28 L200,28 L280,28 L290,28 L295,8 L300,48 L307,4 L312,52 L317,28 L330,28 L400,28 L480,28 L490,28 L495,8 L500,48 L507,4 L512,52 L517,28 L530,28 L600,28 L680,28 L690,28 L695,8 L700,48 L707,4 L712,52 L717,28 L730,28 L800,28 L880,28 L890,28 L895,8 L900,48 L907,4 L912,52 L917,28 L930,28 L1000,28 L1080,28 L1090,28 L1095,8 L1100,48 L1107,4 L1112,52 L1117,28 L1130,28 L1200,28 L1280,28 L1290,28 L1295,8 L1300,48 L1307,4 L1312,52 L1317,28 L1330,28 L1400,28"/>
+  </svg>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo-wrap">
+    <div class="nav-logo-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#060D1F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    </div>
+    <div class="nav-logo-text">Med<span>Core</span> Academy</div>
+  </div>
+  <button class="nav-tab active">Dashboard</button>
+  <button class="nav-tab">Students</button>
+  <button class="nav-tab">Courses</button>
+  <button class="nav-tab">Finance</button>
+  <button class="nav-tab">Instructors</button>
+  <div class="nav-right">
+    <div class="founder-pill">
+      <div class="founder-avatar">IS</div>
+      <div>
+        <div class="founder-name">Islam Salikhanov</div>
+        <div class="founder-role">Founder & CEO</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- FILTERS -->
+  <div class="fbar">
+    <span class="fbar-label">Period:</span>
+    <select onchange="showToast('Filter applied')">
+      <option>June 2026</option>
+      <option>May 2026</option>
+      <option>Q2 2026</option>
+      <option>YTD 2026</option>
+    </select>
+    <select onchange="showToast('Filter applied')">
+      <option>All Programs</option>
+      <option>Clinical Pharmacology</option>
+      <option>Emergency Medicine</option>
+      <option>Cardiology Basics</option>
+      <option>Surgery Fundamentals</option>
+    </select>
+    <select onchange="showToast('Filter applied')">
+      <option>All Cohorts</option>
+      <option>Cohort Jun-26</option>
+      <option>Cohort May-26</option>
+      <option>Cohort Apr-26</option>
+    </select>
+    <select onchange="showToast('Filter applied')">
+      <option>All Instructors</option>
+      <option>Islam Salikhanov</option>
+      <option>Dr. Asel Nurova</option>
+      <option>Dr. Marat Bekov</option>
+    </select>
+  </div>
+
+  <!-- 1. HEALTH — 30 SECONDS -->
+  <div class="sec" id="sec-daily">
+    <div class="sec-head" onclick="toggleSec('daily')">
+      <div class="sec-title">
+        <span class="sec-icon teal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </span>
+        Academy Health — 30 seconds
+      </div>
+      <button class="tog-btn" id="tog-daily">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-daily">
+      <div class="vital-grid" id="vitalGrid"></div>
+      <div class="ai-brief">
+        <div class="ai-brief-lbl">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          AI Daily Brief
+        </div>
+        <div class="ai-brief-text">
+          Academy is <strong>performing above plan</strong> this month. 34 students already renewed for July — strongest early-renewal signal in 6 months. <strong>9 at-risk dropouts</strong> need personal outreach today. Demo-to-enroll conversion hit <strong>71% this week</strong>. Emergency Medicine cohort shows −14% completion rate — recommend instructor check-in.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. KPIs -->
+  <div class="sec" id="sec-kpi">
+    <div class="sec-head" onclick="toggleSec('kpi')">
+      <div class="sec-title">
+        <span class="sec-icon blue">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </span>
+        Key Metrics
+      </div>
+      <button class="tog-btn" id="tog-kpi">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-kpi">
+      <div class="kpi-grid" id="kpiGrid"></div>
+    </div>
+  </div>
+
+  <!-- 3. RISKS -->
+  <div class="sec" id="sec-risks">
+    <div class="sec-head" onclick="toggleSec('risks')">
+      <div class="sec-title">
+        <span class="sec-icon red">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </span>
+        Risks
+      </div>
+      <button class="tog-btn" id="tog-risks">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-risks">
+      <div class="risk-list" id="riskList"></div>
+    </div>
+  </div>
+
+  <!-- 4. FUNNEL -->
+  <div class="sec" id="sec-funnel">
+    <div class="sec-head" onclick="toggleSec('funnel')">
+      <div class="sec-title">
+        <span class="sec-icon amber">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        </span>
+        Enrollment Funnel
+      </div>
+      <button class="tog-btn" id="tog-funnel">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-funnel">
+      <div class="funnel-list" id="funnelList"></div>
+    </div>
+  </div>
+
+  <!-- 5. CHARTS -->
+  <div class="sec" id="sec-charts">
+    <div class="sec-head" onclick="toggleSec('charts')">
+      <div class="sec-title">
+        <span class="sec-icon teal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </span>
+        Analytics
+      </div>
+      <button class="tog-btn" id="tog-charts">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-charts">
+      <div class="chart-grid">
+        <div class="chart-box">
+          <div class="chart-title">Revenue by month (₽ thousands)</div>
+          <div class="bar-chart" id="chart-rev"></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">Completion rate (%)</div>
+          <div class="bar-chart" id="chart-comp"></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">New enrollments</div>
+          <div class="bar-chart" id="chart-new"></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">Dropouts by month</div>
+          <div class="bar-chart" id="chart-drop"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. AI EXECUTIVE BRIEF -->
+  <div class="sec" id="sec-ai">
+    <div class="sec-head" onclick="toggleSec('ai')">
+      <div class="sec-title">
+        <span class="sec-icon dark">✦</span>
+        AI Executive Brief
+      </div>
+      <button class="tog-btn" id="tog-ai">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-ai">
+      <div class="ai-exec">
+        <div class="ai-exec-lbl">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          AI Analyst · June 2026 · MedCore Academy
+        </div>
+        <div class="ai-exec-text">
+          <p>📈 <strong>Revenue up +11% vs. May</strong> — the strongest single-month growth since Q3 2025. Clinical Pharmacology drove 38% of total revenue. Early July renewals (34 students, 23% of active base) are the highest pre-renewal count recorded.</p>
+          <p>⚠️ <strong>Emergency Medicine cohort is underperforming:</strong> completion rate dropped to 61% (−14pp). Dr. Bekow's retention score is 54% — recommend a curriculum review and 1:1 student outreach campaign this week.</p>
+          <p>🚀 <strong>Top opportunity:</strong> 47 leads opened the demo landing but didn't register. A targeted retargeting sequence (Telegram + WhatsApp) historically converts 22% of this segment. Estimated uplift: <strong>+₽180 000</strong>.</p>
+          <p>📅 <strong>July forecast:</strong> ₽1 380 000–₽1 450 000 assuming current conversion holds and summer intensive launches on schedule.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. GROWTH -->
+  <div class="sec" id="sec-growth">
+    <div class="sec-head" onclick="toggleSec('growth')">
+      <div class="sec-title">
+        <span class="sec-icon teal">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </span>
+        Growth Opportunities
+      </div>
+      <button class="tog-btn" id="tog-growth">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-growth">
+      <div class="growth-list" id="growthList"></div>
+    </div>
+  </div>
+
+  <!-- 8. RATINGS -->
+  <div class="sec" id="sec-rating">
+    <div class="sec-head" onclick="toggleSec('rating')">
+      <div class="sec-title">
+        <span class="sec-icon amber">★</span>
+        Leaderboard
+      </div>
+      <button class="tog-btn" id="tog-rating">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-rating">
+      <div class="rating-grid" id="ratingGrid"></div>
+    </div>
+  </div>
+
+  <!-- 9. MONTHLY REPORT -->
+  <div class="sec" id="sec-monthly">
+    <div class="sec-head" onclick="toggleSec('monthly')">
+      <div class="sec-title">
+        <span class="sec-icon blue">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </span>
+        AI Monthly Report
+      </div>
+      <button class="tog-btn" id="tog-monthly">▲ Collapse</button>
+    </div>
+    <div class="sec-body" id="body-monthly">
+      <div class="monthly-box">
+        <div class="monthly-stats">
+          <div class="ms-item"><div class="ms-val up">+11%</div><div class="ms-lbl">Revenue vs. May</div></div>
+          <div class="ms-item"><div class="ms-val up">78%</div><div class="ms-lbl">Avg. completion rate</div></div>
+          <div class="ms-item"><div class="ms-val up">71%</div><div class="ms-lbl">Demo conversion</div></div>
+          <div class="ms-item"><div class="ms-val down">−4</div><div class="ms-lbl">Net dropouts</div></div>
+          <div class="ms-item"><div class="ms-val up">34</div><div class="ms-lbl">Early July renewals</div></div>
+        </div>
+        <div class="monthly-text">
+          <p>June 2026 was MedCore Academy's best month in terms of revenue and early renewals. Clinical Pharmacology and Cardiology Basics are the two flagship programs pulling the strongest results — both showing 85%+ completion rates.</p>
+          <p>The main risk heading into July is the Emergency Medicine cohort. Completion has dropped 14 percentage points over two months. A combination of content review and live Q&A sessions is recommended before the next intake opens.</p>
+          <p>The TikTok channel drove 31% of new demo registrations in June — up from 18% in May. Recommend increasing short-form content production for the summer months when organic reach typically peaks for medical education content.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- MODAL -->
+<div class="modal-ov" id="modal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-hd-left">
+        <h3 id="modalTitle">List</h3>
+        <p id="modalSub"></p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-scroll" id="modalBody"></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ====== COLLAPSE STATE ======
+const CKEY='medcore_collapse_v1';
+let cs={};
+try{cs=JSON.parse(localStorage.getItem(CKEY)||'{}');}catch(e){}
+const SECS=['daily','kpi','risks','funnel','charts','ai','growth','rating','monthly'];
+
+function toggleSec(id){
+  cs[id]=!cs[id];
+  try{localStorage.setItem(CKEY,JSON.stringify(cs));}catch(e){}
+  applySec(id);
+}
+function applySec(id){
+  const b=document.getElementById('body-'+id);
+  const t=document.getElementById('tog-'+id);
+  if(!b||!t) return;
+  const col=!!cs[id];
+  b.classList.toggle('collapsed',col);
+  t.textContent=col?'▼ Expand':'▲ Collapse';
+}
+
+// ====== DATA ======
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun'];
+const D={
+  revenue:   [820,890,960,1050,1140,1265],
+  completion:[72,75,70,77,74,78],
+  newEnroll: [18,14,22,17,12,19],
+  dropouts:  [5,4,7,4,9,4],
+  kpis:[
+    {label:'Revenue',value:'₽1 265 000',diff:'+11% vs. May',dir:'up'},
+    {label:'Active Students',value:'212',diff:'+7 vs. May',dir:'up'},
+    {label:'Dropouts',value:'9',diff:'+4 vs. May',dir:'down'},
+    {label:'New Enrollments',value:'19',diff:'+7 vs. May',dir:'up'},
+    {label:'Demo Registrations',value:'47',diff:'+12 vs. May',dir:'up'},
+    {label:'Demo Conversion',value:'71%',diff:'+6% vs. May',dir:'up'},
+    {label:'Avg. Revenue / Student',value:'₽5 968',diff:'+₽180',dir:'up'},
+    {label:'Completion Rate',value:'78%',diff:'+4% vs. May',dir:'up'},
+  ],
+  funnel:[
+    {label:'Leads (all sources)',n:94,pct:100},
+    {label:'Registered for free demo',n:60,pct:64},
+    {label:'Attended free demo',n:43,pct:46},
+    {label:'Enrolled after demo',n:30,pct:32},
+    {label:'Active in module 2+',n:24,pct:26},
+    {label:'Certified / Completed',n:18,pct:19},
+  ],
+  risks:[
+    {key:'unpaid',   label:'Did not pay for current month',  count:11,dot:'red'},
+    {key:'past_due', label:'Did not pay last month',         count:5, dot:'red'},
+    {key:'dropout',  label:'At-risk of dropping out',        count:9, dot:'red'},
+    {key:'low_comp', label:'Cohorts with low completion',    count:2, dot:'amber'},
+    {key:'low_fill', label:'Underfilled programs',           count:3, dot:'amber'},
+    {key:'low_inst', label:'Instructors with low retention', count:2, dot:'amber'},
+    {key:'overload', label:'Overloaded cohorts',             count:1, dot:'muted'},
+  ],
+  modal_unpaid:[
+    {name:'Алия Нурланова',    phone:'+7 701 111 22 33', course:'Clinical Pharmacology', debt:'₽9 900'},
+    {name:'Дамир Сейткали',    phone:'+7 705 222 33 44', course:'Emergency Medicine',    debt:'₽9 900'},
+    {name:'Жанна Ахметова',    phone:'+7 702 333 44 55', course:'Cardiology Basics',     debt:'₽12 900'},
+    {name:'Марат Искаков',     phone:'+7 747 444 55 66', course:'Surgery Fundamentals',  debt:'₽9 900'},
+    {name:'Гульнара Оразова',  phone:'+7 700 555 66 77', course:'Clinical Pharmacology', debt:'₽9 900'},
+  ],
+  modal_dropout:[
+    {name:'Сабина Дюсенова',  course:'Emergency Medicine',   progress:'22%', last:'12.06.2026'},
+    {name:'Тимур Жаксыбеков', course:'Emergency Medicine',   progress:'31%', last:'09.06.2026'},
+    {name:'Асем Болатова',    course:'Surgery Fundamentals', progress:'18%', last:'07.06.2026'},
+    {name:'Нурлан Ергали',    course:'Cardiology Basics',    progress:'45%', last:'15.06.2026'},
+  ],
+  modal_low_comp:[
+    {cohort:'Emergency Medicine Jun-26',  instructor:'Dr. Bekow', prev:'75%',curr:'61%',diff:'-14%'},
+    {cohort:'Surgery Fundamentals Apr-26',instructor:'Dr. Bekow', prev:'70%',curr:'63%',diff:'-7%'},
+  ],
+  modal_low_fill:[
+    {program:'Pediatric Medicine Basics', instructor:'Dr. Seitkali', fill:'41%'},
+    {program:'Oncology Intro',            instructor:'Dr. Nurova',   fill:'38%'},
+    {program:'Neurology Basics',          instructor:'Dr. Bekow',    fill:'53%'},
+  ],
+  modal_low_inst:[
+    {name:'Dr. Marat Bekow', retention:'54%'},
+    {name:'Dr. Asel Nurova', retention:'61%'},
+  ],
+  modal_overload:[
+    {cohort:'Clinical Pharmacology Jun-26', fill:'112%'},
+  ],
+  modal_next:[
+    {name:'Жанна Касенова',  course:'Clinical Pharmacology', date:'01.06.2026'},
+    {name:'Самат Ермеков',   course:'Cardiology Basics',     date:'03.06.2026'},
+    {name:'Виктория Жукова', course:'Emergency Medicine',    date:'05.06.2026'},
+  ],
+  growth:[
+    {icon:'🎯',title:'Retargeting non-converting demo visitors',   sub:'47 leads viewed landing but never registered — WhatsApp + Telegram sequence converts ~22%',impact:'+₽180 000',level:'high'},
+    {icon:'📹',title:'Expand TikTok short-form content',          sub:'TikTok drove 31% of demo signups in June, up from 18% in May — scale this channel',impact:'+₽140 000',level:'high'},
+    {icon:'🎓',title:'Introduce certification upsell',             sub:'78% of graduates have no formal cert — offer verified PDF + LinkedIn badge for ₽2 900',impact:'+₽98 000',level:'high'},
+    {icon:'👨‍⚕️',title:'Alumni referral program',                  sub:'Former students refer at 3× conversion rate — formalize with a bonus structure',impact:'+₽75 000',level:'high'},
+  ],
+  ratings:{
+    instructors:[
+      {name:'Islam Salikhanov', val:'94%', dir:'green'},
+      {name:'Dr. Asel Nurova', val:'82%', dir:'green'},
+      {name:'Dr. Seitkali',    val:'76%', dir:'green'},
+      {name:'Dr. Marat Bekow', val:'54%', dir:'red'},
+    ],
+    programs:[
+      {name:'Clinical Pharmacology', val:'₽7 200 / student', dir:'green'},
+      {name:'Cardiology Basics',     val:'₽6 800 / student', dir:'green'},
+      {name:'Emergency Medicine',    val:'₽5 100 / student', dir:'green'},
+      {name:'Surgery Fundamentals',  val:'₽4 200 / student', dir:'red'},
+    ],
+  },
+};
+
+// ====== RENDER ======
+function renderVitals(){
+  const items=[
+    {label:'Revenue today',      value:'₽68 000',sub:'Yesterday: ₽54 000',      color:'teal', key:'rev_today'},
+    {label:'Active enrollments', value:'212',    sub:'+7 this month',            color:'blue', key:'active'},
+    {label:'Dropouts',           value:'9',      sub:'Need outreach today',       color:'red',  key:'dropout'},
+    {label:'New enrollments',    value:'19',     sub:'June total',               color:'teal', key:'new_enroll'},
+    {label:'Demo regs today / yesterday', value:'8 / 5', sub:'Conversion last batch: 71%', color:'amber', key:'demo'},
+    {label:'Renewed for July',   value:'34',     sub:'23% of active base',       color:'blue', key:'next'},
+  ];
+  document.getElementById('vitalGrid').innerHTML=items.map(i=>`
+    <div class="vital ${i.color}" onclick="openModal('${i.key}')">
+      <div class="vital-label">${i.label}</div>
+      <div class="vital-value">${i.value}</div>
+      <div class="vital-sub">${i.sub}</div>
+      <span class="vital-arr">›</span>
+    </div>`).join('');
+}
+
+function renderKPI(){
+  document.getElementById('kpiGrid').innerHTML=D.kpis.map(k=>`
+    <div class="kpi">
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-value">${k.value}</div>
+      <div class="kpi-diff ${k.dir}">${k.dir==='up'?'▲':'▼'} ${k.diff}</div>
+    </div>`).join('');
+}
+
+function renderRisks(){
+  document.getElementById('riskList').innerHTML=D.risks.map(r=>`
+    <div class="risk-item" onclick="openModal('${r.key}')">
+      <div class="risk-left">
+        <span class="rdot ${r.dot}"></span>
+        <span class="risk-name">${r.label}</span>
+      </div>
+      <div class="risk-right">
+        <span class="risk-count ${r.dot}">${r.count}</span>
+        <span class="risk-arr">›</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderFunnel(){
+  const max=D.funnel[0].n;
+  document.getElementById('funnelList').innerHTML=D.funnel.map(f=>`
+    <div class="funnel-row">
+      <span class="funnel-label">${f.label}</span>
+      <div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${(f.n/max*100).toFixed(0)}%"></div></div>
+      <span class="funnel-n">${f.n}</span>
+      <span class="funnel-pct">${f.pct}%</span>
+    </div>`).join('');
+}
+
+function renderCharts(){
+  function bars(id,data,cls=''){
+    const mx=Math.max(...data);
+    document.getElementById(id).innerHTML=data.map((v,i)=>`
+      <div class="bar-col">
+        <div class="bar ${cls}" style="height:${(v/mx*100).toFixed(0)}%" title="${v}"></div>
+        <span class="bar-lbl">${MONTHS[i]}</span>
+      </div>`).join('');
+  }
+  bars('chart-rev',D.revenue);
+  bars('chart-comp',D.completion);
+  bars('chart-new',D.newEnroll);
+  bars('chart-drop',D.dropouts,'red');
+}
+
+function renderGrowth(){
+  document.getElementById('growthList').innerHTML=D.growth.map(g=>`
+    <div class="growth-item">
+      <div class="growth-icon">${g.icon}</div>
+      <div>
+        <div class="growth-title">${g.title}</div>
+        <div class="growth-sub">${g.sub}</div>
+        <div class="growth-impact">Potential: ${g.impact} / mo</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderRatings(){
+  document.getElementById('ratingGrid').innerHTML=`
+    <div class="rating-list">
+      <div class="rating-list-title">Instructors by retention</div>
+      ${D.ratings.instructors.map((r,i)=>`
+        <div class="rating-row">
+          <span class="rpos">${i+1}</span>
+          <span class="rname">${r.name}</span>
+          <span class="rval ${r.dir}">${r.val}</span>
+        </div>`).join('')}
+    </div>
+    <div class="rating-list">
+      <div class="rating-list-title">Programs by revenue / student</div>
+      ${D.ratings.programs.map((r,i)=>`
+        <div class="rating-row">
+          <span class="rpos">${i+1}</span>
+          <span class="rname">${r.name}</span>
+          <span class="rval ${r.dir}">${r.val}</span>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ====== MODAL ======
+function openModal(key){
+  const ov=document.getElementById('modal');
+  const title=document.getElementById('modalTitle');
+  const sub=document.getElementById('modalSub');
+  const body=document.getElementById('modalBody');
+  let h='';
+
+  if(key==='unpaid'||key==='rev_today'||key==='active'){
+    title.textContent='Did not pay this month';
+    sub.textContent=`${D.modal_unpaid.length} students · June 2026`;
+    h=`<table class="mtbl"><thead><tr><th>Student</th><th>Phone</th><th>Program</th><th>Debt</th></tr></thead><tbody>
+      ${D.modal_unpaid.map(s=>`<tr><td><b>${s.name}</b></td><td style="color:var(--muted)">${s.phone}</td><td>${s.course}</td><td><span class="mtag red">${s.debt}</span></td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  else if(key==='past_due'){
+    title.textContent='Did not pay last month';
+    sub.textContent='Critical — 2+ months overdue';
+    h=`<table class="mtbl"><thead><tr><th>Student</th><th>Program</th><th>Debt</th></tr></thead><tbody>
+      ${D.modal_unpaid.slice(0,3).map(s=>`<tr><td><b>${s.name}</b></td><td>${s.course}</td><td><span class="mtag red">${s.debt}</span></td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  else if(key==='dropout'){
+    title.textContent='At-risk of dropping out';
+    sub.textContent='Last login 7+ days ago · below 50% progress';
+    h=`<table class="mtbl"><thead><tr><th>Student</th><th>Program</th><th>Progress</th><th>Last seen</th></tr></thead><tbody>
+      ${D.modal_dropout.map(s=>`<tr><td><b>${s.name}</b></td><td>${s.course}</td><td><span class="mtag amber">${s.progress}</span></td><td style="color:var(--muted)">${s.last}</td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  else if(key==='low_comp'){
+    title.textContent='Cohorts with low completion';
+    sub.textContent='Sorted worst → best';
+    h=`<table class="mtbl"><thead><tr><th>Cohort</th><th>Instructor</th><th>Prev. month</th><th>This month</th><th>Change</th></tr></thead><tbody>
+      ${D.modal_low_comp.map(r=>`<tr><td><b>${r.cohort}</b></td><td>${r.instructor}</td><td>${r.prev}</td><td>${r.curr}</td><td><span class="mtag red">${r.diff}</span></td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  else if(key==='low_fill'){
+    title.textContent='Underfilled programs';
+    sub.textContent='Below 60% capacity';
+    h=`<table class="mtbl"><thead><tr><th>Program</th><th>Instructor</th><th>Fill rate</th></tr></thead><tbody>
+      ${D.modal_low_fill.map(r=>`<tr><td><b>${r.program}</b></td><td>${r.instructor}</td><td><span class="mtag amber">${r.fill}</span></td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  else if(key==='low_inst'){
+    title.textContent='Instructors with low retention';
+    sub.textContent='Below academy average (78%)';
+    h=`<table class="mtbl"><thead><tr><th>Instructor</th><th>Retention</th></tr></thead><tbody>
+      ${D.modal_low_inst.map(r=>`<tr><td><b>${r.name}</b></td><td><span class="mtag red">${r.retention}</span></td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  else if(key==='overload'){
+    title.textContent='Overloaded cohorts';
+    sub.textContent='Above 100% capacity';
+    h=`<table class="mtbl"><thead><tr><th>Cohort</th><th>Fill rate</th></tr></thead><tbody>
+      ${D.modal_overload.map(r=>`<tr><td><b>${r.cohort}</b></td><td><span class="mtag teal">${r.fill}</span></td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  else if(key==='next'||key==='new_enroll'){
+    title.textContent='Renewed for July';
+    sub.textContent='34 students already paid for next month';
+    h=`<div style="background:var(--teal-dim);border:1px solid var(--border2);border-radius:10px;padding:13px 16px;margin-bottom:14px;font-size:13.5px;color:var(--teal);font-weight:600;">
+      ✓ 34 of 212 active students (16%) renewed before month end
+    </div>
+    <table class="mtbl"><thead><tr><th>Student</th><th>Program</th><th>Paid on</th></tr></thead><tbody>
+      ${D.modal_next.map(s=>`<tr><td><b>${s.name}</b></td><td>${s.course}</td><td style="color:var(--muted)">${s.date}</td></tr>`).join('')}
+      <tr><td colspan="3" style="text-align:center;color:var(--muted);font-size:12px;padding:12px;">+ 31 more students</td></tr>
+    </tbody></table>`;
+  }
+  else if(key==='demo'){
+    title.textContent='Demo registrations';
+    sub.textContent='Today: 8 · Yesterday: 5 · Last batch conversion: 71%';
+    h=`<table class="mtbl"><thead><tr><th>Lead</th><th>Source</th><th>Program of interest</th><th>Demo date</th></tr></thead><tbody>
+      <tr><td><b>Асель Нурбекова</b></td><td>TikTok</td><td>Clinical Pharmacology</td><td>24.06.2026</td></tr>
+      <tr><td><b>Руслан Дюсенов</b></td><td>Instagram</td><td>Cardiology Basics</td><td>24.06.2026</td></tr>
+      <tr><td><b>Малика Сейтова</b></td><td>Google</td><td>Emergency Medicine</td><td>25.06.2026</td></tr>
+      <tr><td colspan="4" style="text-align:center;color:var(--muted);font-size:12px;padding:12px;">+ 5 more today</td></tr>
+    </tbody></table>`;
+  }
+  else{
+    title.textContent='Details';
+    sub.textContent='';
+    h='<p style="color:var(--muted);padding:20px 0;">Loading data…</p>';
+  }
+
+  body.innerHTML=h;
+  ov.classList.add('open');
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+
+// ====== TOAST ======
+function showToast(msg){
+  const c=document.getElementById('toasts');
+  const el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span class="dot"></span><span>${msg}</span>`;
+  c.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),200);},3000);
+}
+
+// ====== INIT ======
+function init(){
+  renderVitals();renderKPI();renderRisks();renderFunnel();
+  renderCharts();renderGrowth();renderRatings();
+  SECS.forEach(id=>applySec(id));
+}
+init();
+</script>
+</body>
+</html>
