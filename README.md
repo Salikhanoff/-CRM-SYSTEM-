@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ученики сети — CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F5F5F7;
+  --white:#FFFFFF;
+  --ink:#0A0A0A;
+  --ink2:#3A3A3A;
+  --muted:#8A8A8E;
+  --border:#E5E5EA;
+  --amber:#C87A00;
+  --amber-bg:#FFF4E0;
+  --amber-btn:#F5A623;
+  --red:#D32F2F;
+  --red-bg:#FFF0F0;
+  --red-border:#FFCDD2;
+  --green:#1B7B3A;
+  --green-bg:#F0FBF4;
+  --green-border:#A8D5B5;
+  --blue:#1A56DB;
+  --blue-bg:#EFF6FF;
+  --blue-border:#BFDBFE;
+  --purple:#6D28D9;
+  --purple-bg:#F5F3FF;
+  --purple-border:#DDD6FE;
+  --orange:#C2410C;
+  --orange-bg:#FFF7ED;
+  --orange-border:#FED7AA;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);font-family:'Inter',sans-serif;color:var(--ink);font-size:14px;line-height:1.5;}
+
+/* LAYOUT */
+.layout{display:flex;min-height:100vh;}
+.sidebar{width:220px;background:var(--white);border-right:1px solid var(--border);padding:20px 0;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto;}
+.sidebar-logo{display:flex;align-items:center;gap:8px;padding:0 16px 20px;border-bottom:1px solid var(--border);margin-bottom:8px;}
+.sidebar-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#6D5BD0,#FF6B5B);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:13px;}
+.sidebar-logo-text{font-weight:800;font-size:14px;}
+.sidebar-logo-text span{color:#6D5BD0;}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:9px 16px;font-size:13.5px;font-weight:500;color:var(--muted);cursor:pointer;border-radius:0;transition:.15s;}
+.sidebar-item:hover{background:var(--bg);color:var(--ink);}
+.sidebar-item.active{color:var(--ink);font-weight:700;background:var(--bg);}
+.sidebar-item svg{flex-shrink:0;}
+.sidebar-section{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);padding:14px 16px 4px;}
+
+.main{flex:1;overflow-x:hidden;}
+
+/* TOP BAR */
+.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);}
+.topbar-title{font-size:22px;font-weight:800;margin-top:2px;}
+.topbar-sub{font-size:13px;color:var(--muted);margin-top:2px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+
+/* PAGE CONTENT */
+.content{padding:24px 28px;}
+
+/* SECTION HEADER */
+.section-eyebrow{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.section-eyebrow::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--amber);}
+.section-title-row{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.section-title{font-size:20px;font-weight:800;}
+.section-sub{font-size:13px;color:var(--muted);margin-top:3px;font-weight:400;}
+
+/* TABS */
+.view-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.view-tab{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--border);background:var(--white);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;transition:.15s;}
+.view-tab:hover{border-color:#aaa;}
+.view-tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.view-tab .badge{background:rgba(255,255,255,.2);color:#fff;border-radius:999px;padding:1px 7px;font-size:11px;}
+.view-tab:not(.active) .badge{background:var(--bg);color:var(--muted);}
+
+/* KPI SECTION */
+.kpi-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px;}
+.kpi-card{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:14px 16px;cursor:pointer;transition:transform .12s,box-shadow .15s;}
+.kpi-card:hover{transform:translateY(-2px);box-shadow:var(--sh2);}
+.kpi-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.kpi-icon.gray{background:#F2F2F7;color:#636366;}
+.kpi-icon.green{background:#E8F8EE;color:var(--green);}
+.kpi-icon.orange{background:#FFF3E0;color:#E65100;}
+.kpi-icon.red{background:var(--red-bg);color:var(--red);}
+.kpi-icon.blue{background:var(--blue-bg);color:var(--blue);}
+.kpi-icon.purple{background:var(--purple-bg);color:var(--purple);}
+.kpi-number{font-size:28px;font-weight:800;line-height:1;margin-bottom:4px;}
+.kpi-name{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);}
+
+/* FUNNEL */
+.funnel-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:22px;}
+.funnel-card{border-radius:14px;padding:14px 16px;cursor:pointer;border:1px solid transparent;transition:transform .12s,box-shadow .15s;position:relative;}
+.funnel-card:hover{transform:translateY(-2px);box-shadow:var(--sh2);}
+.funnel-card::after{content:'›';position:absolute;right:14px;top:14px;font-size:16px;opacity:.35;}
+.funnel-card:last-child::after{display:none;}
+.funnel-num{font-size:11px;font-weight:700;text-align:right;color:var(--muted);margin-bottom:4px;}
+.funnel-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+.funnel-value{font-size:26px;font-weight:800;line-height:1;margin-bottom:4px;}
+.funnel-name{font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:2px;}
+.funnel-hint{font-size:11px;font-weight:600;}
+
+.fc1{background:#F8F6FF;border-color:#DDD6FE;} .fc1 .funnel-icon{background:#EDE9FE;color:#6D28D9;} .fc1 .funnel-value{color:#5B21B6;} .fc1 .funnel-hint{color:#7C3AED;}
+.fc2{background:#EFF6FF;border-color:#BFDBFE;} .fc2 .funnel-icon{background:#DBEAFE;color:#1D4ED8;} .fc2 .funnel-value{color:#1E40AF;} .fc2 .funnel-hint{color:#2563EB;}
+.fc3{background:#FFF5F5;border-color:#FECACA;} .fc3 .funnel-icon{background:#FEE2E2;color:#DC2626;} .fc3 .funnel-value{color:#B91C1C;} .fc3 .funnel-hint{color:#DC2626;}
+.fc4{background:#FFFBEB;border-color:#FDE68A;} .fc4 .funnel-icon{background:#FEF3C7;color:#D97706;} .fc4 .funnel-value{color:#B45309;} .fc4 .funnel-hint{color:#D97706;}
+.fc5{background:#FFF7ED;border-color:#FED7AA;} .fc5 .funnel-icon{background:#FFEDD5;color:#C2410C;} .fc5 .funnel-value{color:#9A3412;} .fc5 .funnel-hint{color:#C2410C;}
+.fc6{background:#F0FDF4;border-color:#BBF7D0;} .fc6 .funnel-icon{background:#DCFCE7;color:#15803D;} .fc6 .funnel-value{color:#166534;} .fc6 .funnel-hint{color:#16A34A;}
+
+/* SEGMENTS */
+.segs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;}
+.seg{flex:none;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--white);font-size:13px;font-weight:600;color:var(--ink2);cursor:pointer;white-space:nowrap;transition:.15s;}
+.seg:hover{background:var(--bg);}
+.seg.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+
+/* FILTER ROW */
+.filter-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.search-box{display:flex;align-items:center;gap:8px;background:var(--white);border:1px solid var(--border);border-radius:10px;padding:8px 12px;width:220px;}
+.search-box input{border:none;outline:none;font-family:'Inter';font-size:13px;width:100%;background:transparent;}
+.fsel{padding:8px 12px;border:1px solid var(--border);border-radius:10px;font-family:'Inter';font-size:13px;background:var(--white);color:var(--ink);cursor:pointer;}
+.fsel:focus{outline:1px solid #6D5BD0;}
+.btn-customize{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;border:1px solid var(--border);background:var(--white);font-family:'Inter';font-size:13px;font-weight:600;cursor:pointer;color:var(--ink2);margin-left:auto;}
+.btn-customize:hover{background:var(--bg);}
+
+/* TABLE */
+.table-wrap{background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--sh);}
+.tbl-scroll{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:900px;}
+thead th{text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:12px 14px;background:#FAFAFA;border-bottom:1px solid var(--border);white-space:nowrap;}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:#FAFAFE;cursor:pointer;}
+tbody tr.sel td{background:#F5F3FF;}
+.td-num{color:var(--muted);font-size:12px;}
+.td-name{font-weight:600;}
+.td-phone{color:var(--muted);font-size:12.5px;}
+.td-debt{font-weight:700;color:var(--red);}
+.td-debt.no{color:var(--muted);font-weight:400;}
+
+/* STATUS PILLS */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap;}
+.pill .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.pill-gray{background:#F2F2F7;color:#636366;} .pill-gray .dot{background:#636366;}
+.pill-blue{background:var(--blue-bg);color:#1E40AF;} .pill-blue .dot{background:#3B82F6;}
+.pill-red{background:var(--red-bg);color:var(--red);} .pill-red .dot{background:var(--red);}
+.pill-amber{background:#FFFBEB;color:#92400E;} .pill-amber .dot{background:#F59E0B;}
+.pill-green{background:var(--green-bg);color:#166534;} .pill-green .dot{background:#22C55E;}
+.pill-purple{background:var(--purple-bg);color:#5B21B6;} .pill-purple .dot{background:#8B5CF6;}
+.pill-orange{background:var(--orange-bg);color:var(--orange);} .pill-orange .dot{background:#F97316;}
+
+.ltv{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11.5px;font-weight:600;background:#F2F2F7;color:#636366;}
+.ltv.gold{background:#FEF3C7;color:#92400E;}
+
+/* ROW ACTIONS */
+.row-acts{display:flex;gap:4px;}
+.ract{width:28px;height:28px;border-radius:8px;border:none;background:none;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:.15s;}
+.ract:hover{background:var(--bg);color:var(--ink);}
+
+/* ADD BUTTON */
+.btn-add{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px;background:var(--amber-btn);color:#fff;font-family:'Inter';font-size:14px;font-weight:700;border:none;cursor:pointer;transition:.15s;}
+.btn-add:hover{filter:brightness(1.05);}
+
+/* CHECKBOX */
+input[type=checkbox]{accent-color:#6D5BD0;width:15px;height:15px;cursor:pointer;}
+
+/* MASS BAR */
+.mass-bar{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(150%);background:var(--ink);color:#fff;border-radius:16px;padding:10px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,.3);z-index:40;transition:transform .25s;flex-wrap:wrap;max-width:94vw;}
+.mass-bar.show{transform:translateX(-50%) translateY(0);}
+.mass-bar .mc{font-weight:700;font-size:13px;}
+.mass-bar button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;}
+.mass-bar button:hover{background:rgba(255,255,255,.2);}
+.mass-bar button.danger{background:rgba(220,38,38,.35);}
+
+/* DRAWER */
+.drawer-ov{position:fixed;inset:0;background:rgba(0,0,0,.35);opacity:0;pointer-events:none;transition:opacity .2s;z-index:55;}
+.drawer-ov.open{opacity:1;pointer-events:auto;}
+.drawer{position:fixed;top:0;right:0;height:100%;width:420px;max-width:95vw;background:var(--white);box-shadow:-12px 0 40px rgba(0,0,0,.12);transform:translateX(100%);transition:transform .25s;z-index:56;overflow-y:auto;}
+.drawer-ov.open .drawer{transform:translateX(0);}
+.drawer-hd{padding:20px 22px 16px;border-bottom:1px solid var(--border);}
+.drawer-hd-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px;}
+.drawer-hd-name{font-size:20px;font-weight:800;}
+.drawer-close{background:none;border:none;cursor:pointer;color:var(--muted);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;}
+.drawer-close:hover{background:var(--bg);}
+.drawer-chips{display:flex;flex-wrap:wrap;gap:6px;}
+.dchip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:var(--bg);font-size:12px;font-weight:600;color:var(--ink2);}
+.drawer-body{padding:18px 22px;}
+.drawer-sec{margin-bottom:20px;}
+.drawer-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.drawer-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.drawer-acts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+.dl{display:grid;grid-template-columns:110px 1fr;row-gap:10px;font-size:13px;}
+.dl dt{color:var(--muted);} .dl dd{margin:0;font-weight:500;}
+
+/* CONFLICT ALERT */
+.conflict{background:#FFF5F5;border:1.5px solid #FECACA;border-radius:10px;padding:10px 13px;font-size:12.5px;color:var(--red);display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;}
+.conflict svg{flex-shrink:0;margin-top:1px;}
+.conflict.warn{background:#FFFBEB;border-color:#FDE68A;color:#92400E;}
+
+/* COMMENTS */
+.dc-item{padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.dc-item:last-child{border-bottom:none;}
+.dc-meta{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.dc-inp-row{display:flex;gap:7px;margin-top:10px;}
+.dc-inp{flex:1;border:1px solid var(--border);border-radius:9px;padding:8px 11px;font-family:'Inter';font-size:13px;}
+.dc-inp:focus{outline:2px solid #6D5BD0;border-color:transparent;}
+
+/* STATUS CHANGE */
+.status-sel{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:9px;font-family:'Inter';font-size:13px;color:var(--ink);background:var(--white);margin-bottom:10px;}
+
+/* BTNS */
+.btn{font-family:'Inter';font-size:13px;font-weight:600;padding:9px 16px;border-radius:10px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.15s;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,#6D5BD0,#FF6B5B 90%);color:#fff;}
+.btn-primary:hover{filter:brightness(1.08);}
+.btn-secondary{background:var(--white);color:var(--ink);border:1px solid var(--border);}
+.btn-secondary:hover{background:var(--bg);}
+.btn-ghost{background:var(--bg);color:var(--muted);border:1px solid var(--border);}
+.btn-wait{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border);width:100%;justify-content:center;border-radius:9px;padding:9px;}
+.btn-wait:hover{background:var(--purple);color:#fff;}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60;opacity:0;pointer-events:none;transition:opacity .2s;}
+.modal-ov.open{opacity:1;pointer-events:auto;}
+.modal-box{background:var(--white);border-radius:20px;max-width:480px;width:100%;box-shadow:0 24px 60px rgba(0,0,0,.2);transform:translateY(8px);transition:transform .2s;}
+.modal-ov.open .modal-box{transform:translateY(0);}
+.modal-hd{padding:20px 22px 16px;border-bottom:1px solid var(--border);}
+.modal-hd h3{font-size:17px;font-weight:800;}
+.modal-hd p{font-size:12.5px;color:var(--muted);margin-top:3px;}
+.modal-body{padding:16px 22px 0;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.fg-full{grid-column:1/-1;}
+.f{display:flex;flex-direction:column;gap:4px;}
+.f label{font-size:12px;font-weight:600;color:var(--muted);}
+.f label .req{color:#e53e3e;}
+.f input,.f select,.f textarea{width:100%;padding:9px 11px;border:1px solid var(--border);border-radius:9px;font-family:'Inter';font-size:13.5px;color:var(--ink);}
+.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid #6D5BD0;border-color:transparent;}
+.age-hint{font-size:11.5px;color:#6D5BD0;font-weight:600;margin-top:2px;}
+.radio-row{display:flex;gap:8px;margin-top:2px;}
+.radio-opt{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;border:1px solid var(--border);background:var(--bg);font-size:13px;cursor:pointer;font-weight:600;color:var(--muted);}
+.radio-opt input{display:none;}
+.radio-opt.on{background:var(--purple-bg);border-color:#8B5CF6;color:var(--purple);}
+.modal-foot{padding:14px 22px 20px;display:flex;gap:8px;justify-content:flex-end;border-top:1px solid var(--border);margin-top:16px;}
+
+/* COL CUSTOMIZER */
+.col-list{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:16px 22px;}
+.col-item{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);font-size:13.5px;font-weight:600;cursor:pointer;}
+.col-item input{accent-color:#6D5BD0;width:15px;height:15px;}
+.col-item.on{background:var(--purple-bg);border-color:#8B5CF6;color:var(--purple);}
+
+/* WAITLIST */
+.pri{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:600;}
+.pri-h{background:var(--red-bg);color:var(--red);}
+.pri-m{background:#FFFBEB;color:#92400E;}
+.pri-l{background:var(--green-bg);color:var(--green);}
+
+/* TOASTS */
+.toasts{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:9px;z-index:70;}
+.toast{padding:11px 16px;border-radius:12px;font-size:13.5px;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.2);animation:tin .25s ease;max-width:340px;}
+.toast.ok{background:var(--ink);color:#fff;}
+.toast.err{background:var(--red);color:#fff;}
+.toast.wrn{background:#92400E;color:#fff;}
+@keyframes tin{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.toast.out{animation:tout .2s ease forwards;}
+@keyframes tout{to{opacity:0;transform:translateY(8px);}}
+
+.empty-row{padding:48px;text-align:center;color:var(--muted);}
+
+@media(max-width:900px){.kpi-grid,.funnel-grid{grid-template-columns:repeat(3,1fr);} .sidebar{display:none;}}
+@media(max-width:600px){.kpi-grid,.funnel-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-icon">П</div>
+    <div class="sidebar-logo-text">Плие<span>CRM</span></div>
+  </div>
+  <div class="sidebar-section">Основное</div>
+  <div class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Дашборд
+  </div>
+  <div class="sidebar-item active">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    Ученики
+  </div>
+  <div class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Расписание
+  </div>
+  <div class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    Финансы
+  </div>
+  <div class="sidebar-section">Аналитика</div>
+  <div class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Отчёты
+  </div>
+  <div class="sidebar-item">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+    Педагоги
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div>
+      <div class="topbar-label">CEO NETWORK COMMAND</div>
+      <div class="topbar-title">Ученики сети</div>
+      <div class="topbar-sub">Вся база учеников: продления, долги, LTV-сегменты, коммуникации и массовые действия. Владелец видит все филиалы.</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- SECTION HEADER -->
+    <div class="section-eyebrow">Ученики</div>
+    <div class="section-title-row">
+      <div>
+        <div class="section-title">Клиентская база студии</div>
+        <div class="section-sub">Продления, долги, LTV-сегменты, коммуникации, лист ожидания и массовые действия.</div>
+      </div>
+      <button class="btn-add" onclick="openModal('addStudent')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        Добавить ученика
+      </button>
+    </div>
+
+    <!-- VIEW TABS -->
+    <div class="view-tabs">
+      <button class="view-tab active" onclick="showView('registry')">Реестр <span class="badge" id="tabBadge1">0</span></button>
+      <button class="view-tab" onclick="showView('waitlist')">Лист ожидания <span class="badge" id="tabBadge2">0</span></button>
+    </div>
+
+    <!-- REGISTRY VIEW -->
+    <div id="view-registry">
+
+      <!-- KPI -->
+      <div class="kpi-label">Основные показатели</div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+
+      <!-- FUNNEL -->
+      <div class="kpi-label">Воронка продаж</div>
+      <div class="funnel-grid" id="funnelGrid"></div>
+
+      <!-- SEGMENTS -->
+      <div class="segs" id="segsRow"></div>
+
+      <!-- FILTER ROW -->
+      <div class="filter-row">
+        <div class="search-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A8A8E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInp" placeholder="Поиск по имени, телефону…" oninput="applyFilters()">
+        </div>
+        <select class="fsel" id="fStatus" onchange="applyFilters()">
+          <option value="all">Все статусы</option>
+          <option value="no_status">Без статуса</option>
+          <option value="trial_scheduled">Записан на пробный</option>
+          <option value="trial_missed">Не пришёл на пробный</option>
+          <option value="trial_rescheduled">Перезаписан</option>
+          <option value="trial_no_buy">Был, не купил</option>
+          <option value="bought">Купил абонемент</option>
+          <option value="active">Активный ученик</option>
+          <option value="renewal_needed">Требует продления</option>
+          <option value="debt">Должник</option>
+          <option value="next_month">Куплен следующий месяц</option>
+          <option value="waitlist">Лист ожидания</option>
+          <option value="vacation">Каникулы</option>
+          <option value="left">Ушедший</option>
+        </select>
+        <select class="fsel" id="fBranch" onchange="applyFilters()">
+          <option value="all">Все филиалы</option>
+          <option>Основная база</option>
+          <option>Филиал «Жастар»</option>
+          <option>Филиал «Достык»</option>
+        </select>
+        <select class="fsel" id="fGroup" onchange="applyFilters()">
+          <option value="all">Все группы</option>
+          <option>Ансамбль</option><option>Соло</option><option>Хип-хоп</option><option>Малыши</option>
+        </select>
+        <select class="fsel" id="fLtv" onchange="applyFilters()">
+          <option value="all">Все LTV</option>
+          <option>Новый</option><option>Адаптация</option><option>Постоянный</option>
+          <option>Лояльный</option><option>Ядро студии</option><option>Легенда Эхо Гор</option>
+        </select>
+        <select class="fsel" id="fArch" onchange="applyFilters()">
+          <option value="active">Активные</option>
+          <option value="archive">Архив</option>
+          <option value="all">Все</option>
+        </select>
+        <button class="btn-customize" onclick="openModal('colCustomizer')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+          Настроить таблицу
+        </button>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <div class="tbl-scroll">
+          <table>
+            <thead id="tHead"></thead>
+            <tbody id="tBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-row" id="emptyRow" style="display:none;">Никого не найдено по текущим фильтрам</div>
+      </div>
+    </div>
+
+    <!-- WAITLIST VIEW -->
+    <div id="view-waitlist" style="display:none;">
+      <div class="table-wrap">
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>#</th><th>Имя и фамилия</th><th>Телефон</th><th>Пол</th><th>Возраст</th><th>Филиал</th><th>Группа</th><th>В очереди с</th><th>Ожидание</th><th>Приоритет</th><th>Комментарий</th><th>Действия</th></tr></thead>
+            <tbody id="wlBody"></tbody>
+          </table>
+        </div>
+        <div class="empty-row" id="wlEmpty" style="display:none;">Лист ожидания пуст</div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- MASS BAR -->
+<div class="mass-bar" id="massBar">
+  <span class="mc" id="massCnt">Выбрано 0</span>
+  <button onclick="openModal('massGroup')">Группа</button>
+  <button onclick="openModal('massBranch')">Филиал</button>
+  <button onclick="openModal('massStatus')">Статус</button>
+  <button onclick="massWa()">WhatsApp</button>
+  <button onclick="massComment()">Комментарий</button>
+  <button onclick="massExport()">Excel</button>
+  <button class="danger" onclick="massArchive()">В архив</button>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-ov" id="drawerOv" onclick="if(event.target===this)closeDrawer()">
+  <div class="drawer" id="drawer"></div>
+</div>
+
+<!-- ADD STUDENT MODAL -->
+<div class="modal-ov" id="modal-addStudent">
+  <div class="modal-box">
+    <div class="modal-hd"><h3>Новый ученик</h3><p>Статус «Без статуса» · После сохранения откроется карточка</p></div>
+    <div class="modal-body">
+      <div class="fgrid">
+        <div class="f"><label>Имя <span class="req">*</span></label><input type="text" id="nFirst" placeholder="Айгерим"></div>
+        <div class="f"><label>Фамилия <span class="req">*</span></label><input type="text" id="nLast" placeholder="Болатова"></div>
+        <div class="f"><label>Телефон <span class="req">*</span></label><input type="tel" id="nPhone" placeholder="+7 707 …"></div>
+        <div class="f"><label>Дата рождения</label><input type="date" id="nDob" oninput="calcAge()"><div class="age-hint" id="ageHint"></div></div>
+        <div class="f fg-full"><label>Пол</label>
+          <div class="radio-row">
+            <label class="radio-opt on" id="rF"><input type="radio" name="gender" value="female" checked> Женский</label>
+            <label class="radio-opt" id="rM"><input type="radio" name="gender" value="male"> Мужской</label>
+          </div>
+        </div>
+        <div class="f"><label>Филиал <span class="req">*</span></label><select id="nBranch"><option>Основная база</option><option>Филиал «Жастар»</option><option>Филиал «Достык»</option></select></div>
+        <div class="f"><label>Группа</label><select id="nGroup"><option value="">— не выбрана —</option><option>Ансамбль</option><option>Соло</option><option>Хип-хоп</option><option>Малыши</option></select></div>
+        <div class="f"><label>Источник</label><select id="nSource"><option>Instagram</option><option>WhatsApp</option><option>TikTok</option><option>Google</option><option>2GIS</option><option>Рекомендация</option><option>Повторный клиент</option><option>Другое</option></select></div>
+        <div class="f"><label>Имя родителя</label><input type="text" id="nParent" placeholder="Жанна"></div>
+        <div class="f fg-full"><label>Комментарий</label><textarea id="nComment" rows="2" placeholder="Любые заметки…"></textarea></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeModal('addStudent')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveNewStudent()">Сохранить и открыть карточку →</button>
+    </div>
+  </div>
+</div>
+
+<!-- COL CUSTOMIZER -->
+<div class="modal-ov" id="modal-colCustomizer">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-hd"><h3>Настроить таблицу</h3><p>Включите нужные столбцы</p></div>
+    <div class="col-list" id="colList"></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('colCustomizer')">Отмена</button><button class="btn btn-primary" onclick="applyColSettings()">Применить</button></div>
+  </div>
+</div>
+
+<!-- MASS MODALS -->
+<div class="modal-ov" id="modal-massGroup"><div class="modal-box" style="max-width:340px;"><div class="modal-hd"><h3>Перевести в группу</h3></div><div class="modal-body"><div class="f"><label>Группа</label><select id="mg-g"><option>Ансамбль</option><option>Соло</option><option>Хип-хоп</option><option>Малыши</option></select></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('massGroup')">Отмена</button><button class="btn btn-primary" onclick="doMassGroup()">Перевести</button></div></div></div>
+<div class="modal-ov" id="modal-massBranch"><div class="modal-box" style="max-width:340px;"><div class="modal-hd"><h3>Сменить филиал</h3></div><div class="modal-body"><div class="f"><label>Филиал</label><select id="mg-b"><option>Основная база</option><option>Филиал «Жастар»</option><option>Филиал «Достык»</option></select></div></div><div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('massBranch')">Отмена</button><button class="btn btn-primary" onclick="doMassBranch()">Сохранить</button></div></div></div>
+<div class="modal-ov" id="modal-massStatus">
+  <div class="modal-box" style="max-width:340px;">
+    <div class="modal-hd"><h3>Изменить статус</h3></div>
+    <div class="modal-body"><div class="f"><label>Новый статус</label><select id="mg-s"><option value="no_status">Без статуса</option><option value="trial_scheduled">Записан на пробный</option><option value="trial_missed">Не пришёл на пробный</option><option value="trial_rescheduled">Перезаписан</option><option value="trial_no_buy">Был, не купил</option><option value="bought">Купил абонемент</option><option value="active">Активный ученик</option><option value="renewal_needed">Требует продления</option><option value="debt">Должник</option><option value="next_month">Куплен следующий месяц</option><option value="vacation">Каникулы</option><option value="left">Ушедший</option></select></div></div>
+    <div class="modal-foot"><button class="btn btn-ghost" onclick="closeModal('massStatus')">Отмена</button><button class="btn btn-primary" onclick="doMassStatus()">Применить</button></div>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ===== КОНФИГ СТАТУСОВ =====
+const SC = {
+  no_status:         {label:'Без статуса',            cls:'pill-gray'},
+  trial_scheduled:   {label:'Записан на пробный',     cls:'pill-blue'},
+  trial_missed:      {label:'Не пришёл на пробный',   cls:'pill-red'},
+  trial_rescheduled: {label:'Перезаписан',             cls:'pill-amber'},
+  trial_no_buy:      {label:'Был, не купил',           cls:'pill-orange'},
+  bought:            {label:'Купил абонемент',         cls:'pill-green'},
+  active:            {label:'Активный ученик',         cls:'pill-gray'},
+  renewal_needed:    {label:'Требует продления',       cls:'pill-amber'},
+  debt:              {label:'Должник',                 cls:'pill-red'},
+  next_month:        {label:'Куплен следующий месяц', cls:'pill-green'},
+  waitlist:          {label:'Лист ожидания',           cls:'pill-purple'},
+  vacation:          {label:'Каникулы',                cls:'pill-gray'},
+  left:              {label:'Ушедший',                 cls:'pill-gray'},
+};
+
+// ===== ДАННЫЕ =====
+let students = [
+  {id:1,  first:'Айгерим',  last:'Болатова',   phone:'+7 707 111 22 33', gender:'female', dob:'2012-03-15', branch:'Основная база',  group:'Ансамбль', dur:14, end:'30.06.2026', debt:0,     status:'active',          archived:false, source:'Instagram',       parent:'Жанна',  comments:[]},
+  {id:2,  first:'Диас',     last:'Нурланов',   phone:'+7 701 222 33 44', gender:'male',   dob:'2013-07-22', branch:'Основная база',  group:'Хип-хоп',  dur:2,  end:'25.06.2026', debt:0,     status:'bought',          archived:false, source:'TikTok',          parent:'',       comments:[]},
+  {id:3,  first:'Карина',   last:'Ахметова',   phone:'+7 705 333 44 55', gender:'female', dob:'2010-11-08', branch:'Филиал «Жастар»', group:'Соло',     dur:8,  end:'20.06.2026', debt:16000, status:'debt',            archived:false, source:'Рекомендация',    parent:'Алма',   comments:[]},
+  {id:4,  first:'Дамир',    last:'Сериков',    phone:'+7 702 444 55 66', gender:'male',   dob:'2015-04-01', branch:'Основная база',  group:'Малыши',   dur:5,  end:'22.06.2026', debt:8000,  status:'debt',            archived:false, source:'Google',          parent:'Айнур',  comments:[]},
+  {id:5,  first:'Жанна',    last:'Касенова',   phone:'+7 747 555 66 77', gender:'female', dob:'2008-09-30', branch:'Филиал «Достык»', group:'Ансамбль', dur:45, end:'31.07.2026', debt:0,     status:'next_month',      archived:false, source:'Instagram',       parent:'',       comments:[]},
+  {id:6,  first:'Самат',    last:'Ермеков',    phone:'+7 700 666 77 88', gender:'male',   dob:'2003-02-14', branch:'Основная база',  group:'Хип-хоп',  dur:62, end:'28.06.2026', debt:0,     status:'active',          archived:false, source:'2GIS',            parent:'',       comments:[]},
+  {id:7,  first:'Аружан',   last:'Тулегенова', phone:'+7 705 777 88 99', gender:'female', dob:'2014-06-12', branch:'Филиал «Жастар»', group:'Соло',     dur:1,  end:null,         debt:0,     status:'trial_scheduled', archived:false, source:'WhatsApp',        parent:'Бота',   comments:[]},
+  {id:8,  first:'Ержан',    last:'Абенов',     phone:'+7 701 888 99 00', gender:'male',   dob:'2014-08-05', branch:'Основная база',  group:'Малыши',   dur:9,  end:'18.06.2026', debt:16000, status:'debt',            archived:false, source:'Рекомендация',    parent:'Асем',   comments:[]},
+  {id:9,  first:'Виктория', last:'Жукова',     phone:'+7 707 234 56 78', gender:'female', dob:'2013-03-15', branch:'Основная база',  group:'Ансамбль', dur:22, end:'30.06.2026', debt:0,     status:'active',          archived:false, source:'Instagram',       parent:'Жанна Жукова', comments:[]},
+  {id:10, first:'Мадина',   last:'Сапарова',   phone:'+7 702 999 00 11', gender:'female', dob:'2007-12-20', branch:'Филиал «Достык»', group:'Хип-хоп',  dur:4,  end:'26.06.2026', debt:0,     status:'renewal_needed',  archived:false, source:'Повторный клиент',parent:'',       comments:[]},
+  {id:11, first:'Алишер',   last:'Касымов',    phone:'+7 747 111 22 00', gender:'male',   dob:'2011-05-18', branch:'Основная база',  group:'Соло',     dur:3,  end:'19.06.2026', debt:16000, status:'debt',            archived:false, source:'Google',          parent:'Дина',   comments:[]},
+  {id:12, first:'Нурлан',   last:'Жумабеков',  phone:'+7 701 888 77 66', gender:'male',   dob:'2014-01-25', branch:'Основная база',  group:'Хип-хоп',  dur:0,  end:null,         debt:0,     status:'trial_scheduled', archived:false, source:'2GIS',            parent:'Серик',  comments:[]},
+  {id:13, first:'Асель',    last:'Нурпеисова', phone:'+7 700 555 44 33', gender:'female', dob:'2012-11-20', branch:'Филиал «Достык»', group:'Соло',     dur:11, end:'01.08.2026', debt:0,     status:'vacation',        archived:false, source:'Instagram',       parent:'',       comments:[]},
+  {id:14, first:'Сабина',   last:'Дюсенова',   phone:'+7 747 777 66 55', gender:'female', dob:'2009-04-12', branch:'Филиал «Жастар»', group:'Ансамбль', dur:30, end:'30.06.2026', debt:0,     status:'active',          archived:false, source:'Рекомендация',    parent:'',       comments:[]},
+  {id:15, first:'Бекзат',   last:'Оспанов',    phone:'+7 702 666 55 44', gender:'male',   dob:'2009-10-03', branch:'Основная база',  group:'Хип-хоп',  dur:6,  end:null,         debt:0,     status:'left',            archived:true,  source:'TikTok',          parent:'',       comments:[]},
+  {id:16, first:'Тимур',    last:'Жаксыбеков', phone:'+7 705 444 33 22', gender:'male',   dob:'2014-03-10', branch:'Основная база',  group:'',         dur:0,  end:null,         debt:0,     status:'no_status',       archived:false, source:'Instagram',       parent:'',       comments:[]},
+  {id:17, first:'Малика',   last:'Сейтова',    phone:'+7 700 222 33 44', gender:'female', dob:'2012-06-18', branch:'Основная база',  group:'Соло',     dur:0,  end:null,         debt:0,     status:'trial_no_buy',    archived:false, source:'Instagram',       parent:'',       comments:[]},
+  {id:18, first:'Арман',    last:'Бекенов',    phone:'+7 702 333 44 55', gender:'male',   dob:'2015-02-22', branch:'Филиал «Достык»', group:'Малыши',   dur:0,  end:null,         debt:0,     status:'trial_missed',    archived:false, source:'TikTok',          parent:'Нуржан', comments:[]},
+  {id:19, first:'Руслан',   last:'Дюсенов',    phone:'+7 705 000 11 22', gender:'male',   dob:'2013-09-05', branch:'Основная база',  group:'',         dur:0,  end:null,         debt:0,     status:'no_status',       archived:false, source:'Другое',          parent:'',       comments:[]},
+];
+
+let waitlist = [
+  {id:101,first:'Камила', last:'Ахатова',    phone:'+7 705 999 88 77', gender:'female', dob:'2015-07-07', branch:'Филиал «Достык»', group:'Малыши',   since:'2026-05-01', comment:''},
+  {id:102,first:'Гульнара',last:'Ержанова',  phone:'+7 701 222 11 00', gender:'female', dob:'2013-04-14', branch:'Основная база',  group:'Ансамбль', since:'2026-06-15', comment:'Хочет в пятницу'},
+];
+
+let selected = new Set();
+let activeSeg = 'all';
+
+// ===== ХЕЛПЕРЫ =====
+const TODAY = new Date(2026,5,22);
+const pad = n => String(n).padStart(2,'0');
+const fmtMoney = n => n.toLocaleString('ru-RU')+' тг';
+const fullName = s => s.first+' '+s.last;
+function calcAgeYears(dob){
+  if(!dob) return null;
+  const d=new Date(dob); let age=TODAY.getFullYear()-d.getFullYear();
+  if(TODAY.getMonth()-d.getMonth()<0||(TODAY.getMonth()===d.getMonth()&&TODAY.getDate()<d.getDate())) age--;
+  return age;
+}
+function ageLabel(y){
+  if(y===null) return '—';
+  const m=y%10,c=y%100;
+  if(m===1&&c!==11) return y+' год';
+  if(m>=2&&m<=4&&!(c>=12&&c<=14)) return y+' года';
+  return y+' лет';
+}
+function ltvSeg(m){
+  if(m<3) return 'Новый'; if(m<6) return 'Адаптация'; if(m<12) return 'Постоянный';
+  if(m<36) return 'Лояльный'; if(m<60) return 'Ядро студии'; return 'Легенда Эхо Гор';
+}
+function daysSince(iso){return Math.round((TODAY-new Date(iso))/86400000);}
+function priLabel(d){return d>=30?{l:'Высокий',c:'pri-h'}:d>=7?{l:'Средний',c:'pri-m'}:{l:'Низкий',c:'pri-l'};}
+
+// ===== КОНФЛИКТЫ =====
+function conflict(s, action){
+  if(action==='add_waitlist' && ['active','next_month','bought'].includes(s.status))
+    return 'У ученика уже есть активный абонемент. Добавление в лист ожидания невозможно.';
+  if(action==='sell_sub' && s.archived)
+    return 'Ученик находится в архиве. Сначала восстановите ученика.';
+  if(action==='sell_sub' && s.status==='next_month')
+    return 'На выбранный период у ученика уже есть оплаченный абонемент.';
+  if(action==='mark' && s.status==='waitlist')
+    return 'Ученик в листе ожидания и не закреплён за активной группой.';
+  if(action==='sell_group' && !s.group)
+    return 'Для продажи группового абонемента необходимо выбрать группу.';
+  return null;
+}
+
+// ===== СЕГМЕНТЫ =====
+const SEGS = [
+  {k:'all',             l:'Все',                p:s=>true},
+  {k:'active',          l:'Активные',           p:s=>['active','bought','next_month','renewal_needed'].includes(s.status)},
+  {k:'renewal_needed',  l:'Требуют продления',  p:s=>s.status==='renewal_needed'},
+  {k:'debt',            l:'Должники',           p:s=>s.debt>0||s.status==='debt'},
+  {k:'no_status',       l:'Без статуса',        p:s=>s.status==='no_status'},
+  {k:'trial_scheduled', l:'Записаны на пробный',p:s=>s.status==='trial_scheduled'},
+  {k:'next_month',      l:'Купили следующий',   p:s=>s.status==='next_month'},
+  {k:'waitlist',        l:'Лист ожидания',      p:s=>s.status==='waitlist'},
+  {k:'vacation',        l:'Каникулы',           p:s=>s.status==='vacation'},
+  {k:'vacation',        l:'Вернувшиеся',        p:s=>s.status==='trial_rescheduled'},
+  {k:'left',            l:'Ушедшие',            p:s=>s.archived},
+];
+
+function archPass(s){const v=document.getElementById('fArch').value;if(v==='active')return!s.archived;if(v==='archive')return s.archived;return true;}
+
+function computeFiltered(){
+  const def=SEGS.find(d=>d.k===activeSeg)||SEGS[0];
+  const fSt=document.getElementById('fStatus').value;
+  const fBr=document.getElementById('fBranch').value;
+  const fGr=document.getElementById('fGroup').value;
+  const fLtv=document.getElementById('fLtv').value;
+  const q=document.getElementById('searchInp').value.trim().toLowerCase();
+  return students.filter(s=>{
+    if(!archPass(s)) return false;
+    if(!def.p(s)) return false;
+    if(fSt!=='all'&&s.status!==fSt) return false;
+    if(fBr!=='all'&&s.branch!==fBr) return false;
+    if(fGr!=='all'&&s.group!==fGr) return false;
+    if(fLtv!=='all'&&ltvSeg(s.dur)!==fLtv) return false;
+    if(q&&!([s.first,s.last,s.phone,s.parent,s.group].join(' ').toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+// ===== KPI =====
+function renderKPI(){
+  const na=students.filter(s=>!s.archived);
+  const items=[
+    {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>`, ic:'gray', n:students.length, l:'Всего учеников', seg:'all'},
+    {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><polyline points="17 11 19 13 23 9"/></svg>`, ic:'green', n:na.filter(s=>['active','bought','next_month'].includes(s.status)).length, l:'Активные', seg:'active'},
+    {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/></svg>`, ic:'orange', n:na.filter(s=>s.status==='renewal_needed').length, l:'Требуют продления', seg:'renewal_needed'},
+    {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`, ic:'red', n:na.filter(s=>s.debt>0||s.status==='debt').length, l:'Должники', seg:'debt'},
+    {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`, ic:'blue', n:na.filter(s=>s.status==='no_status').length, l:'Без статуса', seg:'no_status'},
+    {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, ic:'purple', n:waitlist.length, l:'Лист ожидания', seg:'waitlist'},
+  ];
+  document.getElementById('kpiGrid').innerHTML=items.map(i=>`
+    <div class="kpi-card" onclick="filterBySeg('${i.seg}')">
+      <div class="kpi-icon ${i.ic}">${i.icon}</div>
+      <div class="kpi-number">${i.n}</div>
+      <div class="kpi-name">${i.l}</div>
+    </div>`).join('');
+}
+
+// ===== FUNNEL =====
+function renderFunnel(){
+  const na=students.filter(s=>!s.archived);
+  const steps=[
+    {k:'no_status',         l:'Без статуса',         hint:'нет целевых действий', n:1},
+    {k:'trial_scheduled',   l:'Записаны на пробный', hint:'ожидают занятия',     n:2},
+    {k:'trial_missed',      l:'Не пришли на пробный',hint:'перезаписать',        n:3},
+    {k:'trial_rescheduled', l:'Перезаписаны',        hint:'ждут занятия',        n:4},
+    {k:'trial_no_buy',      l:'Были, не купили',     hint:'дожать',              n:5},
+    {k:'bought',            l:'Купили абонемент',    hint:'новый посетитель',    n:6},
+  ];
+  const hintCls=['fc1','fc2','fc3','fc4','fc5','fc6'];
+  const icons=[
+    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>`,
+    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>`,
+    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0118.8-4.3M22 12.5a10 10 0 01-18.8 4.2"/></svg>`,
+    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>`,
+    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+  ];
+  document.getElementById('funnelGrid').innerHTML=steps.map((st,i)=>`
+    <div class="funnel-card ${hintCls[i]}" onclick="filterBySeg('${st.k}')">
+      <div class="funnel-num">${st.n}</div>
+      <div class="funnel-icon">${icons[i]}</div>
+      <div class="funnel-value">${na.filter(s=>s.status===st.k).length}</div>
+      <div class="funnel-name">${st.l}</div>
+      <div class="funnel-hint">${st.hint}</div>
+    </div>`).join('');
+}
+
+function filterBySeg(key){
+  activeSeg=key;
+  const fSt=document.getElementById('fStatus');
+  if(SC[key]) fSt.value=key; else fSt.value='all';
+  renderSegs();renderTable();
+  document.getElementById('view-registry').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ===== SEGMENTS =====
+const SEG_LIST=[
+  {k:'all',l:'Все'},
+  {k:'active',l:'Активные'},
+  {k:'renewal_needed',l:'Требуют продления'},
+  {k:'debt',l:'Должники'},
+  {k:'no_status',l:'Без статуса'},
+  {k:'trial_scheduled',l:'Записаны на пробный'},
+  {k:'next_month',l:'Купили следующий'},
+  {k:'waitlist',l:'Лист ожидания'},
+  {k:'vacation',l:'Каникулы'},
+  {k:'left',l:'Ушедшие'},
+];
+function renderSegs(){
+  document.getElementById('segsRow').innerHTML=SEG_LIST.map(s=>`
+    <button class="seg ${activeSeg===s.k?'active':''}" onclick="filterBySeg('${s.k}')">${s.l}</button>`).join('');
+}
+
+// ===== COLUMNS =====
+const ALL_COLS=[
+  {k:'num',   l:'№',                always:true},
+  {k:'name',  l:'Имя и фамилия',   always:true},
+  {k:'phone', l:'Телефон'},
+  {k:'branch',l:'Филиал'},
+  {k:'group', l:'Группа'},
+  {k:'age',   l:'Возраст'},
+  {k:'gender',l:'Пол'},
+  {k:'dur',   l:'Стаж'},
+  {k:'end',   l:'Окончание'},
+  {k:'debt',  l:'Долг'},
+  {k:'ltv',   l:'LTV'},
+  {k:'source',l:'Источник'},
+  {k:'status',l:'Статус'},
+  {k:'actions',l:'Действия',always:true},
+];
+let visCols=new Set(['num','name','phone','branch','group','age','end','debt','status','actions']);
+
+function renderTableHead(){
+  const cols=ALL_COLS.filter(c=>c.always||visCols.has(c.k));
+  document.getElementById('tHead').innerHTML=
+    `<tr><th><input type="checkbox" id="selAll" onchange="toggleAll(this.checked)"></th>`+
+    cols.map(c=>`<th>${c.l}</th>`).join('')+`</tr>`;
+}
+
+function renderTable(){
+  renderTableHead();
+  const rows=computeFiltered();
+  document.getElementById('emptyRow').style.display=rows.length?'none':'block';
+  const cols=ALL_COLS.filter(c=>c.always||visCols.has(c.k));
+  let idx=0;
+  document.getElementById('tBody').innerHTML=rows.map(s=>{
+    idx++;
+    const cfg=SC[s.status]||SC.no_status;
+    const age=calcAgeYears(s.dob);
+    const ltv=ltvSeg(s.dur);
+    const ltvG=ltv==='Ядро студии'||ltv==='Легенда Эхо Гор';
+    const cells=cols.map(c=>{
+      switch(c.k){
+        case 'num':    return `<td class="td-num">${idx}</td>`;
+        case 'name':   return `<td class="td-name">${fullName(s)}</td>`;
+        case 'phone':  return `<td class="td-phone">${s.phone}</td>`;
+        case 'branch': return `<td>${s.branch}</td>`;
+        case 'group':  return `<td>${s.group||'<span style="color:var(--muted)">—</span>'}</td>`;
+        case 'age':    return `<td>${ageLabel(age)}</td>`;
+        case 'gender': return `<td>${s.gender==='female'?'Ж':'М'}</td>`;
+        case 'dur':    return `<td>${s.dur} мес.</td>`;
+        case 'end':    return `<td>${s.end||'—'}</td>`;
+        case 'debt':   return `<td class="td-debt ${s.debt?'':'no'}">${s.debt?fmtMoney(s.debt):'—'}</td>`;
+        case 'ltv':    return `<td><span class="ltv ${ltvG?'gold':''}">${ltv}</span></td>`;
+        case 'source': return `<td>${s.source||'—'}</td>`;
+        case 'status': return `<td><span class="pill ${cfg.cls}"><span class="dot"></span>${cfg.label}</span></td>`;
+        case 'actions':return `<td onclick="event.stopPropagation()"><div class="row-acts">
+          <button class="ract" title="Позвонить" onclick="window.open('tel:${s.phone.replace(/\s/g,'')}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></button>
+          <button class="ract" title="WhatsApp" onclick="event.stopPropagation();toast('WhatsApp: ${fullName(s)}','ok')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></button>
+          <button class="ract" title="Telegram" onclick="event.stopPropagation();toast('Telegram: ${fullName(s)}','ok')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+          <button class="ract" title="Открыть карточку" onclick="event.stopPropagation();openDrawer(${s.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div></td>`;
+        default: return '<td>—</td>';
+      }
+    }).join('');
+    return `<tr class="row ${selected.has(s.id)?'sel':''}" onclick="openDrawer(${s.id})">
+      <td onclick="event.stopPropagation()"><input type="checkbox" ${selected.has(s.id)?'checked':''} onchange="toggleSel(${s.id},this.checked)"></td>
+      ${cells}</tr>`;
+  }).join('');
+  const selAll=document.getElementById('selAll');
+  if(selAll) selAll.checked=rows.length>0&&rows.every(r=>selected.has(r.id));
+  renderMassBar();
+}
+
+// ===== DRAWER =====
+let dSid=null;
+function openDrawer(id){dSid=id;renderDrawer();document.getElementById('drawerOv').classList.add('open');}
+function closeDrawer(){document.getElementById('drawerOv').classList.remove('open');}
+function renderDrawer(){
+  const s=students.find(x=>x.id===dSid);if(!s) return;
+  const cfg=SC[s.status]||SC.no_status;
+  const age=calcAgeYears(s.dob);
+  const c1=conflict(s,'add_waitlist');
+  const c2=conflict(s,'sell_sub');
+  const c3=conflict(s,'sell_group');
+  const c4=conflict(s,'mark');
+  document.getElementById('drawer').innerHTML=`
+    <div class="drawer-hd">
+      <div class="drawer-hd-top">
+        <div class="drawer-hd-name">${fullName(s)}</div>
+        <button class="drawer-close" onclick="closeDrawer()">✕</button>
+      </div>
+      <div class="drawer-chips">
+        <span class="pill ${cfg.cls}"><span class="dot"></span>${cfg.label}</span>
+        ${s.group?`<span class="dchip">${s.group}</span>`:'<span class="dchip" style="color:var(--muted)">Без группы</span>'}
+        <span class="dchip">${s.branch}</span>
+        ${age!==null?`<span class="dchip">${ageLabel(age)}</span>`:''}
+      </div>
+    </div>
+    <div class="drawer-body">
+      <div class="drawer-sec">
+        <div class="drawer-acts">
+          <button class="btn btn-secondary" style="font-size:12px;padding:7px 12px">☎ Позвонить</button>
+          <button class="btn btn-secondary" style="font-size:12px;padding:7px 12px" onclick="toast('WhatsApp: ${fullName(s)}','ok')">WhatsApp</button>
+          <button class="btn btn-secondary" style="font-size:12px;padding:7px 12px" onclick="toast('Telegram: ${fullName(s)}','ok')">Telegram</button>
+        </div>
+        <div class="dl">
+          <dt>Телефон</dt><dd>${s.phone}</dd>
+          <dt>Пол</dt><dd>${s.gender==='female'?'Женский':'Мужской'}</dd>
+          ${s.dob?`<dt>Дата рождения</dt><dd>${s.dob.split('-').reverse().join('.')}${age!==null?' ('+ageLabel(age)+')':''}</dd>`:''}
+          ${s.parent?`<dt>Родитель</dt><dd>${s.parent}</dd>`:''}
+          <dt>Источник</dt><dd>${s.source||'—'}</dd>
+          <dt>Стаж</dt><dd>${s.dur} мес. · ${ltvSeg(s.dur)}</dd>
+          ${s.end?`<dt>Окончание</dt><dd>${s.end}</dd>`:''}
+          ${s.debt?`<dt>Долг</dt><dd style="color:var(--red);font-weight:700">${fmtMoney(s.debt)}</dd>`:''}
+        </div>
+      </div>
+
+      <div class="drawer-sec">
+        <div class="drawer-label">Действия</div>
+        ${c2?`<div class="conflict">${warnIcon()}${c2}</div>`:''}
+        ${c3?`<div class="conflict warn">${warnIcon()}${c3}</div>`:''}
+        ${c4?`<div class="conflict">${warnIcon()}${c4}</div>`:''}
+        <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:8px;${c2?'opacity:.5;cursor:not-allowed':''}"
+          onclick="${c2?`toast('${c2.replace(/'/g,"\\'")}','err')`:`toast('Открываем окно продажи…','ok')`}">
+          + Продать абонемент
+        </button>
+        ${c1
+          ?`<div class="conflict warn" style="margin-top:0">${warnIcon()}${c1}</div>`
+          :`<button class="btn btn-wait" onclick="addToWaitlist(${s.id})">+ Добавить в лист ожидания</button>`}
+      </div>
+
+      <div class="drawer-sec">
+        <div class="drawer-label">Изменить статус</div>
+        <select class="status-sel" onchange="changeStatus(${s.id},this.value)">
+          ${Object.entries(SC).map(([k,v])=>`<option value="${k}" ${s.status===k?'selected':''}>${v.label}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="drawer-sec">
+        <div class="drawer-label">Комментарии</div>
+        <div id="dcList">${s.comments.length?s.comments.map(c=>`<div class="dc-item"><div class="dc-meta">${c.date}</div>${c.text}</div>`).join(''):'<div style="color:var(--muted);font-size:13px;padding:6px 0">Пока нет комментариев</div>'}</div>
+        <div class="dc-inp-row">
+          <input class="dc-inp" id="dcInp" placeholder="Добавить комментарий…" onkeydown="if(event.key==='Enter')addComment()">
+          <button class="btn btn-primary" style="padding:8px 13px;font-size:12px" onclick="addComment()">+</button>
+        </div>
+      </div>
+    </div>`;
+}
+function warnIcon(){return`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`;}
+function addComment(){
+  const s=students.find(x=>x.id===dSid);if(!s) return;
+  const inp=document.getElementById('dcInp');const t=inp.value.trim();if(!t) return;
+  s.comments.unshift({date:`${pad(TODAY.getDate())}.${pad(TODAY.getMonth()+1)}.${TODAY.getFullYear()}`,text:t});
+  inp.value='';renderDrawer();
+}
+function changeStatus(id,v){
+  const s=students.find(x=>x.id===id);if(!s) return;
+  s.status=v;if(v==='left')s.archived=true;
+  renderKPI();renderFunnel();renderTable();renderDrawer();
+  toast(`Статус: ${SC[v]?.label}`,'ok');
+}
+function addToWaitlist(sid){
+  const s=students.find(x=>x.id===sid);if(!s) return;
+  const c=conflict(s,'add_waitlist');if(c){toast(c,'err');return;}
+  if(waitlist.find(w=>w.id===sid)){toast(`${fullName(s)} уже в листе ожидания`,'wrn');return;}
+  waitlist.unshift({id:s.id,first:s.first,last:s.last,phone:s.phone,gender:s.gender,dob:s.dob,branch:s.branch,group:s.group||'',since:TODAY.toISOString().slice(0,10),comment:''});
+  s.status='waitlist';
+  renderKPI();renderFunnel();renderTable();renderDrawer();closeDrawer();
+  updateTabBadges();
+  toast(`${fullName(s)} добавлен в лист ожидания`,'ok');
+}
+
+// ===== WAITLIST =====
+function renderWaitlist(){
+  const wlE=document.getElementById('wlEmpty');
+  const wlB=document.getElementById('wlBody');
+  wlE.style.display=waitlist.length?'none':'block';
+  wlB.innerHTML=waitlist.map((w,i)=>{
+    const age=calcAgeYears(w.dob);
+    const d=daysSince(w.since);
+    const p=priLabel(d);
+    return `<tr>
+      <td class="td-num">${i+1}</td>
+      <td class="td-name">${w.first} ${w.last}</td>
+      <td class="td-phone">${w.phone}</td>
+      <td>${w.gender==='female'?'Ж':'М'}</td>
+      <td>${ageLabel(age)}</td>
+      <td>${w.branch}</td>
+      <td>${w.group||'—'}</td>
+      <td>${w.since.split('-').reverse().join('.')}</td>
+      <td>${d} дн.</td>
+      <td><span class="pri ${p.c}">${p.l}</span></td>
+      <td style="font-size:12px;color:var(--muted);max-width:120px;white-space:normal">${w.comment||'—'}</td>
+      <td><div class="row-acts">
+        <button class="ract" onclick="toast('Звоним ${w.first}','ok')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.362 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.338 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></button>
+        <button class="ract" onclick="toast('WhatsApp: ${w.first} ${w.last}','ok')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></button>
+        <button class="ract" style="color:var(--green)" onclick="enrollWl(${w.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></button>
+        <button class="ract" style="color:var(--red)" onclick="removeWl(${w.id})"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+function enrollWl(wid){
+  const w=waitlist.find(x=>x.id===wid);if(!w) return;
+  waitlist=waitlist.filter(x=>x.id!==wid);
+  const s=students.find(x=>x.id===wid);if(s){s.status='trial_scheduled';}
+  renderWaitlist();renderKPI();renderFunnel();renderTable();updateTabBadges();
+  toast(`${w.first} ${w.last} записан в группу`,'ok');
+}
+function removeWl(wid){waitlist=waitlist.filter(x=>x.id!==wid);renderWaitlist();updateTabBadges();toast('Удалён из листа','ok');}
+
+// ===== ADD STUDENT =====
+function calcAge(){
+  const dob=document.getElementById('nDob').value;const h=document.getElementById('ageHint');
+  if(!dob){h.textContent='';return;}
+  const d=new Date(dob);let a=TODAY.getFullYear()-d.getFullYear();
+  if(TODAY.getMonth()-d.getMonth()<0||(TODAY.getMonth()===d.getMonth()&&TODAY.getDate()<d.getDate())) a--;
+  h.textContent=a>=0?ageLabel(a):'';
+}
+function saveNewStudent(){
+  const first=document.getElementById('nFirst').value.trim();
+  const last=document.getElementById('nLast').value.trim();
+  const phone=document.getElementById('nPhone').value.trim();
+  const branch=document.getElementById('nBranch').value;
+  if(!first||!last||!phone){toast('Заполните: Имя, Фамилия, Телефон','err');return;}
+  const gender=document.querySelector('input[name="gender"]:checked')?.value||'female';
+  const id=Date.now();
+  students.push({id,first,last,phone,gender,dob:document.getElementById('nDob').value||null,
+    branch,group:document.getElementById('nGroup').value,dur:0,end:null,debt:0,status:'no_status',
+    archived:false,source:document.getElementById('nSource').value,
+    parent:document.getElementById('nParent').value.trim(),comments:[]});
+  closeModal('addStudent');
+  renderKPI();renderFunnel();renderTable();updateTabBadges();
+  setTimeout(()=>openDrawer(id),200);
+  toast('Ученик создан — статус «Без статуса»','ok');
+  ['nFirst','nLast','nPhone','nDob','nParent','nComment'].forEach(k=>{const e=document.getElementById(k);if(e)e.value='';});
+  document.getElementById('ageHint').textContent='';
+}
+
+// ===== COL CUSTOMIZER =====
+function openColCustomizer(){
+  document.getElementById('colList').innerHTML=ALL_COLS.filter(c=>!c.always).map(c=>`
+    <label class="col-item ${visCols.has(c.k)?'on':''}" onclick="toggleCI(this,'${c.k}')">
+      <input type="checkbox" ${visCols.has(c.k)?'checked':''} onchange="void(0)">${c.l}
+    </label>`).join('');
+}
+function toggleCI(el,k){el.classList.toggle('on');el.querySelector('input').checked=el.classList.contains('on');}
+function applyColSettings(){
+  visCols=new Set(Array.from(document.querySelectorAll('#colList .col-item.on')).map(el=>el.getAttribute('onclick').match(/'(\w+)'/)[1]));
+  visCols.add('actions');closeModal('colCustomizer');renderTable();toast('Таблица обновлена','ok');
+}
+
+// ===== SELECT / MASS =====
+function toggleSel(id,c){if(c)selected.add(id);else selected.delete(id);renderTable();}
+function toggleAll(c){computeFiltered().forEach(s=>c?selected.add(s.id):selected.delete(s.id));renderTable();}
+function renderMassBar(){
+  const b=document.getElementById('massBar');b.classList.toggle('show',selected.size>0);
+  document.getElementById('massCnt').textContent=`Выбрано ${selected.size}`;
+}
+function doMassGroup(){const g=document.getElementById('mg-g').value;students.forEach(s=>{if(selected.has(s.id))s.group=g;});closeModal('massGroup');renderTable();toast(`Группа → ${g}`,'ok');}
+function doMassBranch(){const b=document.getElementById('mg-b').value;students.forEach(s=>{if(selected.has(s.id))s.branch=b;});closeModal('massBranch');renderTable();toast(`Филиал → ${b}`,'ok');}
+function doMassStatus(){const v=document.getElementById('mg-s').value;students.forEach(s=>{if(selected.has(s.id)){s.status=v;if(v==='left')s.archived=true;}});closeModal('massStatus');renderKPI();renderFunnel();renderTable();toast(`Статус изменён у ${selected.size} уч.`,'ok');}
+function massWa(){if(!selected.size)return;toast(`WhatsApp → ${selected.size} ученикам`,'ok');}
+function massComment(){if(!selected.size)return;const t=prompt('Комментарий:');if(!t)return;const d=`${pad(TODAY.getDate())}.${pad(TODAY.getMonth()+1)}.${TODAY.getFullYear()}`;students.forEach(s=>{if(selected.has(s.id))s.comments.unshift({date:d,text:t});});toast(`Добавлено ${selected.size} уч.`,'ok');}
+function massExport(){if(!selected.size)return;const rows=students.filter(s=>selected.has(s.id));const h=['Имя','Фамилия','Телефон','Статус'];const lines=[h.join(';'),...rows.map(s=>[s.first,s.last,s.phone,SC[s.status]?.label].join(';'))];const blob=new Blob(['\uFEFF'+lines.join('\n')],{type:'text/csv;charset=utf-8;'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ученики.csv';a.click();toast(`Выгружено ${rows.length} уч.`,'ok');}
+function massArchive(){if(!selected.size)return;const n=selected.size;students.forEach(s=>{if(selected.has(s.id)){s.archived=true;s.status='left';}});selected.clear();renderKPI();renderFunnel();renderTable();toast(`${n} уч. в архиве`,'ok');}
+
+// ===== VIEWS =====
+function showView(v){
+  document.getElementById('view-registry').style.display=v==='registry'?'':'none';
+  document.getElementById('view-waitlist').style.display=v==='waitlist'?'':'none';
+  document.querySelectorAll('.view-tab').forEach((t,i)=>t.classList.toggle('active',['registry','waitlist'][i]===v));
+  if(v==='waitlist') renderWaitlist();
+}
+function updateTabBadges(){
+  document.getElementById('tabBadge1').textContent=students.filter(s=>!s.archived).length;
+  document.getElementById('tabBadge2').textContent=waitlist.length;
+}
+
+// ===== MODAL =====
+function openModal(name){
+  if(name==='colCustomizer') openColCustomizer();
+  document.getElementById('modal-'+name).classList.add('open');
+}
+function closeModal(name){document.getElementById('modal-'+name).classList.remove('open');}
+
+// ===== FILTERS =====
+function applyFilters(){renderTable();}
+
+// ===== TOAST =====
+function toast(msg,type='ok'){
+  const c=document.getElementById('toasts');const el=document.createElement('div');
+  el.className='toast '+type;el.textContent=msg;c.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),200);},(type==='err'?5000:3200));
+}
+
+// Radio
+document.addEventListener('change',e=>{
+  if(e.target.name==='gender'){
+    document.querySelectorAll('.radio-opt').forEach(l=>l.classList.remove('on'));
+    e.target.parentElement.classList.add('on');
+  }
+});
+
+// INIT
+renderKPI();renderFunnel();renderSegs();renderTable();updateTabBadges();
+</script>
+</body>
+</html>
