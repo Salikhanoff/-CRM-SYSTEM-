@@ -504,8 +504,8 @@
         <div class="page-sub">Бюджет доходов и расходов · контроль плана · мотивация · прогнозы по всей сети</div>
       </div>
       <div class="head-actions">
-        <button class="btn btn-secondary">Период: Июнь 2026 ▾</button>
-        <button class="btn btn-brand">+ Создать новый БДР</button>
+        <button class="btn btn-secondary" id="periodBtn" onclick="pickPeriod(this)">Период: Июнь 2026 ▾</button>
+        <button class="btn btn-brand" onclick="createNewBDR()">+ Создать новый БДР</button>
       </div>
     </div>
 
@@ -543,7 +543,7 @@
 
       <div class="slabel">Планирование расходов · по категориям</div>
       <div class="tree-card">
-        <div class="tree-head"><h3>Расходы</h3><button class="btn btn-secondary" style="padding:6px 12px;font-size:12px">+ Категория</button></div>
+        <div class="tree-head"><h3>Расходы</h3><button class="btn btn-secondary" style="padding:6px 12px;font-size:12px" onclick="addCategory()">+ Категория</button></div>
         <table>
           <thead><tr><th>Категория</th><th class="num">План, ₸</th><th class="num">Режим</th></tr></thead>
           <tbody id="expenseTree"></tbody>
@@ -825,18 +825,7 @@ function pickSource(el){
 
 // ===== ПЕРЕКЛЮЧЕНИЕ РЕЖИМА АВТО/ВРУЧНУЮ =====
 function bindModePills(){
-  document.querySelectorAll('.mode-pill').forEach(function(p){
-    // только pill в строках таблиц (не заголовочные с auto-dot)
-    if(p.querySelector('.auto-dot')) return;
-    p.style.cursor='pointer';
-    p.title='Переключить режим';
-    p.addEventListener('click', function(){
-      var isAuto = p.classList.contains('auto');
-      p.classList.toggle('auto', !isAuto);
-      p.classList.toggle('manual', isAuto);
-      p.textContent = isAuto ? 'вручную' : 'авто';
-    });
-  });
+  document.querySelectorAll('.mode-pill').forEach(function(p){ bindOneModePill(p); });
 }
 
 // ===== ФАКТ: суммирование (показываем подсказку итогов) =====
@@ -874,6 +863,79 @@ function bindLadders(){
       });
     });
     recalc();
+  });
+}
+
+// ===== СОЗДАТЬ НОВЫЙ БДР =====
+function createNewBDR(){
+  // обнуляем дерево выручки и расходов для планирования с нуля
+  document.querySelectorAll('#revenueTree input').forEach(function(i){ i.value='0'; });
+  document.querySelectorAll('#expenseTree input').forEach(function(i){ i.value='0'; });
+  // сбрасываем выбор источника на "Вручную"
+  document.querySelectorAll('.source-opt').forEach(function(o){ o.classList.remove('on'); });
+  var manual = Array.prototype.slice.call(document.querySelectorAll('.source-opt'))
+    .filter(function(o){ var t=o.querySelector('.source-opt-title'); return t && t.textContent.trim()==='Вручную'; })[0];
+  if(manual) manual.classList.add('on');
+  // переключаемся на вкладку План
+  var planTab = document.querySelector('.subtab');
+  if(planTab) showPanel('plan', planTab);
+  recalcPlan();
+  // обновляем подпись периода под новый месяц
+  var pb=document.getElementById('periodBtn');
+  if(pb){
+    var months=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+    var d=new Date();
+    pb.textContent='Период: '+months[d.getMonth()]+' '+d.getFullYear()+' ▾';
+  }
+  flash('Новый БДР создан — заполните план с нуля');
+}
+
+// ===== ВЫБОР ПЕРИОДА =====
+var PERIOD_MONTHS=['Март 2026','Апрель 2026','Май 2026','Июнь 2026','Июль 2026'];
+var periodIdx=3;
+function pickPeriod(btn){
+  periodIdx=(periodIdx+1)%PERIOD_MONTHS.length;
+  btn.textContent='Период: '+PERIOD_MONTHS[periodIdx]+' ▾';
+  flash('Период переключён: '+PERIOD_MONTHS[periodIdx]);
+}
+
+// ===== ДОБАВИТЬ КАТЕГОРИЮ РАСХОДОВ =====
+function addCategory(){
+  var name=prompt('Название категории расхода:','Новая категория');
+  if(name===null) return;
+  var tbody=document.getElementById('expenseTree');
+  var tr=document.createElement('tr');
+  tr.className='tree-row lvl1';
+  tr.innerHTML='<td>'+(name||'Новая категория')+'</td>'+
+    '<td class="num editable-cell"><input value="0"></td>'+
+    '<td class="num"><span class="mode-pill manual">вручную</span></td>';
+  tbody.appendChild(tr);
+  // навешиваем интерактив на новую строку
+  var inp=tr.querySelector('input');
+  inp.addEventListener('input', recalcPlan);
+  bindOneModePill(tr.querySelector('.mode-pill'));
+  recalcPlan();
+}
+
+// ===== МИНИ-УВЕДОМЛЕНИЕ =====
+function flash(msg){
+  var n=document.createElement('div');
+  n.textContent=msg;
+  n.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy,#1a2b4a);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;';
+  document.body.appendChild(n);
+  requestAnimationFrame(function(){ n.style.opacity='1'; });
+  setTimeout(function(){ n.style.opacity='0'; setTimeout(function(){ n.remove(); },250); }, 2200);
+}
+
+function bindOneModePill(p){
+  if(!p || p.querySelector('.auto-dot')) return;
+  p.style.cursor='pointer';
+  p.title='Переключить режим';
+  p.addEventListener('click', function(){
+    var isAuto=p.classList.contains('auto');
+    p.classList.toggle('auto', !isAuto);
+    p.classList.toggle('manual', isAuto);
+    p.textContent=isAuto?'вручную':'авто';
   });
 }
 
