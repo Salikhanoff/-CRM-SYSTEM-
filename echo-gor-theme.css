@@ -1,0 +1,181 @@
+/* =========================================================================
+   ЭХО ГОР — фирменная тема для CRM
+   Подключение:  <link rel="stylesheet" href="echo-gor-theme.css">
+   Тёмная тема включена по умолчанию. Светлая:  <html data-theme="day">
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
+
+/* ----------  ПАЛИТРА  ---------- */
+:root {
+  --eg-bg:#12161A; --eg-panel:#1A2027; --eg-inset:#161B21; --eg-control:#1E252D;
+  --eg-hover:#232D37; --eg-nav-active:#222C36;
+  --eg-border:#2A333C; --eg-border-2:#232C35; --eg-row-border:#1F272F;
+  --eg-chip:#232C35; --eg-chip-2:#2C353F; --eg-scrollbar:#2C353F;
+  --eg-text:#E9ECEF; --eg-heading:#F2F4F6; --eg-text-2:#AEB6BE;
+  --eg-muted:#7E8893; --eg-muted-2:#6E7884; --eg-faint:#5E6873;
+  --eg-gold:#BF9D5F; --eg-gold-deep:#947C51; --eg-blue:#8FB8CC; --eg-blue-deep:#5E8194;
+  --eg-green:#7FB089; --eg-red:#C45A5A; --eg-on-gold:#1A2027;
+  --eg-ok-bg:rgba(127,176,137,.14); --eg-gold-bg:rgba(191,157,95,.16);
+  --eg-red-bg:rgba(196,90,90,.15); --eg-blue-bg:rgba(143,184,204,.15);
+  --eg-radius:12px; --eg-radius-sm:8px;
+  --eg-font:'IBM Plex Sans',system-ui,sans-serif;
+  --eg-display:'Oswald',var(--eg-font);
+}
+
+[data-theme="day"] {
+  --eg-bg:#E8ECF1; --eg-panel:#FFFFFF; --eg-inset:#F1F4F7; --eg-control:#F1F4F7;
+  --eg-hover:#EDF1F5; --eg-nav-active:#ECF0F4;
+  --eg-border:#DCE2E8; --eg-border-2:#E8ECF1; --eg-row-border:#EEF1F4;
+  --eg-chip:#EDF1F5; --eg-chip-2:#DEE4EB; --eg-scrollbar:#CCD4DD;
+  --eg-text:#222B33; --eg-heading:#11171D; --eg-text-2:#46505B;
+  --eg-muted:#6B7682; --eg-muted-2:#8A95A1; --eg-faint:#A2ADB8;
+  --eg-gold:#947C51; --eg-gold-deep:#7E6840; --eg-blue:#5E8194; --eg-blue-deep:#3F5F73;
+  --eg-green:#4F8A63; --eg-red:#B14545; --eg-on-gold:#FFFFFF;
+  --eg-ok-bg:rgba(79,138,99,.13); --eg-gold-bg:rgba(148,124,81,.15);
+  --eg-red-bg:rgba(177,69,69,.12); --eg-blue-bg:rgba(94,129,148,.14);
+}
+
+/* ----------  БАЗА  ---------- */
+body {
+  background:var(--eg-bg) !important;
+  color:var(--eg-text);
+  font-family:var(--eg-font);
+  -webkit-font-smoothing:antialiased;
+  transition:background .3s,color .3s;
+}
+*::-webkit-scrollbar{width:9px;height:9px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:var(--eg-scrollbar);border-radius:6px}
+
+a{color:var(--eg-gold);text-decoration:none}
+a:hover{color:var(--eg-gold-deep)}
+
+h1,h2,h3,h4,h5,h6{
+  font-family:var(--eg-display);
+  color:var(--eg-heading);
+  font-weight:600;
+  letter-spacing:.3px;
+}
+h1,h2{text-transform:uppercase}
+small,.muted,.text-muted{color:var(--eg-muted)}
+
+/* ----------  ПАНЕЛИ / КАРТОЧКИ  ----------
+   Сработает для типичных классов-контейнеров. Добавьте свой класс при необходимости. */
+.card,.panel,.box,.tile,.widget,.kpi,.stat,section.card,[class*="card"]{
+  background:var(--eg-panel);
+  border:1px solid var(--eg-border);
+  border-radius:var(--eg-radius);
+  color:var(--eg-text);
+}
+
+/* ----------  ТАБЛИЦЫ  ---------- */
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:var(--eg-panel);
+  border:1px solid var(--eg-border);
+  border-radius:var(--eg-radius);
+  overflow:hidden;
+  color:var(--eg-text);
+}
+thead th{
+  background:transparent;
+  color:var(--eg-muted-2);
+  font-family:var(--eg-font);
+  font-size:12px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  text-align:left;
+  padding:14px 18px;
+  border-bottom:1px solid var(--eg-border-2);
+}
+tbody td{
+  padding:13px 18px;
+  border-bottom:1px solid var(--eg-row-border);
+  font-size:14px;
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--eg-hover)}
+
+/* ----------  КНОПКИ  ---------- */
+button,.btn,input[type="submit"],input[type="button"],a.btn{
+  font-family:var(--eg-font);
+  font-weight:600;
+  font-size:14px;
+  padding:10px 18px;
+  border-radius:var(--eg-radius-sm);
+  border:1px solid var(--eg-border);
+  background:var(--eg-control);
+  color:var(--eg-text);
+  cursor:pointer;
+  transition:background .15s,border-color .15s,opacity .15s;
+}
+button:hover,.btn:hover{background:var(--eg-hover)}
+
+/* Главная кнопка — золотая. Добавьте класс .btn-primary / .primary, либо она применится к [type=submit]. */
+.btn-primary,.primary,button.primary,input[type="submit"],
+button[class*="primary"],a[class*="primary"]{
+  background:linear-gradient(135deg,var(--eg-gold-deep),var(--eg-gold));
+  color:var(--eg-on-gold);
+  border:none;
+}
+.btn-primary:hover,.primary:hover,input[type="submit"]:hover{opacity:.92;background:linear-gradient(135deg,var(--eg-gold-deep),var(--eg-gold))}
+
+/* ----------  ПОЛЯ ВВОДА  ---------- */
+input,select,textarea{
+  font-family:var(--eg-font);
+  font-size:14px;
+  color:var(--eg-text);
+  background:var(--eg-control);
+  border:1px solid var(--eg-border);
+  border-radius:var(--eg-radius-sm);
+  padding:9px 13px;
+  outline:none;
+  transition:border-color .15s;
+}
+input::placeholder,textarea::placeholder{color:var(--eg-faint)}
+input:focus,select:focus,textarea:focus{border-color:var(--eg-gold)}
+label{color:var(--eg-text-2);font-size:13px;font-weight:500}
+
+/* ----------  НАВИГАЦИЯ / ШАПКА  ---------- */
+header,nav,.navbar,.topbar,.sidebar,aside{
+  background:var(--eg-panel);
+  border-color:var(--eg-border);
+  color:var(--eg-text);
+}
+nav a{color:var(--eg-text-2)}
+nav a:hover,nav a.active,nav a[aria-current]{color:var(--eg-heading)}
+
+/* ----------  МОДАЛЬНЫЕ ОКНА  ---------- */
+dialog,.modal,.modal-content,[class*="modal"]>[class*="content"],[role="dialog"]{
+  background:var(--eg-panel);
+  color:var(--eg-text);
+  border:1px solid var(--eg-border);
+  border-radius:var(--eg-radius);
+}
+.modal-title,dialog h2,dialog h3{color:var(--eg-heading)}
+
+/* ----------  СТАТУС-БЕЙДЖИ  ----------
+   Раскрасьте через классы .badge--ok / .badge--warn / .badge--danger / .badge--info */
+.badge,.tag,.chip,.status,[class*="badge"]{
+  display:inline-block;
+  font-size:11.5px;
+  font-weight:600;
+  padding:4px 11px;
+  border-radius:20px;
+  background:var(--eg-chip);
+  color:var(--eg-text-2);
+}
+.badge--ok,.status--ok,.is-ok,[class*="success"]{background:var(--eg-ok-bg);color:var(--eg-green)}
+.badge--warn,.status--warn,.is-warn,[class*="warning"]{background:var(--eg-gold-bg);color:var(--eg-gold)}
+.badge--danger,.status--danger,.is-danger,[class*="danger"],[class*="error"]{background:var(--eg-red-bg);color:var(--eg-red)}
+.badge--info,.status--info,.is-info{background:var(--eg-blue-bg);color:var(--eg-blue)}
+
+/* ----------  АКЦЕНТНЫЕ ЧИСЛА / KPI  ---------- */
+.kpi-value,.stat-value,[class*="kpi"] [class*="value"]{
+  font-family:var(--eg-display);
+  font-weight:600;
+  color:var(--eg-heading);
+}
