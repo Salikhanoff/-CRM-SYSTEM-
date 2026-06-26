@@ -767,10 +767,129 @@ function showPanel(id, btn){
   document.getElementById('panel-'+id).classList.add('active');
   btn.classList.add('active');
 }
-function pickSource(el){
-  document.querySelectorAll('.source-opt').forEach(o=>o.classList.remove('on'));
-  el.classList.add('on');
+
+// ===== УТИЛИТЫ =====
+function parseNum(s){
+  // убираем пробелы/неразрывные пробелы, поддержка минуса (− и -)
+  var n = String(s).replace(/[\s\u00A0\u202F]/g,'').replace('−','-').replace(/[^0-9.-]/g,'');
+  var v = parseFloat(n);
+  return isNaN(v)?0:v;
 }
+
+// ===== ПЛАН: live-пересчёт KPI =====
+function recalcPlan(){
+  var rev=0, exp=0;
+  document.querySelectorAll('#revenueTree .tree-row.lvl0 input').forEach(function(i){ rev += parseNum(i.value); });
+  // если уровня 0 нет — суммируем верхний уровень (lvl1)
+  if(rev===0){
+    document.querySelectorAll('#revenueTree .tree-row.lvl1 input').forEach(function(i){ rev += parseNum(i.value); });
+  }
+  document.querySelectorAll('#expenseTree input').forEach(function(i){ exp += parseNum(i.value); });
+  var profit = rev - exp;
+  var margin = rev>0 ? Math.round(profit/rev*100) : 0;
+  setText('planRevenue', fmt(rev));
+  setText('planExpense', fmt(exp));
+  setText('planProfit', fmt(profit));
+  setText('planMargin', margin+'%');
+}
+
+function setText(id, val){ var el=document.getElementById(id); if(el) el.textContent=val; }
+
+// ===== ИСТОЧНИК ПЛАНА: подстановка цифр =====
+var SOURCE_PRESETS = {
+  'Прошлый месяц': 27400000,
+  'Прошлый год':   24100000,
+  'Среднее значение': 26000000,
+  'Вручную': 0
+};
+function pickSource(el){
+  document.querySelectorAll('.source-opt').forEach(function(o){ o.classList.remove('on'); });
+  el.classList.add('on');
+  var title = (el.querySelector('.source-opt-title')||{}).textContent || '';
+  var target = SOURCE_PRESETS[title.trim()];
+  if(target === undefined) return;
+  if(target === 0){
+    // режим "Вручную" — обнуляем дерево для ввода с нуля
+    document.querySelectorAll('#revenueTree input').forEach(function(i){ i.value = '0'; });
+  } else {
+    // масштабируем текущее дерево выручки под новую общую сумму
+    var inputs = document.querySelectorAll('#revenueTree .tree-row.lvl0 input');
+    var base = 30000000; // исходная сумма сети из revenueData
+    var k = target / base;
+    document.querySelectorAll('#revenueTree input').forEach(function(i){
+      i.value = fmt(parseNum(i.value) * k);
+    });
+  }
+  recalcPlan();
+}
+
+// ===== ПЕРЕКЛЮЧЕНИЕ РЕЖИМА АВТО/ВРУЧНУЮ =====
+function bindModePills(){
+  document.querySelectorAll('.mode-pill').forEach(function(p){
+    // только pill в строках таблиц (не заголовочные с auto-dot)
+    if(p.querySelector('.auto-dot')) return;
+    p.style.cursor='pointer';
+    p.title='Переключить режим';
+    p.addEventListener('click', function(){
+      var isAuto = p.classList.contains('auto');
+      p.classList.toggle('auto', !isAuto);
+      p.classList.toggle('manual', isAuto);
+      p.textContent = isAuto ? 'вручную' : 'авто';
+    });
+  });
+}
+
+// ===== ФАКТ: суммирование (показываем подсказку итогов) =====
+function bindFactInputs(){
+  document.querySelectorAll('#panel-fact input').forEach(function(i){
+    i.addEventListener('input', function(){ /* живое редактирование, итоги в П/Ф */ });
+  });
+}
+
+// ===== МОТИВАЦИЯ: KPI-лестница =====
+function bindLadders(){
+  document.querySelectorAll('.mot-card').forEach(function(card){
+    var inputs = card.querySelectorAll('.ladder-input');
+    var salaryEl = card.querySelector('.mot-salary-val');
+    function recalc(){
+      // текущий шаг = .current, иначе последний .reached
+      var current = card.querySelector('.ladder-step.current .ladder-input');
+      var bonus = current ? parseNum(current.value) : 0;
+      var oklad = 350000; // базовый оклад (правится в коррективах)
+      if(salaryEl) salaryEl.textContent = fmt(oklad + bonus) + ' ₸';
+    }
+    inputs.forEach(function(i){ i.addEventListener('input', recalc); });
+    // клик по шагу делает его текущим
+    card.querySelectorAll('.ladder-step').forEach(function(step){
+      step.style.cursor='pointer';
+      step.addEventListener('click', function(e){
+        if(e.target.tagName==='INPUT') return;
+        card.querySelectorAll('.ladder-step').forEach(function(s){ s.classList.remove('current'); });
+        step.classList.add('current');
+        // все шаги до текущего — reached
+        var steps = Array.prototype.slice.call(card.querySelectorAll('.ladder-step'));
+        var idx = steps.indexOf(step);
+        steps.forEach(function(s,n){ s.classList.toggle('reached', n>0 && n<=idx); });
+        recalc();
+      });
+    });
+    recalc();
+  });
+}
+
+// ===== ИНИЦИАЛИЗАЦИЯ ИНТЕРАКТИВА =====
+function initInteractive(){
+  // live-пересчёт плана
+  document.querySelectorAll('#revenueTree input, #expenseTree input').forEach(function(i){
+    i.addEventListener('input', recalcPlan);
+  });
+  bindModePills();
+  bindFactInputs();
+  bindLadders();
+  recalcPlan();
+}
+// деревья рендерятся выше в этом же скрипте, DOM уже готов
+initInteractive();
 
 </script>
 
