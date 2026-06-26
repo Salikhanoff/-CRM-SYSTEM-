@@ -335,7 +335,8 @@
   .eg-toggle div{padding:6px 11px;border-radius:6px;font-size:14px;cursor:pointer;line-height:1;color:var(--muted-c)}
   .eg-toggle div.on{background:var(--gold-c);color:var(--on-gold)}
   .eg-toggle.lang div{padding:6px 14px;font-size:13px;font-weight:600}
-  .eg-content{flex:1;padding:30px 36px;max-width:1500px;overflow-x:hidden}
+  .eg-content{flex:1;width:100%;min-width:0;padding:30px 36px;overflow-x:hidden;box-sizing:border-box}
+  .eg-content>*{max-width:1280px;margin-left:auto;margin-right:auto}
   /* перекраска компонентов под тему */
   .card,.panel,.box,.tcard,.modal,.sheet,.drawer{background:var(--panel) !important;border-color:var(--border-c) !important;color:var(--text)}
   select,input,textarea,.colcfg-btn,.btn-ghost{background:var(--control) !important;color:var(--text) !important;border-color:var(--border-c) !important}
@@ -448,7 +449,6 @@
       <div class="eg-toggle" id="themeToggle"><div onclick="egTheme('night')" title="Ночь">☾</div><div class="on" onclick="egTheme('day')" title="День">☀</div></div>
       <div class="eg-toggle lang" id="langToggle"><div class="on">РУС</div></div>
       </div>
-    </div>
     <div class="eg-content">
 
     <h1>Преподаватели сети</h1>
