@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Планирование (БДР) — Эхо Гор CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===== ЭХО ГОР — система тем (день/ночь) ===== */
+  :root, [data-theme="night"]{
+    --bg:#12161A; --panel:#1A2027; --inset:#161B21; --control:#1E252D; --hover:#232D37;
+    --nav-active:#222C36; --border-c:#2A333C; --border2:#232C35; --row-border:#1F272F;
+    --chip:#232C35; --scrollbar:#2C353F;
+    --text:#E9ECEF; --heading:#F2F4F6; --text2:#AEB6BE; --text-muted:#9AA4AE;
+    --muted-c:#7E8893; --muted2:#6E7884; --faint:#5E6873;
+    --gold-c:#BF9D5F; --gold-deep:#947C51; --blue-c:#8FB8CC; --blue-deep:#5E8194;
+    --green-c:#7FB089; --red-c:#C45A5A; --on-gold:#1A2027;
+    --ok-bg:rgba(127,176,137,.14); --gold-bg:rgba(191,157,95,.16);
+    --red-bg2:rgba(196,90,90,.15); --blue-bg2:rgba(143,184,204,.15);
+    --shadow:0 8px 28px rgba(0,0,0,.45); --r:16px;
+  }
+  [data-theme="day"]{
+    --bg:#E8ECF1; --panel:#FFFFFF; --inset:#F1F4F7; --control:#F1F4F7; --hover:#EDF1F5;
+    --nav-active:#ECF0F4; --border-c:#DCE2E8; --border2:#E8ECF1; --row-border:#EEF1F4;
+    --chip:#EDF1F5; --scrollbar:#CCD4DD;
+    --text:#222B33; --heading:#11171D; --text2:#46505B; --text-muted:#5C6772;
+    --muted-c:#6B7682; --muted2:#8A95A1; --faint:#A2ADB8;
+    --gold-c:#947C51; --gold-deep:#7E6840; --blue-c:#5E8194; --blue-deep:#3F5F73;
+    --green-c:#4F8A63; --red-c:#B14545; --on-gold:#FFFFFF;
+    --ok-bg:rgba(79,138,99,.13); --gold-bg:rgba(148,124,81,.15);
+    --red-bg2:rgba(177,69,69,.12); --blue-bg2:rgba(94,129,148,.14);
+    --shadow:0 4px 16px rgba(0,0,0,.1); --r:16px;
+  }
+  /* алиасы старых переменных файла -> тема */
+  :root, [data-theme]{
+    --card:var(--panel); --line:var(--border-c); --ink:var(--heading); --muted:var(--muted-c);
+    --gold:var(--gold-c); --gold-soft:var(--gold-bg); --gold-ink:var(--gold-c);
+    --green:var(--green-c); --green-soft:var(--ok-bg);
+    --red:var(--red-c); --red-soft:var(--red-bg2);
+    --blue:var(--blue-c); --blue-soft:var(--blue-bg2);
+    --purple:var(--gold-c); --purple-soft:var(--gold-bg);
+    --amber:var(--gold-c); --amber-soft:var(--gold-bg);
+  }
+
+  /* нейтрализованный старый :root — всё через тему */
+  :root, [data-theme]{
+    --card:var(--panel); --line:var(--border-c); --ink:var(--heading); --muted:var(--muted-c);
+    --gold:var(--gold-c); --gold-soft:var(--gold-bg); --gold-ink:var(--gold-c);
+    --green:var(--green-c); --green-soft:var(--ok-bg); --red:var(--red-c); --red-soft:var(--red-bg2);
+    --blue:var(--blue-c); --blue-soft:var(--blue-bg2); --purple:var(--gold-c); --purple-soft:var(--gold-bg);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter','Oswald',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-y:scroll}
+  .app{display:flex;min-height:100vh}
+  .side{width:280px;flex-shrink:0;padding:24px 16px;display:flex;flex-direction:column;gap:8px}
+  .brand{background:var(--ink);border-radius:var(--r);padding:20px 22px;margin-bottom:12px}
+  .brand-logo{font-family:'Bebas Neue',sans-serif;font-size:34px;line-height:1;letter-spacing:.02em;display:flex;gap:4px}
+  .brand-logo .b-echo{color:var(--blue)} .brand-logo .b-gor{color:#fff}
+  .brand-sub{color:#9aa0a6;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;margin-top:6px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:13px 18px;border-radius:12px;
+    color:var(--muted);text-decoration:none;font-weight:600;font-size:15px;transition:.15s;cursor:pointer}
+  .nav a:hover{background:#EAEBE7}
+  .nav a.active{background:var(--gold-soft);color:var(--gold-ink)}
+  .nav a svg{width:18px;height:18px;flex-shrink:0}
+  .rbac{margin-top:auto;background:var(--green-soft);border-radius:var(--r);padding:18px 20px}
+  .rbac .tag{color:var(--green);font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .rbac b{display:block;margin:6px 0 4px;font-size:16px}
+  .rbac p{color:var(--muted);font-size:13px}
+
+  .main{flex:1;padding:36px 44px;max-width:1600px}
+  h1{font-family:'Bebas Neue','Oswald',sans-serif;font-size:38px;font-weight:800;letter-spacing:.01em}
+  .eyebrow{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-ink)}
+  .lead{color:var(--muted);max-width:760px;margin:8px 0 24px;font-size:16px}
+  .owner-tag{display:inline-flex;align-items:center;gap:6px;background:var(--gold-soft);color:var(--gold-ink);
+    font-size:12px;font-weight:800;padding:5px 12px;border-radius:999px;margin-left:10px;vertical-align:middle}
+
+  .toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:20px}
+  .filters{display:flex;gap:10px;flex-wrap:wrap}
+  select{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;
+    color:var(--ink);font-weight:600;cursor:pointer;outline:none}
+  select:focus{border-color:var(--gold)}
+  select.period{background:var(--gold-soft);border-color:#E0D6BF;color:var(--gold-ink)}
+  .btn-gold{background:var(--gold);color:#fff;border:none;border-radius:999px;padding:13px 22px;font-weight:800;
+    font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:.15s;box-shadow:0 6px 16px rgba(148,124,81,.3)}
+  .btn-gold:hover{filter:brightness(1.05)}
+  .btn-ghost{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:999px;padding:13px 20px;font-weight:700;font-size:14px;cursor:pointer;transition:.15s}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-ink)}
+  .btn-sm{border:1px solid var(--line);background:#fff;border-radius:999px;padding:9px 16px;font-weight:700;font-size:13px;cursor:pointer;transition:.12s}
+  .btn-sm:hover{border-color:var(--gold);color:var(--gold-ink)}
+
+  /* KPI tiles */
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .tile{background:var(--card);border-radius:var(--r);padding:20px 22px;box-shadow:var(--shadow)}
+  .tile .lbl{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+  .tile .val{font-size:30px;font-weight:800;margin-top:8px;font-family:'Oswald',sans-serif}
+  .tile .sub{font-size:13px;color:var(--muted);margin-top:4px}
+  .tile.profit .val{color:var(--green)} .tile.exp .val{color:var(--red)}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+  @media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+  .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:24px}
+  .card h3{font-size:16px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+  .card h3 .ai-ic{color:var(--gold-ink)}
+
+  table{width:100%;border-collapse:collapse}
+  th{text-align:left;padding:12px 10px;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--line)}
+  td{padding:13px 10px;font-size:14px;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+  td.r,th.r{text-align:right}
+  .badge{display:inline-block;padding:4px 11px;border-radius:999px;font-size:12px;font-weight:800}
+  .b-green{color:var(--green);background:var(--green-soft)}
+  .b-red{color:var(--red);background:var(--red-soft)}
+  .b-gray{color:var(--muted);background:#EEEFEA}
+  .b-gold{color:var(--gold-ink);background:var(--gold-soft)}
+  .b-blue{color:var(--blue-ink);background:var(--blue-soft)}
+
+  /* accounts */
+  .accounts{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:6px}
+  @media(max-width:760px){.accounts{grid-template-columns:1fr}}
+  .acc{background:#F8F9F6;border:1px solid var(--line);border-radius:14px;padding:16px 18px;cursor:pointer;transition:.12s}
+  .acc:hover{border-color:var(--gold)}
+  .acc .nm{font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px}
+  .acc .bal{font-size:24px;font-weight:800;margin-top:8px;font-family:'Oswald',sans-serif}
+  .acc .flow{font-size:12px;color:var(--muted);margin-top:6px}
+  .acc .flow .in{color:var(--green)} .acc .flow .out{color:var(--red)}
+
+  /* tabs */
+  .vtabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .vtab{padding:9px 18px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:700;font-size:14px;color:var(--muted);cursor:pointer}
+  .vtab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .view{display:none} .view.active{display:block}
+
+  /* analytics bars */
+  .barrow{margin-bottom:12px}
+  .barrow .bl{display:flex;justify-content:space-between;font-size:14px;font-weight:600;margin-bottom:6px}
+  .bar{height:10px;border-radius:5px;background:#EEEFEA;overflow:hidden}
+  .bar span{display:block;height:100%;border-radius:5px;background:var(--gold)}
+
+  .ai-box{background:linear-gradient(135deg,#F2EDE2,#fff);border:1px solid #E0D6BF;border-radius:var(--r);padding:22px 24px;margin-bottom:24px}
+  .ai-box .ttl{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px;margin-bottom:12px}
+  .ai-box .ttl svg{width:22px;height:22px;color:var(--gold-ink)}
+  .ai-box p{font-size:15px;color:#5a5446;margin:6px 0}
+  .ai-box .pt{display:flex;gap:8px;margin:4px 0;font-size:14px;color:#5a5446}
+  .ai-box .pt b{color:var(--ink)}
+  /* daily digest */
+  .digest{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:900px){.digest{grid-template-columns:repeat(2,1fr)}}
+  .dg{background:#fff;border:1px solid #E0D6BF;border-radius:12px;padding:14px 16px}
+  .dg .dl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+  .dg .dv{font-size:22px;font-weight:800;margin-top:6px;font-family:'Oswald',sans-serif}
+  .dg .ds{font-size:12px;margin-top:4px}
+  .dg.ok{border-color:var(--green)} .dg.ok .dv{color:var(--green)}
+  .dg.warn{border-color:var(--red)} .dg.warn .dv{color:var(--red)}
+  .dg .dot-ok{color:var(--green)} .dg .dot-warn{color:var(--red)}
+
+  /* ops filters */
+  .ops-filters{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .ops-search{flex:1;min-width:240px;display:flex;align-items:center;gap:8px;background:#F8F9F6;border:1px solid var(--line);border-radius:12px;padding:0 14px}
+  .ops-search svg{color:var(--muted);flex-shrink:0}
+  .ops-search input{border:none;background:none;outline:none;padding:11px 0;font-size:14px;width:100%;font-family:inherit}
+  .ops-summary{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:14px;padding:10px 14px;background:#F8F9F6;border-radius:12px}
+  .ops-summary b{color:var(--ink)}
+  .ops-summary .in{color:var(--green)} .ops-summary .out{color:var(--red)}
+  .set-row{display:flex;justify-content:space-between;align-items:center;padding:11px 14px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;font-size:14px;background:#F8F9F6}
+  .set-del{border:1px solid #EBC4B6;background:#fff;color:var(--red);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer}
+  .set-del:hover{background:var(--red-soft)}
+  .rev-details{background:#F8F9F6;border-radius:14px;padding:8px 16px}
+  .rev-details .rd{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:14px;gap:16px}
+  .rev-details .rd:last-child{border-bottom:none}
+  .rev-details .rd span{color:var(--muted)}
+  .rev-details .rd b{text-align:right}
+
+  /* modal */
+  .overlay{position:fixed;inset:0;background:rgba(20,24,33,.55);display:none;z-index:50;backdrop-filter:blur(3px);padding:40px 20px;overflow-y:auto}
+  .overlay.open{display:flex;align-items:flex-start;justify-content:center}
+  .sheet{background:var(--bg);width:100%;max-width:600px;border-radius:24px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.4);animation:rise .25s}
+  @keyframes rise{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+  .sheet-head{background:var(--card);padding:24px 28px;display:flex;justify-content:space-between;align-items:center}
+  .sheet-head h2{font-size:21px;font-weight:800}
+  .close{width:38px;height:38px;border:none;background:#EEEFEA;border-radius:11px;font-size:19px;cursor:pointer;color:var(--muted)}
+  .sheet-body{padding:22px 28px 28px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field.full{grid-column:1/-1}
+  .field label{font-size:12px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+  .field input,.field select,.field textarea{border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:14px;outline:none;background:#fff;font-family:inherit}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px}
+  .modal-foot{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+
+  .toasts{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:90}
+  .toast{background:var(--ink);color:#fff;padding:14px 20px;border-radius:14px;font-weight:600;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;align-items:center;gap:10px;animation:rise .2s;max-width:360px}
+  .toast .dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0}
+  .toast.err .dot{background:var(--red)}
+
+  @media(max-width:900px){.side{display:none}.main{padding:22px 16px}h1{font-size:30px}.tiles{grid-template-columns:repeat(2,1fr)}.form-grid{grid-template-columns:1fr}}
+
+  /* ===== ОБОЛОЧКА ДИЗАЙНА ===== */
+  body{font-family:'IBM Plex Sans','Inter',sans-serif !important;background:var(--bg);color:var(--text);transition:background .3s,color .3s}
+  h1,h2,h3,.brand-logo{font-family:'Oswald',sans-serif !important;color:var(--heading) !important;letter-spacing:.3px !important}
+  .app{display:flex;min-height:100vh}
+  .side{width:252px !important;flex-shrink:0;padding:0 !important;background:var(--panel);border-right:1px solid var(--border-c);display:flex;flex-direction:column;gap:0 !important}
+  .eg-logo-box{padding:22px 22px 18px;border-bottom:1px solid var(--border2)}
+  .eg-logo-box img{width:100%;display:block}
+  .nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:3px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:11px 13px !important;border-radius:8px !important;color:var(--text2) !important;text-decoration:none;font-weight:500 !important;font-size:14px !important;transition:background .15s}
+  .nav a .navbar{width:4px;height:18px;border-radius:3px;background:transparent;flex:none}
+  .nav a:hover{background:var(--hover) !important}
+  .nav a.active{background:var(--nav-active) !important;color:var(--heading) !important;font-weight:600 !important}
+  .nav a.active .navbar{background:var(--gold-c)}
+  .nav a svg{width:18px;height:18px;flex-shrink:0;opacity:.85}
+  .eg-values{padding:16px 20px;border-top:1px solid var(--border2)}
+  .eg-values .vl{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;color:var(--gold-c);text-transform:uppercase;margin-bottom:6px}
+  .eg-values .sub{font-size:12px;color:var(--muted2);line-height:1.5}
+  .rbac,.brand,.intro{display:none !important}
+  .main{flex:1;padding:0 !important;max-width:none !important;display:flex;flex-direction:column;background:var(--bg)}
+  .eg-topbar{height:70px;flex:none;background:var(--inset);border-bottom:1px solid var(--border-c);display:flex;align-items:center;gap:20px;padding:0 28px}
+  .eg-search{flex:1;max-width:420px;display:flex;align-items:center;gap:10px;background:var(--control);border:1px solid var(--border-c);border-radius:9px;padding:9px 14px}
+  .eg-search span{color:var(--faint);font-size:15px}
+  .eg-search input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:inherit;font-size:14px}
+  .eg-spacer{flex:1}
+  .eg-toggle{display:flex;align-items:center;background:var(--control);border:1px solid var(--border-c);border-radius:8px;padding:3px}
+  .eg-toggle div{padding:6px 11px;border-radius:6px;font-size:14px;cursor:pointer;line-height:1;color:var(--muted-c)}
+  .eg-toggle div.on{background:var(--gold-c);color:var(--on-gold)}
+  .eg-toggle.lang div{padding:6px 14px;font-size:13px;font-weight:600}
+  .eg-content{flex:1;width:100%;min-width:0;padding:30px 36px;overflow-x:hidden;box-sizing:border-box}
+  .eg-content>*{max-width:1280px;margin-left:auto;margin-right:auto}
+  /* перекраска компонентов под тему */
+  .card,.panel,.box,.tcard,.modal,.sheet,.drawer{background:var(--panel) !important;border-color:var(--border-c) !important;color:var(--text)}
+  select,input,textarea,.colcfg-btn,.btn-ghost{background:var(--control) !important;color:var(--text) !important;border-color:var(--border-c) !important}
+  select.month,select.period{background:var(--gold-bg) !important;border-color:var(--gold-c) !important;color:var(--gold-c) !important}
+  table thead th{background:var(--inset) !important;color:var(--muted-c) !important;border-bottom-color:var(--border-c) !important}
+  table td{border-color:var(--row-border) !important;color:var(--text)}
+  table tr:hover td{background:var(--hover) !important}
+  .lead{color:var(--muted-c) !important}
+  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--scrollbar);border-radius:5px}
+  /* ===== КОНТРАСТ И ИКОНКИ ===== */
+  .app .tile .val,.app .kpi .v,.app .v,.app .stat-v,.app .num,.app .big{color:var(--heading) !important}
+  .kpi .k,.k,.tile .lbl,.tile .sub,.app .sub{color:var(--muted-c) !important}
+  b,strong{color:var(--heading)}
+  .sal-hero,.hero,.month-hero,#tomBanner,.tom-banner{background:var(--gold-bg) !important;border-color:var(--gold-c) !important;color:var(--text) !important}
+  .sal-hero .nm,.hero .nm,#tomBanner .nm,.tom-banner .nm,.info .nm{color:var(--heading) !important}
+  #tomBanner .elbl,.tom-banner .elbl,.elbl{color:var(--gold-c) !important}
+  #tomBanner .crown,.tom-banner .crown,.crown{background:var(--gold-c) !important;color:var(--on-gold) !important}
+  .btn-gold,.btn-primary,button.primary,.add-btn,.btn-add{background:var(--gold-c) !important;color:var(--on-gold) !important;border-color:var(--gold-c) !important}
+  .ava,.avatar,.tcard-ava,.teacher-ava{background:var(--chip) !important;color:var(--text-muted) !important}
+  .badge,.chip,.tag,.pill{border-color:var(--border-c)}
+  [data-theme="night"] select.month,[data-theme="night"] select.period{color:var(--gold-c) !important}
+  /* AI-блок сводки под тему */
+  .ai-box{background:var(--gold-bg) !important;border-color:var(--gold-c) !important}
+  .ai-box .ttl{color:var(--heading) !important}
+  .ai-box .ttl svg{color:var(--gold-c) !important}
+  .ai-box p,.ai-box .pt{color:var(--text) !important}
+  .ai-box .pt b,.ai-box p b{color:var(--heading) !important}
+  .ai-box .dg{background:var(--panel) !important;border-color:var(--border-c) !important}
+  .ai-box .dg .dl{color:var(--muted-c) !important}
+  .ai-box .dg .dv{color:var(--heading) !important}
+  .ai-box .dg.ok .dv{color:var(--green-c) !important}
+  .ai-box .dg.warn .dv{color:var(--red-c) !important}
+  /* ===== ФИНАЛЬНАЯ ДОЗАЧИСТКА КОНТРАСТА (все вкладки) ===== */
+  /* любые заголовки внутри карточек/модалок — читаемы */
+  .card h1,.card h2,.card h3,.card h4,.panel h3,.box h3,.sheet h2,.sheet h3,.modal h2,.modal h3,
+  .drawer h2,.drawer h3,h2,h3,h4{color:var(--heading) !important}
+  /* модалки целиком под тему: оверлей, тело, шапка */
+  .overlay,.modal-overlay,.backdrop{background:rgba(8,11,15,.62) !important}
+  .sheet,.modal,.modal-box,.drawer,.dialog,.popup,.sheet-body,.modal-body{background:var(--panel) !important;color:var(--text) !important}
+  .sheet-head,.modal-head,.drawer-head,.dialog-head{background:var(--inset) !important;border-bottom:1px solid var(--border-c) !important}
+  .sheet-head h2,.modal-head h2,.drawer-head h2{color:var(--heading) !important}
+  .close,.modal-close,.sheet-close{background:var(--control) !important;color:var(--text-muted) !important}
+  /* карточки счетов и любые светлые подложки */
+  .acc,.account-card,.subcard,.inner-card,.tile,.kpi,.stat,.mini,.cell-card,.list-card,.lesson,.event{background:var(--inset) !important;border-color:var(--border-c) !important}
+  .acc .nm,.acc .bal,.account-card .nm,.account-card .bal{color:var(--heading) !important}
+  /* поля ввода и метки в модалках */
+  .field label,.form label,label{color:var(--muted-c) !important}
+  .field input,.field select,.field textarea,.form input,.form select,.form textarea,input,select,textarea{background:var(--control) !important;color:var(--text) !important;border-color:var(--border-c) !important}
+  input::placeholder,textarea::placeholder{color:var(--faint) !important}
+  /* hero/баннер/summary светлые подложки -> золотая тема */
+  .sal-hero,.hero,.month-hero,#tomBanner,.tom-banner,.ai-box,.summary-box,.notice,.banner,.fine-summary,.sum-box{background:var(--gold-bg) !important;border-color:var(--gold-c) !important}
+  .sal-hero *,.hero *,.ai-box *,.summary-box *,.banner *,.fine-summary *{color:var(--text)}
+  .sal-hero b,.hero b,.ai-box b,.summary-box b,.banner b,.fine-summary b,
+  .sal-hero .nm,.hero .nm,.ai-box .nm,.fine-summary .big,.sum-box .big{color:var(--heading) !important}
+  .ai-box .ttl,.summary-box .ttl{color:var(--heading) !important}
+  /* крупные суммы/числа на любой подложке */
+  .big,.amount,.sum-val,.total,.fine-amount,.v,.val,.num{color:var(--heading) !important}
+  /* строки списков под тему */
+  .row,.drow,.item-row,.list-row,.lrow{border-color:var(--row-border) !important;color:var(--text)}
+  .row:hover,.drow:hover,.list-row:hover{background:var(--hover) !important}
+  /* любой захардкоженный белый фон внутри контента */
+  .eg-content [style*="background:#fff"],.eg-content [style*="background:#FFF"]{background:var(--panel) !important}
+  /* ===== КОНТРОЛЫ ПОД ТЕМУ (кнопки/селекты/таблетки/поля) ===== */
+  .btn-ghost,.icn-btn,.nav-week button,.date-pill,.modes,.seg,.vtab,
+  .mode-btn,.view-mode,.tab,.pill-btn,.colcfg-btn,.btn-customize,.btn-sm,
+  select,.fsel,.search,.search-box,.f input,.f select,
+  .field input,.field select,.field textarea,
+  input[type=text],input[type=search],input[type=number],input[type=date],textarea{
+    background:var(--control) !important;color:var(--text) !important;border-color:var(--border-c) !important;
+  }
+  .modes,.seg-wrap,.tabs,.vtabs{background:var(--inset) !important}
+  /* активные таблетки/режимы — золотой акцент */
+  .modes .active,.mode-btn.active,.view-mode.active,.seg.active,.vtab.active,.tab.active,
+  .modes button.on,.seg.on{background:var(--gold-c) !important;color:var(--on-gold) !important;border-color:var(--gold-c) !important}
+  /* неактивные таблетки в группе */
+  .modes button,.seg,.vtab,.tab{color:var(--text2) !important;background:transparent !important}
+  .modes button.active,.vtab.active,.seg.active,.tab.active{background:var(--gold-c) !important;color:var(--on-gold) !important}
+  /* поля поиска с иконкой */
+  .search,.search-box,.ops-search,.eg-search{background:var(--control) !important;border-color:var(--border-c) !important}
+  .search input,.search-box input,.ops-search input{background:transparent !important;color:var(--text) !important}
+  input::placeholder,textarea::placeholder{color:var(--faint) !important}
+  /* «Сбросить» и вторичные белые кнопки */
+  .btn-sm,.reset-btn,.btn-reset{background:var(--control) !important;color:var(--text) !important;border-color:var(--border-c) !important}
+  /* заголовки внутри карточек/секций */
+  .card h3,.panel h3,.box h3,.sec-title,.block-title,.list-title{color:var(--heading) !important}
+  /* итоговая строка (Найдено/Доходы/Расходы/Сальдо) */
+  .ops-summary,.summary-row,.totals{color:var(--text-muted) !important}
+  .ops-summary b,.summary-row b{color:var(--heading) !important}
+  .ops-summary .in{color:var(--green-c) !important}.ops-summary .out{color:var(--red-c) !important}
+  /* select со стрелками (нативные) — тёмный фон в тёмной теме */
+  [data-theme="night"] select{background-color:#1E252D !important;color:#E9ECEF !important}
+
+  /* ===== МОСТ: переменные БДР -> тема ЭХО ГОР (день/ночь) ===== */
+  :root, [data-theme="night"], [data-theme="day"]{
+    --white:var(--panel);
+    --border:var(--border-c);
+    --brand:var(--gold-c);
+    --brand-dark:var(--gold-deep,var(--gold-c));
+    --brand-soft:var(--gold-bg);
+    --navy:var(--blue-c);
+  }
+  /* ===== БДР: компоненты под тему ===== */
+  .bdr .page-head{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+  .bdr .page-title{font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;color:var(--heading)}
+  .bdr .page-sub{font-size:13px;color:var(--text2);margin-top:4px}
+  .bdr .head-actions{display:flex;gap:10px}
+
+  .bdr .subtabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap;border-bottom:1px solid var(--border-c);padding-bottom:0}
+  .bdr .subtab{padding:10px 16px;border:none;background:none;font-family:'IBM Plex Sans',sans-serif;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;position:relative;white-space:nowrap}
+  .bdr .subtab:hover{color:var(--heading)}
+  .bdr .subtab.active{color:var(--gold-c)}
+  .bdr .subtab.active::after{content:'';position:absolute;left:14px;right:14px;bottom:-1px;height:2.5px;background:var(--gold-c);border-radius:2px}
+
+  .bdr .panel{display:none}
+  .bdr .panel.active{display:block;animation:bdrfade .25s}
+  @keyframes bdrfade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .bdr .slabel{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:12px}
+
+  .bdr .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .bdr .kpi{background:var(--panel);border:1px solid var(--border-c);border-radius:16px;padding:16px 18px}
+  .bdr .kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .bdr .kpi-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+  .bdr .kpi-ic.brand{background:var(--gold-bg);color:var(--gold-c)}
+  .bdr .kpi-ic.green{background:var(--ok-bg);color:var(--green-c)}
+  .bdr .kpi-ic.red{background:var(--red-soft);color:var(--red-c)}
+  .bdr .kpi-ic.blue{background:var(--blue-soft);color:var(--blue-c)}
+  .bdr .kpi-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .bdr .kpi-badge.up{background:var(--ok-bg);color:var(--green-c)}
+  .bdr .kpi-badge.down{background:var(--red-soft);color:var(--red-c)}
+  .bdr .kpi-val{font-size:24px;font-weight:800;line-height:1;margin-bottom:4px;color:var(--heading)}
+  .bdr .kpi-lbl{font-size:12px;color:var(--text2);font-weight:600}
+
+  .bdr .source-card,.bdr .scenario-card,.bdr .ai-recs,.bdr .ai-prob,.bdr .mot-card,.bdr .daily-card{background:var(--panel);border:1px solid var(--border-c);border-radius:16px}
+  .bdr .source-card{padding:20px 22px;margin-bottom:20px}
+  .bdr .source-title{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--heading)}
+  .bdr .source-sub{font-size:12.5px;color:var(--text2);margin-bottom:16px}
+  .bdr .source-opts{display:flex;gap:10px;flex-wrap:wrap}
+  .bdr .source-opt{flex:1;min-width:160px;border:1.5px solid var(--border-c);border-radius:12px;padding:14px 16px;cursor:pointer;transition:.15s;background:var(--inset)}
+  .bdr .source-opt:hover{border-color:var(--gold-c);background:var(--gold-bg)}
+  .bdr .source-opt.on{border-color:var(--gold-c);background:var(--gold-bg)}
+  .bdr .source-opt-title{font-size:13.5px;font-weight:700;margin-bottom:3px;color:var(--heading)}
+  .bdr .source-opt-desc{font-size:11.5px;color:var(--text2)}
+
+  .bdr .tree-card{background:var(--panel);border:1px solid var(--border-c);border-radius:16px;overflow:hidden;margin-bottom:20px}
+  .bdr .tree-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--border-c)}
+  .bdr .tree-head h3{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;color:var(--heading)}
+  .bdr table{width:100%;border-collapse:collapse;font-size:13px;color:var(--text)}
+  .bdr thead th{text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--text2);padding:11px 18px;background:var(--inset);border-bottom:1px solid var(--border-c)}
+  .bdr thead th.num{text-align:right}
+  .bdr tbody td{padding:11px 18px;border-bottom:1px solid var(--row-border);color:var(--text)}
+  .bdr tbody tr:last-child td{border-bottom:none}
+  .bdr td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+  .bdr .tree-row.lvl0 td:first-child{font-weight:800;padding-left:18px;color:var(--heading)}
+  .bdr .tree-row.lvl1 td:first-child{padding-left:38px;font-weight:600}
+  .bdr .tree-row.lvl2 td:first-child{padding-left:58px;color:var(--text)}
+  .bdr .tree-row.lvl3 td:first-child{padding-left:78px;color:var(--text2);font-size:12.5px}
+  .bdr .tree-row.lvl0{background:var(--gold-bg)}
+  .bdr .tree-row.lvl1{background:var(--inset)}
+  .bdr .tree-toggle{display:inline-flex;width:16px;color:var(--text2);cursor:pointer}
+  .bdr .editable-cell input{width:120px;text-align:right;border:1px solid transparent;border-radius:6px;padding:5px 8px;font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;background:transparent;font-variant-numeric:tabular-nums;color:var(--text)}
+  .bdr .editable-cell input:hover{border-color:var(--border-c);background:var(--control)}
+  .bdr .editable-cell input:focus{outline:none;border-color:var(--gold-c);background:var(--inset)}
+  .bdr .manual-tag{font-size:9px;font-weight:700;color:var(--gold-c);background:var(--gold-bg);padding:1px 5px;border-radius:4px;margin-left:6px;vertical-align:middle}
+  .bdr .auto-dot{width:6px;height:6px;border-radius:50%;background:var(--green-c);display:inline-block;margin-right:5px}
+
+  .bdr .pf-bar-wrap{height:8px;background:var(--border-c);border-radius:999px;overflow:hidden;width:110px;display:inline-block;vertical-align:middle;margin-right:8px}
+  .bdr .pf-bar{height:100%;border-radius:999px}
+  .bdr .pf-bar.good{background:var(--green-c)}.bdr .pf-bar.mid{background:var(--gold-c)}.bdr .pf-bar.bad{background:var(--red-c)}
+  .bdr .dev-pos{color:var(--green-c);font-weight:700}.bdr .dev-neg{color:var(--red-c);font-weight:700}
+
+  .bdr .daily-hero{background:linear-gradient(135deg,var(--gold-c),var(--gold-deep,#5A4D2C));border-radius:18px;padding:24px 26px;color:#fff;margin-bottom:18px;position:relative;overflow:hidden}
+  .bdr .daily-hero::before{content:'';position:absolute;right:-30px;top:-30px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.06)}
+  .bdr .daily-mgr{font-size:13px;opacity:.85;margin-bottom:4px}
+  .bdr .daily-big{font-family:'Oswald',sans-serif;font-size:36px;font-weight:700;margin-bottom:2px}
+  .bdr .daily-need{font-size:14px;opacity:.9}
+  .bdr .daily-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+  .bdr .daily-card{padding:16px 18px}
+  .bdr .daily-card-lbl{font-size:11.5px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+  .bdr .daily-card-val{font-size:22px;font-weight:800;color:var(--heading)}
+  .bdr .daily-card-val.green{color:var(--green-c)}.bdr .daily-card-val.red{color:var(--red-c)}.bdr .daily-card-val.brand{color:var(--gold-c)}
+
+  .bdr .mot-card{padding:20px 22px;margin-bottom:16px}
+  .bdr .mot-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .bdr .mot-mgr{display:flex;align-items:center;gap:12px}
+  .bdr .mot-avatar{width:42px;height:42px;border-radius:50%;background:var(--gold-c);color:var(--on-gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+  .bdr .mot-name{font-size:15px;font-weight:700;color:var(--heading)}
+  .bdr .mot-branch{font-size:12px;color:var(--text2)}
+  .bdr .mot-salary{text-align:right}
+  .bdr .mot-salary-lbl{font-size:11px;color:var(--text2)}
+  .bdr .mot-salary-val{font-size:20px;font-weight:800;color:var(--green-c)}
+  .bdr .kpi-ladder{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+  .bdr .ladder-step{border:1px solid var(--border-c);border-radius:10px;padding:10px;text-align:center;transition:.15s;background:var(--inset)}
+  .bdr .ladder-step.reached{background:var(--ok-bg);border-color:var(--green-c)}
+  .bdr .ladder-step.current{background:var(--gold-bg);border-color:var(--gold-c);border-width:2px}
+  .bdr .ladder-pct{font-size:13px;font-weight:800;margin-bottom:3px;color:var(--heading)}
+  .bdr .ladder-bonus{font-size:11px;color:var(--text2);font-weight:600}
+  .bdr .ladder-step.reached .ladder-bonus{color:var(--green-c)}
+  .bdr .ladder-input{width:100%;border:1px solid var(--border-c);border-radius:6px;padding:4px;text-align:center;font-family:'IBM Plex Sans',sans-serif;font-size:11px;margin-top:4px;background:var(--control);color:var(--text)}
+
+  .bdr .ai-card{background:linear-gradient(135deg,#1F1B12,#2E2718);border-radius:18px;padding:22px 24px;color:#fff;margin-bottom:16px;position:relative;overflow:hidden}
+  .bdr .ai-card::before{content:'AI';position:absolute;right:-8px;top:-18px;font-size:90px;font-weight:800;color:rgba(191,157,95,.10)}
+  .bdr .ai-lbl{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold-c);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+  .bdr .ai-text{font-size:13.5px;line-height:1.7;color:rgba(255,255,255,.85)}
+  .bdr .ai-text strong{color:var(--gold-c)}
+  .bdr .ai-text p{margin-bottom:9px}
+  .bdr .ai-prob{display:flex;align-items:center;gap:14px;padding:18px 20px;margin-bottom:16px}
+  .bdr .ai-prob-circle{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;background:conic-gradient(var(--green-c) 0% 93%,var(--border-c) 93% 100%)}
+  .bdr .ai-prob-circle span{background:var(--panel);width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--green-c)}
+  .bdr .ai-prob-text h4{font-size:15px;font-weight:700;margin-bottom:3px;color:var(--heading)}
+  .bdr .ai-prob-text p{font-size:12.5px;color:var(--text2)}
+  .bdr .ai-recs{padding:20px 22px}
+  .bdr .ai-recs h4{font-size:14px;font-weight:700;margin-bottom:14px;color:var(--heading)}
+  .bdr .rec-item{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid var(--row-border)}
+  .bdr .rec-item:last-child{border-bottom:none}
+  .bdr .rec-check{width:22px;height:22px;border-radius:7px;background:var(--gold-bg);color:var(--gold-c);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px}
+  .bdr .rec-text{font-size:13.5px;color:var(--text)}
+  .bdr .rec-text b{color:var(--gold-c)}
+
+  .bdr .scenario-card{padding:22px 24px}
+  .bdr .scenario-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+  .bdr .sc-control label{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:7px}
+  .bdr .sc-slider{display:flex;align-items:center;gap:10px}
+  .bdr .sc-slider input[type=range]{flex:1;accent-color:var(--gold-c)}
+  .bdr .sc-slider-val{font-size:14px;font-weight:800;color:var(--gold-c);min-width:54px;text-align:right}
+  .bdr .scenario-result{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding-top:18px;border-top:1px solid var(--border-c)}
+  .bdr .sc-res{text-align:center}
+  .bdr .sc-res-lbl{font-size:11px;color:var(--text2);margin-bottom:5px}
+  .bdr .sc-res-val{font-size:20px;font-weight:800;color:var(--heading)}
+  .bdr .sc-res-val.green{color:var(--green-c)}
+  .bdr .sc-res-delta{font-size:11.5px;font-weight:700;margin-top:3px}
+  .bdr .sc-res-delta.up{color:var(--green-c)}.bdr .sc-res-delta.down{color:var(--red-c)}
+
+  .bdr .btn{font-family:'IBM Plex Sans',sans-serif;font-size:13.5px;font-weight:600;padding:10px 18px;border-radius:11px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+  .bdr .btn:active{transform:scale(.97)}
+  .bdr .btn-brand{background:var(--gold-c);color:var(--on-gold)}
+  .bdr .btn-brand:hover{filter:brightness(1.05)}
+  .bdr .btn-secondary{background:var(--control);color:var(--text);border:1px solid var(--border-c)}
+  .bdr .btn-secondary:hover{background:var(--hover)}
+
+  .bdr .mode-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px}
+  .bdr .mode-pill.auto{background:var(--ok-bg);color:var(--green-c)}
+  .bdr .mode-pill.manual{background:var(--gold-bg);color:var(--gold-c)}
+
+  @media(max-width:1000px){.bdr .kpi-grid,.bdr .scenario-controls,.bdr .scenario-result{grid-template-columns:repeat(2,1fr)}.bdr .kpi-ladder{grid-template-columns:repeat(3,1fr)}.bdr .daily-grid{grid-template-columns:1fr}}
+
+</style>
+<body data-theme="day">
+<div class="app">
+  <aside class="side">
+    <div class="eg-logo-box"><img id="egLogo" src="../logo-day.png" alt="Эхо Гор"></div>
+    <nav class="nav">
+      <a href="../index.html"><span class="navbar"></span>Ученики</a>
+      <a href="teachers-echo-gor.html"><span class="navbar"></span>Преподаватели</a>
+      <a href="schedule-echo-gor.html"><span class="navbar"></span>Расписание</a>
+      <a href="accounting-echo-gor.html"><span class="navbar"></span>Бухгалтерия</a>
+      <a href="planning-echo-gor.html" class="active"><span class="navbar"></span>Планирование</a>
+    </nav>
+    <div class="eg-values">
+      <div class="vl">Культура · Сила · Характер</div>
+      <div class="sub">Казахстан · обучаем от 5 лет</div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="eg-topbar">
+      <div class="eg-search"><span>⌕</span><input placeholder="Поиск по сети, филиалам, управляющим…"></div>
+      <div class="eg-spacer"></div>
+      <div class="eg-toggle" id="themeToggle"><div onclick="egTheme('night')" title="Ночь">☾</div><div class="on" onclick="egTheme('day')" title="День">☀</div></div>
+      <div class="eg-toggle lang" id="langToggle"><div class="on">РУС</div></div>
+      </div>
+    <div class="eg-content">
+      <div class="bdr">
+<div class="page-head">
+      <div>
+        <div class="page-title">Планирование (БДР)</div>
+        <div class="page-sub">Бюджет доходов и расходов · контроль плана · мотивация · прогнозы по всей сети</div>
+      </div>
+      <div class="head-actions">
+        <button class="btn btn-secondary">Период: Июнь 2026 ▾</button>
+        <button class="btn btn-brand">+ Создать новый БДР</button>
+      </div>
+    </div>
+
+    <!-- SUBTABS -->
+    <div class="subtabs">
+      <button class="subtab active" onclick="showPanel('plan',this)">План БДР</button>
+      <button class="subtab" onclick="showPanel('fact',this)">Факт БДР</button>
+      <button class="subtab" onclick="showPanel('pf',this)">План / Факт</button>
+      <button class="subtab" onclick="showPanel('daily',this)">Ежедневный отчёт</button>
+      <button class="subtab" onclick="showPanel('ai',this)">AI Аналитика</button>
+      <button class="subtab" onclick="showPanel('mot',this)">Настройки мотивации</button>
+    </div>
+
+    <!-- ============ ПЛАН БДР ============ -->
+    <div class="panel active" id="panel-plan">
+      <div class="source-card">
+        <div class="source-title">Создать план на основе</div>
+        <div class="source-sub">CRM автоматически подставит цифры. Любую сумму можно изменить вручную.</div>
+        <div class="source-opts">
+          <div class="source-opt on" onclick="pickSource(this)"><div class="source-opt-title">Прошлый месяц</div><div class="source-opt-desc">Май 2026: 27,4 млн ₸</div></div>
+          <div class="source-opt" onclick="pickSource(this)"><div class="source-opt-title">Прошлый год</div><div class="source-opt-desc">Июнь 2025: 24,1 млн ₸</div></div>
+          <div class="source-opt" onclick="pickSource(this)"><div class="source-opt-title">Среднее значение</div><div class="source-opt-desc">6 мес: 26,0 млн ₸</div></div>
+          <div class="source-opt" onclick="pickSource(this)"><div class="source-opt-title">Вручную</div><div class="source-opt-desc">С нуля</div></div>
+        </div>
+      </div>
+
+      <div class="slabel">Планирование доходов · по уровням сети</div>
+      <div class="tree-card">
+        <div class="tree-head"><h3>Выручка</h3><span class="mode-pill auto"><span class="auto-dot"></span>авто из CRM</span></div>
+        <table>
+          <thead><tr><th>Уровень</th><th class="num">План, ₸</th><th class="num">Доля</th></tr></thead>
+          <tbody id="revenueTree"></tbody>
+        </table>
+      </div>
+
+      <div class="slabel">Планирование расходов · по категориям</div>
+      <div class="tree-card">
+        <div class="tree-head"><h3>Расходы</h3><button class="btn btn-secondary" style="padding:6px 12px;font-size:12px">+ Категория</button></div>
+        <table>
+          <thead><tr><th>Категория</th><th class="num">План, ₸</th><th class="num">Режим</th></tr></thead>
+          <tbody id="expenseTree"></tbody>
+        </table>
+      </div>
+
+      <div class="kpi-grid" style="margin-top:20px;">
+        <div class="kpi"><div class="kpi-top"><div class="kpi-ic brand">₸</div></div><div class="kpi-val" id="planRevenue">30 000 000</div><div class="kpi-lbl">Плановая выручка</div></div>
+        <div class="kpi"><div class="kpi-top"><div class="kpi-ic red">−</div></div><div class="kpi-val" id="planExpense">18 600 000</div><div class="kpi-lbl">Плановые расходы</div></div>
+        <div class="kpi"><div class="kpi-top"><div class="kpi-ic green">✓</div></div><div class="kpi-val green" id="planProfit" style="color:var(--green)">11 400 000</div><div class="kpi-lbl">Плановая прибыль</div></div>
+        <div class="kpi"><div class="kpi-top"><div class="kpi-ic blue">%</div></div><div class="kpi-val" id="planMargin">38%</div><div class="kpi-lbl">Рентабельность</div></div>
+      </div>
+    </div>
+
+    <!-- ============ ФАКТ БДР ============ -->
+    <div class="panel" id="panel-fact">
+      <div class="slabel">Фактические данные · автоматически из CRM</div>
+      <div class="tree-card">
+        <div class="tree-head"><h3>Поступления (факт)</h3><span class="mode-pill auto"><span class="auto-dot"></span>обновлено сегодня</span></div>
+        <table>
+          <thead><tr><th>Источник</th><th class="num">Факт, ₸</th><th class="num">Режим</th></tr></thead>
+          <tbody>
+            <tr><td>Продажи абонементов</td><td class="num editable-cell"><input value="12 400 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
+            <tr><td>Продажа товаров</td><td class="num editable-cell"><input value="1 850 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
+            <tr><td>Выступления</td><td class="num editable-cell"><input value="1 200 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
+            <tr><td>Банкеты</td><td class="num editable-cell"><input value="650 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
+            <tr><td>Возвраты</td><td class="num editable-cell"><input value="−200 000"></td><td class="num"><span class="mode-pill manual">вручную</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="tree-card">
+        <div class="tree-head"><h3>Расходы (факт)</h3><span class="mode-pill auto"><span class="auto-dot"></span>из Бухгалтерии</span></div>
+        <table>
+          <thead><tr><th>Категория</th><th class="num">Факт, ₸</th><th class="num">Режим</th></tr></thead>
+          <tbody>
+            <tr><td>Зарплаты</td><td class="num editable-cell"><input value="7 800 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
+            <tr><td>Аренда</td><td class="num editable-cell"><input value="3 200 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
+            <tr><td>Маркетинг</td><td class="num editable-cell"><input value="1 900 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
+            <tr><td>Коммунальные</td><td class="num editable-cell"><input value="780 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
+            <tr><td>Прочее</td><td class="num editable-cell"><input value="1 100 000"></td><td class="num"><span class="mode-pill manual">вручную</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ ПЛАН / ФАКТ ============ -->
+    <div class="panel" id="panel-pf">
+      <div class="slabel">Выполнение плана · по уровням</div>
+      <div class="tree-card">
+        <table>
+          <thead><tr><th>Уровень</th><th class="num">План</th><th class="num">Факт</th><th class="num">Отклонение</th><th class="num">Выполнение</th></tr></thead>
+          <tbody id="pfTree"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ ЕЖЕДНЕВНЫЙ ОТЧЁТ ============ -->
+    <div class="panel" id="panel-daily">
+      <div class="slabel">Управляющий: Алия Нурбекова · Филиал «Чокина»</div>
+      <div class="daily-hero">
+        <div class="daily-mgr">Чтобы выполнить план — нужно делать</div>
+        <div class="daily-big">311 000 ₸ <span style="font-size:18px;opacity:.7;">в день</span></div>
+        <div class="daily-need">Осталось 18 дней до конца месяца · до плана 5 600 000 ₸</div>
+      </div>
+      <div class="daily-grid">
+        <div class="daily-card"><div class="daily-card-lbl">План месяца</div><div class="daily-card-val">12 000 000</div></div>
+        <div class="daily-card"><div class="daily-card-lbl">Факт</div><div class="daily-card-val brand">6 400 000</div></div>
+        <div class="daily-card"><div class="daily-card-lbl">Выполнение</div><div class="daily-card-val">53%</div></div>
+        <div class="daily-card"><div class="daily-card-lbl">До плана</div><div class="daily-card-val red">5 600 000</div></div>
+        <div class="daily-card"><div class="daily-card-lbl">До конца месяца</div><div class="daily-card-val">18 дней</div></div>
+        <div class="daily-card"><div class="daily-card-lbl">Прогноз выполнения</div><div class="daily-card-val green">96%</div></div>
+      </div>
+    </div>
+
+    <!-- ============ AI АНАЛИТИКА ============ -->
+    <div class="panel" id="panel-ai">
+      <div class="ai-prob">
+        <div class="ai-prob-circle"><span>93%</span></div>
+        <div class="ai-prob-text"><h4>Вероятность выполнения плана — 93%</h4><p>Сеть идёт в графике. Риск умеренный, основной — филиал «Усолка».</p></div>
+      </div>
+      <div class="ai-card">
+        <div class="ai-lbl">✦ AI-аналитик · Июнь 2026</div>
+        <div class="ai-text">
+          <p>📉 Выручка ниже плана на <strong>6%</strong>. Основное отклонение вызвано филиалом <strong>Усолка</strong> (−1,1 млн ₸).</p>
+          <p>📊 Удержание снизилось на <strong>11%</strong>. Продлено на <strong>18 учеников меньше</strong>, чем в прошлом месяце.</p>
+          <p>💰 Расходы на маркетинг превышают план на 120 000 ₸ без роста заявок — канал требует пересмотра.</p>
+        </div>
+      </div>
+      <div class="ai-recs">
+        <h4>AI-рекомендации для выполнения плана</h4>
+        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Продлить <b>26 учеников</b> с истекающими абонементами</div></div>
+        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Провести <b>18 пробных уроков</b> по записанным лидам</div></div>
+        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Заполнить <b>2 группы</b> с низкой загрузкой</div></div>
+        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Вернуть <b>7 ушедших клиентов</b> через спецпредложение</div></div>
+        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Сократить расходы на рекламу на <b>120 000 ₸</b></div></div>
+      </div>
+    </div>
+
+    <!-- ============ МОТИВАЦИЯ ============ -->
+    <div class="panel" id="panel-mot">
+      <div class="slabel">Настройки мотивации · полностью редактируются владельцем</div>
+      <div class="mot-card">
+        <div class="mot-head">
+          <div class="mot-mgr">
+            <div class="mot-avatar">АН</div>
+            <div><div class="mot-name">Алия Нурбекова</div><div class="mot-branch">Филиал «Чокина» · план 12 000 000 ₸</div></div>
+          </div>
+          <div class="mot-salary">
+            <div class="mot-salary-lbl">Прогноз зарплаты</div>
+            <div class="mot-salary-val">590 000 ₸</div>
+          </div>
+        </div>
+        <div class="kpi-ladder">
+          <div class="ladder-step"><div class="ladder-pct">до 90%</div><input class="ladder-input" value="0"></div>
+          <div class="ladder-step reached"><div class="ladder-pct">90%</div><input class="ladder-input" value="100 000"></div>
+          <div class="ladder-step reached"><div class="ladder-pct">95%</div><input class="ladder-input" value="150 000"></div>
+          <div class="ladder-step current"><div class="ladder-pct">100%</div><input class="ladder-input" value="250 000"></div>
+          <div class="ladder-step"><div class="ladder-pct">105%</div><input class="ladder-input" value="350 000"></div>
+          <div class="ladder-step"><div class="ladder-pct">110%</div><input class="ladder-input" value="500 000"></div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);">
+          <div><div class="daily-card-lbl">Оклад</div><div style="font-size:17px;font-weight:800">350 000</div></div>
+          <div><div class="daily-card-lbl">Текущий бонус (95%)</div><div style="font-size:17px;font-weight:800;color:var(--brand)">240 000</div></div>
+          <div><div class="daily-card-lbl">Прогноз бонуса (100%)</div><div style="font-size:17px;font-weight:800;color:var(--green)">250 000</div></div>
+          <div><div class="daily-card-lbl">Итого к выплате</div><div style="font-size:17px;font-weight:800;color:var(--green)">590 000</div></div>
+        </div>
+      </div>
+      <div class="mot-card">
+        <div class="mot-head">
+          <div class="mot-mgr">
+            <div class="mot-avatar" style="background:var(--navy)">МБ</div>
+            <div><div class="mot-name">Марат Беков</div><div class="mot-branch">Филиал «Полноформат» · план 18 000 000 ₸</div></div>
+          </div>
+          <div class="mot-salary">
+            <div class="mot-salary-lbl">Прогноз зарплаты</div>
+            <div class="mot-salary-val" style="color:var(--gold)">510 000 ₸</div>
+          </div>
+        </div>
+        <div class="kpi-ladder">
+          <div class="ladder-step current"><div class="ladder-pct">до 90%</div><input class="ladder-input" value="0"></div>
+          <div class="ladder-step"><div class="ladder-pct">90%</div><input class="ladder-input" value="120 000"></div>
+          <div class="ladder-step"><div class="ladder-pct">95%</div><input class="ladder-input" value="180 000"></div>
+          <div class="ladder-step"><div class="ladder-pct">100%</div><input class="ladder-input" value="280 000"></div>
+          <div class="ladder-step"><div class="ladder-pct">105%</div><input class="ladder-input" value="400 000"></div>
+          <div class="ladder-step"><div class="ladder-pct">110%</div><input class="ladder-input" value="550 000"></div>
+        </div>
+      </div>
+    </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+function fmt(n){return Math.round(n).toLocaleString('ru-RU');}
+
+// ===== ПЛАН: дерево выручки =====
+const revenueData = [
+  {lvl:0, name:'Выручка сети', val:30000000, share:'100%'},
+  {lvl:1, name:'Полноформат', val:18000000, share:'60%'},
+  {lvl:2, name:'Чокина', val:7200000, share:'24%'},
+  {lvl:3, name:'Ансамбль', val:1300000, share:'4,3%'},
+  {lvl:3, name:'Соло', val:980000, share:'3,3%'},
+  {lvl:2, name:'Достык', val:5400000, share:'18%'},
+  {lvl:1, name:'Усолка', val:7000000, share:'23%'},
+  {lvl:1, name:'Жастар', val:5000000, share:'17%'},
+];
+document.getElementById('revenueTree').innerHTML = revenueData.map(r=>`
+  <tr class="tree-row lvl${r.lvl}">
+    <td>${r.lvl<2?'<span class="tree-toggle">▾</span>':''}${r.name}</td>
+    <td class="num editable-cell"><input value="${fmt(r.val)}"></td>
+    <td class="num">${r.share}</td>
+  </tr>`).join('');
+
+// ===== ПЛАН: расходы =====
+const expenseData = [
+  {name:'Зарплата', val:8200000, mode:'auto'},
+  {name:'Аренда', val:3200000, mode:'auto'},
+  {name:'Маркетинг', val:2100000, mode:'auto'},
+  {name:'Коммунальные', val:850000, mode:'auto'},
+  {name:'Инвентарь', val:600000, mode:'manual'},
+  {name:'Хозяйственные', val:450000, mode:'manual'},
+  {name:'Выступления', val:700000, mode:'auto'},
+  {name:'Транспорт', val:380000, mode:'manual'},
+  {name:'Налоги', val:1620000, mode:'auto'},
+  {name:'Прочее', val:500000, mode:'manual'},
+];
+document.getElementById('expenseTree').innerHTML = expenseData.map(e=>`
+  <tr class="tree-row lvl1">
+    <td>${e.name}</td>
+    <td class="num editable-cell"><input value="${fmt(e.val)}"></td>
+    <td class="num"><span class="mode-pill ${e.mode}">${e.mode==='auto'?'авто':'вручную'}</span></td>
+  </tr>`).join('');
+
+// ===== ПЛАН/ФАКТ =====
+const pfData = [
+  {lvl:0, name:'Вся сеть',     plan:30000000, fact:28200000},
+  {lvl:1, name:'Полноформат',  plan:18000000, fact:16900000},
+  {lvl:2, name:'Чокина',       plan:7200000,  fact:6400000},
+  {lvl:2, name:'Достык',       plan:5400000,  fact:5600000},
+  {lvl:1, name:'Усолка',       plan:7000000,  fact:5900000},
+  {lvl:1, name:'Жастар',       plan:5000000,  fact:5400000},
+];
+document.getElementById('pfTree').innerHTML = pfData.map(r=>{
+  const dev=r.fact-r.plan;
+  const pct=Math.round(r.fact/r.plan*100);
+  const barCls=pct>=100?'good':pct>=90?'mid':'bad';
+  return `<tr class="tree-row lvl${r.lvl}">
+    <td>${r.name}</td>
+    <td class="num">${fmt(r.plan)}</td>
+    <td class="num">${fmt(r.fact)}</td>
+    <td class="num ${dev>=0?'dev-pos':'dev-neg'}">${dev>=0?'+':''}${fmt(dev)}</td>
+    <td class="num"><span class="pf-bar-wrap"><span class="pf-bar ${barCls}" style="width:${Math.min(pct,100)}%"></span></span>${pct}%</td>
+  </tr>`;
+}).join('');
+
+// ===== ПАНЕЛИ =====
+function showPanel(id, btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.subtab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+function pickSource(el){
+  document.querySelectorAll('.source-opt').forEach(o=>o.classList.remove('on'));
+  el.classList.add('on');
+}
+
+</script>
+
+<script>
+(function(){
+  var DAY='../logo-day.png';
+  var NIGHT='../logo-night.png';
+  window.egTheme=function(t){
+    try{localStorage.setItem('eg-theme',t);}catch(e){}
+    applyTheme(t);
+  };
+  function applyTheme(t){
+    document.body.setAttribute('data-theme',t);
+    var tg=document.getElementById('themeToggle');
+    if(tg){tg.children[0].classList.toggle('on',t==='night');tg.children[1].classList.toggle('on',t==='day');}
+    var lg=document.getElementById('egLogo'); if(lg) lg.src=(t==='day')?DAY:NIGHT;
+  }
+  // применяем сохранённую тему при загрузке (дефолт — день)
+  var saved='day';
+  try{saved=localStorage.getItem('eg-theme')||'day';}catch(e){}
+  applyTheme(saved);
+})();
+</script>
+<script>
+/* Мгновенные переходы: предзагрузка раздела при наведении/нажатии */
+(function(){
+  var done={};
+  function prefetch(href){
+    if(!href||done[href]||href.indexOf('#')===0)return;
+    done[href]=1;
+    var l=document.createElement('link');
+    l.rel='prefetch';l.href=href;document.head.appendChild(l);
+  }
+  document.addEventListener('mouseover',function(e){
+    var a=e.target.closest&&e.target.closest('a[href$=".html"]');
+    if(a)prefetch(a.getAttribute('href'));
+  },{passive:true});
+  document.addEventListener('mousedown',function(e){
+    var a=e.target.closest&&e.target.closest('a[href$=".html"]');
+    if(a)prefetch(a.getAttribute('href'));
+  },{passive:true});
+})();
+</script>
+</body>
+</html>
