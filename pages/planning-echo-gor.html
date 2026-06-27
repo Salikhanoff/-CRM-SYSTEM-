@@ -360,6 +360,26 @@
   .bdr .kpi-lbl{font-size:12px;color:var(--text2);font-weight:600}
 
   .bdr .source-card,.bdr .scenario-card,.bdr .ai-recs,.bdr .ai-prob,.bdr .mot-card,.bdr .daily-card{background:var(--panel);border:1px solid var(--border-c);border-radius:16px}
+  .bdr .game-hero{display:flex;gap:20px;align-items:center;background:linear-gradient(135deg,var(--navy,#1a2b4a),#2a3f5f);color:#fff;border-radius:18px;padding:22px 24px;flex-wrap:wrap}
+  .bdr .ring{position:relative;width:120px;height:120px;flex-shrink:0}
+  .bdr .ring svg{transform:rotate(-90deg)}
+  .bdr .ring-label{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .bdr .ring-pct{font-size:28px;font-weight:800;line-height:1}
+  .bdr .ring-sub{font-size:10px;opacity:.7;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+  .bdr .game-stats{display:flex;gap:22px;flex-wrap:wrap}
+  .bdr .gstat{text-align:center}
+  .bdr .gstat-val{font-size:22px;font-weight:800}
+  .bdr .gstat-lbl{font-size:11px;opacity:.75;margin-top:2px}
+  .bdr .coach-msg{flex:1;min-width:200px;font-size:14px;line-height:1.5;background:rgba(255,255,255,.1);border-radius:12px;padding:14px 16px}
+  .bdr .coach-msg b{color:var(--gold,#d4b46a)}
+  .bdr .task-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--panel);border:1px solid var(--border-c);border-radius:12px;margin-bottom:8px;cursor:pointer;transition:.15s}
+  .bdr .task-item:hover{border-color:var(--gold-c)}
+  .bdr .task-item.done{opacity:.6;background:var(--inset)}
+  .bdr .task-item.done .task-text{text-decoration:line-through}
+  .bdr .task-check{width:24px;height:24px;border-radius:7px;border:2px solid var(--border-c);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;color:#fff;transition:.15s}
+  .bdr .task-item.done .task-check{background:var(--green,#3a9d5d);border-color:var(--green,#3a9d5d)}
+  .bdr .task-text{font-size:13.5px;font-weight:600;color:var(--heading);flex:1}
+  .bdr .task-pts{font-size:11px;font-weight:700;color:var(--gold-c,#a08a4a)}
   .bdr .source-card{padding:20px 22px;margin-bottom:20px}
   .bdr .source-title{font-size:15px;font-weight:700;margin-bottom:4px;color:var(--heading)}
   .bdr .source-sub{font-size:12.5px;color:var(--text2);margin-bottom:16px}
@@ -467,6 +487,18 @@
   .bdr .btn-secondary:hover{background:var(--hover)}
 
   .bdr .mode-pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px}
+  .bdr .funnel-step{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:var(--inset);border-radius:10px;font-size:13.5px;font-weight:600;color:var(--heading)}
+  .bdr .funnel-step b{font-size:18px;color:var(--gold-c)}
+  .bdr .funnel-arrow{text-align:center;font-size:11px;color:var(--text2);padding:1px 0}
+  .bdr .bdr-summary{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+  .bdr .sum-card{background:var(--card,#fff);border:1px solid var(--border-c);border-radius:14px;padding:16px 18px}
+  .bdr .sum-card h4{margin:0 0 12px;font-size:13px;font-weight:700;color:var(--heading);display:flex;justify-content:space-between;align-items:center}
+  .bdr .sum-row{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:9px;cursor:pointer;transition:.12s}
+  .bdr .sum-row:hover{background:var(--inset)}
+  .bdr .sum-row .lbl{font-size:12.5px;color:var(--text2)}
+  .bdr .sum-row .val{font-size:15px;font-weight:800;font-variant-numeric:tabular-nums}
+  .bdr .sum-detail{margin-top:6px;padding:8px 10px;background:var(--inset);border-radius:9px;font-size:12px;color:var(--text2)}
+  @media(max-width:780px){.bdr .bdr-summary{grid-template-columns:1fr}}
   .bdr .mode-pill.auto{background:var(--ok-bg);color:var(--green-c)}
   .bdr .mode-pill.manual{background:var(--gold-bg);color:var(--gold-c)}
 
@@ -503,9 +535,15 @@
         <div class="page-title">Планирование (БДР)</div>
         <div class="page-sub">Бюджет доходов и расходов · контроль плана · мотивация · прогнозы по всей сети</div>
       </div>
-      <div class="head-actions">
-        <button class="btn btn-secondary" id="periodBtn" onclick="pickPeriod(this)">Период: Июнь 2026 ▾</button>
-        <button class="btn btn-brand" onclick="createNewBDR()">+ Создать новый БДР</button>
+      <div class="head-actions" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <select id="monthSel" onchange="onPeriodChange()" style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;padding:9px 12px;border-radius:10px;border:1px solid var(--border-c);background:var(--control);color:var(--text);cursor:pointer"></select>
+        <select id="yearSel" onchange="onPeriodChange()" style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;padding:9px 12px;border-radius:10px;border:1px solid var(--border-c);background:var(--control);color:var(--text);cursor:pointer"></select>
+        <span id="bdrStatus" style="font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px"></span>
+        <button class="btn btn-brand" id="createBtn" onclick="createNewBDR()">+ Создать БДР</button>
+        <button class="btn btn-brand" id="editBtn" onclick="toggleEditMode()" style="display:none">Редактировать</button>
+        <button class="btn btn-secondary" id="cancelBtn" onclick="cancelEdit()" style="display:none">Отмена</button>
+        <button class="btn btn-secondary" id="deleteBtn" onclick="deleteBDR()" style="display:none">Удалить БДР</button>
+        <button class="btn btn-secondary" onclick="showHistory()">История</button>
       </div>
     </div>
 
@@ -521,6 +559,7 @@
 
     <!-- ============ ПЛАН БДР ============ -->
     <div class="panel active" id="panel-plan">
+      <div id="bdrSummary" class="bdr-summary"></div>
       <div class="source-card">
         <div class="source-title">Создать план на основе</div>
         <div class="source-sub">CRM автоматически подставит цифры. Любую сумму можно изменить вручную.</div>
@@ -532,22 +571,39 @@
         </div>
       </div>
 
-      <div class="slabel">Планирование доходов · по уровням сети</div>
+      <div class="slabel">Планирование доходов · детально по группам</div>
       <div class="tree-card">
-        <div class="tree-head"><h3>Выручка</h3><span class="mode-pill auto"><span class="auto-dot"></span>авто из CRM</span></div>
-        <table>
-          <thead><tr><th>Уровень</th><th class="num">План, ₸</th><th class="num">Доля</th></tr></thead>
-          <tbody id="revenueTree"></tbody>
-        </table>
+        <div class="tree-head" style="flex-wrap:wrap;gap:10px">
+          <h3>Выручка по группам</h3>
+          <div style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap">
+            <label style="font-size:12.5px;color:var(--text2);font-weight:600">Филиал:</label>
+            <select id="branchSelect" onchange="onBranchChange()" style="font-family:'IBM Plex Sans',sans-serif;font-size:13px;font-weight:600;padding:7px 12px;border-radius:10px;border:1px solid var(--border-c);background:var(--control);color:var(--text);cursor:pointer"></select>
+            <button class="btn btn-secondary" style="padding:7px 12px;font-size:12px" onclick="openNewGroup()">+ Открыть направление</button>
+            <button class="btn btn-brand" style="padding:7px 12px;font-size:12px" onclick="calcRecommendations()">✦ Рассчитать рекомендации</button>
+            <span class="mode-pill auto"><span class="auto-dot"></span>авто из абонементов</span>
+          </div>
+        </div>
+        <div id="groupsHost"></div>
       </div>
+      <div id="recoHost" style="display:none"></div>
 
-      <div class="slabel">Планирование расходов · по категориям</div>
+      <div class="slabel">Планирование расходов · ЗП и бонусы раскрываются по людям ▾</div>
       <div class="tree-card">
         <div class="tree-head"><h3>Расходы</h3><button class="btn btn-secondary" style="padding:6px 12px;font-size:12px" onclick="addCategory()">+ Категория</button></div>
         <table>
-          <thead><tr><th>Категория</th><th class="num">План, ₸</th><th class="num">Режим</th></tr></thead>
+          <thead><tr><th>Категория</th><th class="num">План, ₸</th><th class="num">Режим</th><th></th></tr></thead>
           <tbody id="expenseTree"></tbody>
         </table>
+      </div>
+
+      <div class="slabel">Воронка продаж · сколько действий нужно для плана</div>
+      <div class="tree-card" style="padding:16px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <label style="font-size:13px;font-weight:600;color:var(--text2)">Нужно новых продаж:</label>
+          <input id="funnelNeed" value="20" oninput="renderFunnel()" style="width:70px;border:1px solid var(--border-c);border-radius:8px;padding:6px 10px;font-weight:700;background:var(--control);color:var(--text);text-align:right">
+          <span style="font-size:12px;color:var(--text2)">— система посчитает пробные, записи и лиды по конверсиям</span>
+        </div>
+        <div id="funnelHost" style="display:flex;flex-direction:column;gap:6px"></div>
       </div>
 
       <div class="kpi-grid" style="margin-top:20px;">
@@ -560,33 +616,11 @@
 
     <!-- ============ ФАКТ БДР ============ -->
     <div class="panel" id="panel-fact">
-      <div class="slabel">Фактические данные · автоматически из CRM</div>
-      <div class="tree-card">
-        <div class="tree-head"><h3>Поступления (факт)</h3><span class="mode-pill auto"><span class="auto-dot"></span>обновлено сегодня</span></div>
-        <table>
-          <thead><tr><th>Источник</th><th class="num">Факт, ₸</th><th class="num">Режим</th></tr></thead>
-          <tbody>
-            <tr><td>Продажи абонементов</td><td class="num editable-cell"><input value="12 400 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
-            <tr><td>Продажа товаров</td><td class="num editable-cell"><input value="1 850 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
-            <tr><td>Выступления</td><td class="num editable-cell"><input value="1 200 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
-            <tr><td>Банкеты</td><td class="num editable-cell"><input value="650 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
-            <tr><td>Возвраты</td><td class="num editable-cell"><input value="−200 000"></td><td class="num"><span class="mode-pill manual">вручную</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="tree-card">
-        <div class="tree-head"><h3>Расходы (факт)</h3><span class="mode-pill auto"><span class="auto-dot"></span>из Бухгалтерии</span></div>
-        <table>
-          <thead><tr><th>Категория</th><th class="num">Факт, ₸</th><th class="num">Режим</th></tr></thead>
-          <tbody>
-            <tr><td>Зарплаты</td><td class="num editable-cell"><input value="7 800 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
-            <tr><td>Аренда</td><td class="num editable-cell"><input value="3 200 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
-            <tr><td>Маркетинг</td><td class="num editable-cell"><input value="1 900 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
-            <tr><td>Коммунальные</td><td class="num editable-cell"><input value="780 000"></td><td class="num"><span class="mode-pill auto">авто</span></td></tr>
-            <tr><td>Прочее</td><td class="num editable-cell"><input value="1 100 000"></td><td class="num"><span class="mode-pill manual">вручную</span></td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div id="factSummary" class="bdr-summary"></div>
+      <div class="slabel">Поступления · автоматически из CRM</div>
+      <div class="tree-card"><div id="factIncomeHost"></div></div>
+      <div class="slabel">Расходы (факт) · из Бухгалтерии</div>
+      <div class="tree-card"><div id="factExpenseHost"></div></div>
     </div>
 
     <!-- ============ ПЛАН / ФАКТ ============ -->
@@ -602,95 +636,19 @@
 
     <!-- ============ ЕЖЕДНЕВНЫЙ ОТЧЁТ ============ -->
     <div class="panel" id="panel-daily">
-      <div class="slabel">Управляющий: Алия Нурбекова · Филиал «Чокина»</div>
-      <div class="daily-hero">
-        <div class="daily-mgr">Чтобы выполнить план — нужно делать</div>
-        <div class="daily-big">311 000 ₸ <span style="font-size:18px;opacity:.7;">в день</span></div>
-        <div class="daily-need">Осталось 18 дней до конца месяца · до плана 5 600 000 ₸</div>
-      </div>
-      <div class="daily-grid">
-        <div class="daily-card"><div class="daily-card-lbl">План месяца</div><div class="daily-card-val">12 000 000</div></div>
-        <div class="daily-card"><div class="daily-card-lbl">Факт</div><div class="daily-card-val brand">6 400 000</div></div>
-        <div class="daily-card"><div class="daily-card-lbl">Выполнение</div><div class="daily-card-val">53%</div></div>
-        <div class="daily-card"><div class="daily-card-lbl">До плана</div><div class="daily-card-val red">5 600 000</div></div>
-        <div class="daily-card"><div class="daily-card-lbl">До конца месяца</div><div class="daily-card-val">18 дней</div></div>
-        <div class="daily-card"><div class="daily-card-lbl">Прогноз выполнения</div><div class="daily-card-val green">96%</div></div>
-      </div>
+      <div class="slabel">Ежедневный отчёт управляющего</div>
+      <div id="dailyHost"></div>
     </div>
 
     <!-- ============ AI АНАЛИТИКА ============ -->
     <div class="panel" id="panel-ai">
-      <div class="ai-prob">
-        <div class="ai-prob-circle"><span>93%</span></div>
-        <div class="ai-prob-text"><h4>Вероятность выполнения плана — 93%</h4><p>Сеть идёт в графике. Риск умеренный, основной — филиал «Усолка».</p></div>
-      </div>
-      <div class="ai-card">
-        <div class="ai-lbl">✦ AI-аналитик · Июнь 2026</div>
-        <div class="ai-text">
-          <p>📉 Выручка ниже плана на <strong>6%</strong>. Основное отклонение вызвано филиалом <strong>Усолка</strong> (−1,1 млн ₸).</p>
-          <p>📊 Удержание снизилось на <strong>11%</strong>. Продлено на <strong>18 учеников меньше</strong>, чем в прошлом месяце.</p>
-          <p>💰 Расходы на маркетинг превышают план на 120 000 ₸ без роста заявок — канал требует пересмотра.</p>
-        </div>
-      </div>
-      <div class="ai-recs">
-        <h4>AI-рекомендации для выполнения плана</h4>
-        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Продлить <b>26 учеников</b> с истекающими абонементами</div></div>
-        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Провести <b>18 пробных уроков</b> по записанным лидам</div></div>
-        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Заполнить <b>2 группы</b> с низкой загрузкой</div></div>
-        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Вернуть <b>7 ушедших клиентов</b> через спецпредложение</div></div>
-        <div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">Сократить расходы на рекламу на <b>120 000 ₸</b></div></div>
-      </div>
+      <div id="aiHost"></div>
     </div>
 
     <!-- ============ МОТИВАЦИЯ ============ -->
     <div class="panel" id="panel-mot">
       <div class="slabel">Настройки мотивации · полностью редактируются владельцем</div>
-      <div class="mot-card">
-        <div class="mot-head">
-          <div class="mot-mgr">
-            <div class="mot-avatar">АН</div>
-            <div><div class="mot-name">Алия Нурбекова</div><div class="mot-branch">Филиал «Чокина» · план 12 000 000 ₸</div></div>
-          </div>
-          <div class="mot-salary">
-            <div class="mot-salary-lbl">Прогноз зарплаты</div>
-            <div class="mot-salary-val">590 000 ₸</div>
-          </div>
-        </div>
-        <div class="kpi-ladder">
-          <div class="ladder-step"><div class="ladder-pct">до 90%</div><input class="ladder-input" value="0"></div>
-          <div class="ladder-step reached"><div class="ladder-pct">90%</div><input class="ladder-input" value="100 000"></div>
-          <div class="ladder-step reached"><div class="ladder-pct">95%</div><input class="ladder-input" value="150 000"></div>
-          <div class="ladder-step current"><div class="ladder-pct">100%</div><input class="ladder-input" value="250 000"></div>
-          <div class="ladder-step"><div class="ladder-pct">105%</div><input class="ladder-input" value="350 000"></div>
-          <div class="ladder-step"><div class="ladder-pct">110%</div><input class="ladder-input" value="500 000"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);">
-          <div><div class="daily-card-lbl">Оклад</div><div style="font-size:17px;font-weight:800">350 000</div></div>
-          <div><div class="daily-card-lbl">Текущий бонус (95%)</div><div style="font-size:17px;font-weight:800;color:var(--brand)">240 000</div></div>
-          <div><div class="daily-card-lbl">Прогноз бонуса (100%)</div><div style="font-size:17px;font-weight:800;color:var(--green)">250 000</div></div>
-          <div><div class="daily-card-lbl">Итого к выплате</div><div style="font-size:17px;font-weight:800;color:var(--green)">590 000</div></div>
-        </div>
-      </div>
-      <div class="mot-card">
-        <div class="mot-head">
-          <div class="mot-mgr">
-            <div class="mot-avatar" style="background:var(--navy)">МБ</div>
-            <div><div class="mot-name">Марат Беков</div><div class="mot-branch">Филиал «Полноформат» · план 18 000 000 ₸</div></div>
-          </div>
-          <div class="mot-salary">
-            <div class="mot-salary-lbl">Прогноз зарплаты</div>
-            <div class="mot-salary-val" style="color:var(--gold)">510 000 ₸</div>
-          </div>
-        </div>
-        <div class="kpi-ladder">
-          <div class="ladder-step current"><div class="ladder-pct">до 90%</div><input class="ladder-input" value="0"></div>
-          <div class="ladder-step"><div class="ladder-pct">90%</div><input class="ladder-input" value="120 000"></div>
-          <div class="ladder-step"><div class="ladder-pct">95%</div><input class="ladder-input" value="180 000"></div>
-          <div class="ladder-step"><div class="ladder-pct">100%</div><input class="ladder-input" value="280 000"></div>
-          <div class="ladder-step"><div class="ladder-pct">105%</div><input class="ladder-input" value="400 000"></div>
-          <div class="ladder-step"><div class="ladder-pct">110%</div><input class="ladder-input" value="550 000"></div>
-        </div>
-      </div>
+      <div id="motHost"></div>
     </div>
       </div>
     </div>
@@ -699,259 +657,1175 @@
 
 <script>
 function fmt(n){return Math.round(n).toLocaleString('ru-RU');}
-
-// ===== ПЛАН: дерево выручки =====
-const revenueData = [
-  {lvl:0, name:'Выручка сети', val:30000000, share:'100%'},
-  {lvl:1, name:'Полноформат', val:18000000, share:'60%'},
-  {lvl:2, name:'Чокина', val:7200000, share:'24%'},
-  {lvl:3, name:'Ансамбль', val:1300000, share:'4,3%'},
-  {lvl:3, name:'Соло', val:980000, share:'3,3%'},
-  {lvl:2, name:'Достык', val:5400000, share:'18%'},
-  {lvl:1, name:'Усолка', val:7000000, share:'23%'},
-  {lvl:1, name:'Жастар', val:5000000, share:'17%'},
-];
-document.getElementById('revenueTree').innerHTML = revenueData.map(r=>`
-  <tr class="tree-row lvl${r.lvl}">
-    <td>${r.lvl<2?'<span class="tree-toggle">▾</span>':''}${r.name}</td>
-    <td class="num editable-cell"><input value="${fmt(r.val)}"></td>
-    <td class="num">${r.share}</td>
-  </tr>`).join('');
-
-// ===== ПЛАН: расходы =====
-const expenseData = [
-  {name:'Зарплата', val:8200000, mode:'auto'},
-  {name:'Аренда', val:3200000, mode:'auto'},
-  {name:'Маркетинг', val:2100000, mode:'auto'},
-  {name:'Коммунальные', val:850000, mode:'auto'},
-  {name:'Инвентарь', val:600000, mode:'manual'},
-  {name:'Хозяйственные', val:450000, mode:'manual'},
-  {name:'Выступления', val:700000, mode:'auto'},
-  {name:'Транспорт', val:380000, mode:'manual'},
-  {name:'Налоги', val:1620000, mode:'auto'},
-  {name:'Прочее', val:500000, mode:'manual'},
-];
-document.getElementById('expenseTree').innerHTML = expenseData.map(e=>`
-  <tr class="tree-row lvl1">
-    <td>${e.name}</td>
-    <td class="num editable-cell"><input value="${fmt(e.val)}"></td>
-    <td class="num"><span class="mode-pill ${e.mode}">${e.mode==='auto'?'авто':'вручную'}</span></td>
-  </tr>`).join('');
-
-// ===== ПЛАН/ФАКТ =====
-const pfData = [
-  {lvl:0, name:'Вся сеть',     plan:30000000, fact:28200000},
-  {lvl:1, name:'Полноформат',  plan:18000000, fact:16900000},
-  {lvl:2, name:'Чокина',       plan:7200000,  fact:6400000},
-  {lvl:2, name:'Достык',       plan:5400000,  fact:5600000},
-  {lvl:1, name:'Усолка',       plan:7000000,  fact:5900000},
-  {lvl:1, name:'Жастар',       plan:5000000,  fact:5400000},
-];
-document.getElementById('pfTree').innerHTML = pfData.map(r=>{
-  const dev=r.fact-r.plan;
-  const pct=Math.round(r.fact/r.plan*100);
-  const barCls=pct>=100?'good':pct>=90?'mid':'bad';
-  return `<tr class="tree-row lvl${r.lvl}">
-    <td>${r.name}</td>
-    <td class="num">${fmt(r.plan)}</td>
-    <td class="num">${fmt(r.fact)}</td>
-    <td class="num ${dev>=0?'dev-pos':'dev-neg'}">${dev>=0?'+':''}${fmt(dev)}</td>
-    <td class="num"><span class="pf-bar-wrap"><span class="pf-bar ${barCls}" style="width:${Math.min(pct,100)}%"></span></span>${pct}%</td>
-  </tr>`;
-}).join('');
-
-// ===== ПАНЕЛИ =====
-function showPanel(id, btn){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.subtab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('panel-'+id).classList.add('active');
-  btn.classList.add('active');
-}
-
-// ===== УТИЛИТЫ =====
 function parseNum(s){
-  // убираем пробелы/неразрывные пробелы, поддержка минуса (− и -)
-  var n = String(s).replace(/[\s\u00A0\u202F]/g,'').replace('−','-').replace(/[^0-9.-]/g,'');
-  var v = parseFloat(n);
-  return isNaN(v)?0:v;
+  var n=String(s).replace(/[\s\u00A0\u202F]/g,'').replace('−','-').replace(/[^0-9.-]/g,'');
+  var v=parseFloat(n); return isNaN(v)?0:v;
+}
+function setText(id,val){var el=document.getElementById(id); if(el) el.textContent=val;}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+/* ============================================================
+   ИСТОЧНИК ДАННЫХ (заглушка → потом база абонементов)
+   ============================================================ */
+var GROUPS_ASTANA = [{"zone": "Зал №2", "name": "Ансамбль", "type": "Ансамбль", "teacher": "", "chek": 17176, "post": 17, "new": 0, "max": 18, "pu": 0, "retention": 90, "factPrev": 292904, "factPrev2": 257975, "manualPlan": 0}, {"zone": "Зал №2", "name": "Мужская взрослая 17:00", "type": "Взрослая", "teacher": "", "chek": 21900, "post": 10, "new": 0, "max": 22, "pu": 0, "retention": 90, "factPrev": 209310, "factPrev2": 199563, "manualPlan": 0}, {"zone": "Зал №2", "name": "Мужская взрослая 18:30", "type": "Взрослая", "teacher": "", "chek": 20143, "post": 7, "new": 0, "max": 22, "pu": 0, "retention": 90, "factPrev": 143220, "factPrev2": 137439, "manualPlan": 0}, {"zone": "Зал №2", "name": "Младший ансамбль", "type": "Ансамбль", "teacher": "", "chek": 19961, "post": 17, "new": 0, "max": 21, "pu": 0, "retention": 90, "factPrev": 351547, "factPrev2": 302746, "manualPlan": 0}, {"zone": "Зал №1", "name": "Мужская студия Сб Вс (Хамит)", "type": "Взрослая", "teacher": "Хамит", "chek": 18914, "post": 28, "new": 0, "max": 10, "pu": 0, "retention": 90, "factPrev": 516272, "factPrev2": 468250, "manualPlan": 0}, {"zone": "Зал №1", "name": "Мужская начальный Вт Чт (Тимур)", "type": "Начальная", "teacher": "Тимур", "chek": 18338, "post": 19, "new": 1, "max": 23, "pu": 0, "retention": 90, "factPrev": 347843, "factPrev2": 348696, "manualPlan": 0}, {"zone": "Зал №1", "name": "Продолжающая группа Сб Вс (Тимур)", "type": "Продолжающая", "teacher": "Тимур", "chek": 20444, "post": 27, "new": 0, "max": 22, "pu": 0, "retention": 90, "factPrev": 509733, "factPrev2": 501115, "manualPlan": 0}, {"zone": "Зал №1", "name": "Взрослая продолжающая Сб Вс (Дэйси)", "type": "Продолжающая", "teacher": "Дэйси", "chek": 19089, "post": 15, "new": 0, "max": 20, "pu": 0, "retention": 90, "factPrev": 287619, "factPrev2": 273819, "manualPlan": 0}, {"zone": "Зал №1", "name": "Девичья Ср Пт  (Дэйси)", "type": "Взрослая", "teacher": "Дэйси", "chek": 19550, "post": 12, "new": 3, "max": 15, "pu": 0, "retention": 90, "factPrev": 278193, "factPrev2": 282252, "manualPlan": 0}, {"zone": "Зал №1", "name": "Девичья 10:15 сб/вс (Дэйси)", "type": "Взрослая", "teacher": "Дэйси", "chek": 20130, "post": 27, "new": 0, "max": 22, "pu": 0, "retention": 90, "factPrev": 557220, "factPrev2": 478783, "manualPlan": 0}, {"zone": "Зал №1", "name": "Взрослая начальная Сб Вс (Мерей)", "type": "Начальная", "teacher": "Мерей", "chek": 20174, "post": 23, "new": 0, "max": 15, "pu": 0, "retention": 90, "factPrev": 475489, "factPrev2": 453673, "manualPlan": 0}, {"zone": "Зал №1", "name": "Взрослая продолжающая Сб Вс (Мерей)", "type": "Продолжающая", "teacher": "Мерей", "chek": 19684, "post": 19, "new": 0, "max": 22, "pu": 0, "retention": 90, "factPrev": 360619, "factPrev2": 337257, "manualPlan": 0}, {"zone": "Зал №1", "name": "Девичья 10:00 (Анжела)", "type": "Взрослая", "teacher": "Анжела", "chek": 18572, "post": 22, "new": 0, "max": 25, "pu": 0, "retention": 90, "factPrev": 426740, "factPrev2": 378807, "manualPlan": 0}, {"zone": "Зал №1", "name": "Женская продолжающая Анжела", "type": "Продолжающая", "teacher": "", "chek": 19851, "post": 37, "new": 0, "max": 7, "pu": 0, "retention": 90, "factPrev": 684583, "factPrev2": 656293, "manualPlan": 0}, {"zone": "Зал №1", "name": "Девичья 3-4 года (Анжела)", "type": "Детская", "teacher": "Анжела", "chek": 20273, "post": 11, "new": 0, "max": 22, "pu": 0, "retention": 90, "factPrev": 229731, "factPrev2": 215091, "manualPlan": 0}, {"zone": "Зал №1", "name": "Женская студия Анжела", "type": "Взрослая", "teacher": "", "chek": 18357, "post": 14, "new": 0, "max": 17, "pu": 0, "retention": 90, "factPrev": 263404, "factPrev2": 252413, "manualPlan": 0}, {"zone": "Зал №1", "name": "Женская взрослая Анжела 19:30", "type": "Взрослая", "teacher": "", "chek": 18559, "post": 16, "new": 1, "max": 22, "pu": 0, "retention": 90, "factPrev": 312256, "factPrev2": 320625, "manualPlan": 0}, {"zone": "Зал №1", "name": "Грузинская группа", "type": "Другое", "teacher": "", "chek": 19709, "post": 11, "new": 0, "max": 11, "pu": 0, "retention": 90, "factPrev": 210123, "factPrev2": 207538, "manualPlan": 0}, {"zone": "Зал №1", "name": "Девичья продолжающая вт/чт (Анжела)", "type": "Продолжающая", "teacher": "Анжела", "chek": 19420, "post": 22, "new": 0, "max": 22, "pu": 0, "retention": 90, "factPrev": 439126, "factPrev2": 412967, "manualPlan": 0}, {"zone": "Зал №1", "name": "Мужская 10:00 (Ислам)", "type": "Взрослая", "teacher": "Ислам", "chek": 20700, "post": 20, "new": 0, "max": 22, "pu": 0, "retention": 90, "factPrev": 427257, "factPrev2": 397783, "manualPlan": 0}, {"zone": "Зал №1", "name": "Продолжающая (Ислам)", "type": "Продолжающая", "teacher": "Ислам", "chek": 20167, "post": 12, "new": 0, "max": 12, "pu": 0, "retention": 90, "factPrev": 244809, "factPrev2": 214516, "manualPlan": 0}, {"zone": "Зал №3", "name": "Мини группа взрослая Ср Пт (Медина)", "type": "Мини-группа", "teacher": "Медина", "chek": 16375, "post": 7, "new": 4, "max": 10, "pu": 0, "retention": 90, "factPrev": 171051, "factPrev2": 165807, "manualPlan": 0}, {"zone": "Зал №3", "name": "Мини-группа взрослая ПН Ср (Хамит)", "type": "Мини-группа", "teacher": "Хамит", "chek": 20389, "post": 6, "new": 3, "max": 10, "pu": 0, "retention": 90, "factPrev": 170724, "factPrev2": 167461, "manualPlan": 0}, {"zone": "Зал №3", "name": "Индивидуальные Хамит", "type": "Индивидуальные", "teacher": "", "chek": 47000, "post": 6, "new": 1, "max": 6, "pu": 0, "retention": 90, "factPrev": 306999, "factPrev2": 302323, "manualPlan": 0}, {"zone": "Зал №3", "name": "Мини-группа детская Пн Ср (Хамит)", "type": "Мини-группа", "teacher": "Хамит", "chek": 18750, "post": 8, "new": 1, "max": 4, "pu": 0, "retention": 90, "factPrev": 169195, "factPrev2": 157119, "manualPlan": 0}, {"zone": "Зал №3", "name": "Мини группа детская Вт Чт (Тимур)", "type": "Мини-группа", "teacher": "Тимур", "chek": 24219, "post": 4, "new": 0, "max": 6, "pu": 0, "retention": 90, "factPrev": 93787, "factPrev2": 88092, "manualPlan": 0}, {"zone": "Зал №3", "name": "Мини-группа взрослая Вт Чт (Дэйси)", "type": "Мини-группа", "teacher": "Дэйси", "chek": 22656, "post": 8, "new": 0, "max": 2, "pu": 0, "retention": 90, "factPrev": 173038, "factPrev2": 183265, "manualPlan": 0}, {"zone": "Зал №3", "name": "Индивидуальные Дэйси", "type": "Индивидуальные", "teacher": "", "chek": 22500, "post": 2, "new": 0, "max": 0, "pu": 0, "retention": 90, "factPrev": 45191, "factPrev2": 43437, "manualPlan": 0}, {"zone": "Зал №3", "name": "Индивидуальный Тимур", "type": "Индивидуальные", "teacher": "", "chek": 36750, "post": 1, "new": 0, "max": 1, "pu": 0, "retention": 90, "factPrev": 34627, "factPrev2": 36091, "manualPlan": 0}, {"zone": "Зал №3", "name": "Индивидуальные Медина", "type": "Индивидуальные", "teacher": "", "chek": 44063, "post": 1, "new": 1, "max": 1, "pu": 0, "retention": 90, "factPrev": 82947, "factPrev2": 82232, "manualPlan": 0}, {"zone": "Зал №3", "name": "Индивидуальные Дана", "type": "Индивидуальные", "teacher": "", "chek": 27625, "post": 2, "new": 0, "max": 1, "pu": 0, "retention": 90, "factPrev": 57937, "factPrev2": 53570, "manualPlan": 0}];
+GROUPS_ASTANA.forEach(function(g,i){ g.id='g'+i; if(g.pu===undefined)g.pu=0; });
+
+/* Типы групп — редактируются в настройках (п.4) */
+var GROUP_TYPES=['Начальная','Продолжающая','Ансамбль','Индивидуальные','Мини-группа','Взрослая','Детская','Другое'];
+
+/* Филиалы (заглушка). Астана 203 — реальные группы. */
+var BRANCHES=[
+  {id:'astana203', name:'Астана 203', manager:'Анель', groups:GROUPS_ASTANA},
+  {id:'polnoformat', name:'Полноформат', manager:'Марат', groups:[]},
+];
+function loadGroups(branchId){
+  /* TODO: заменить на fetch к базе абонементов. Формат тот же. */
+  var b=BRANCHES.filter(function(x){return x.id===branchId;})[0];
+  var groups = b ? b.groups.map(function(g){return Object.assign({},g);}) : [];
+  groups.forEach(function(g){
+    g.teacher = loadTeacher(g);     // педагог из вкладки «Педагоги»
+    g.category = loadCategory(g);   // тип группы из вкладки «Группы»
+  });
+  return groups;
+}
+/* Педагог группы из вкладки «Педагоги».
+   TODO: когда появится вкладка/база — заменить на реальный запрос по группе. */
+function loadTeacher(g){
+  return g.teacher || '';
+}
+/* Тип (категория) группы из вкладки «Группы».
+   TODO: когда появится вкладка/база — заменить на реальное поле группы.
+   Пока определяем автоматически по вместимости:
+   1 = индивидуальное, 2–6 = мини-группа, 7+ = групповое. */
+function loadCategory(g){
+  if(g.category) return g.category;
+  if(g.max<=1) return 'individual';
+  if(g.max<=6) return 'mini';
+  return 'group';
+}
+function categoryLabel(c){
+  return c==='individual'?'Индивидуальные':c==='mini'?'Мини-группы':'Групповые абонементы';
 }
 
-// ===== ПЛАН: live-пересчёт KPI =====
-function recalcPlan(){
-  var rev=0, exp=0;
-  document.querySelectorAll('#revenueTree .tree-row.lvl0 input').forEach(function(i){ rev += parseNum(i.value); });
-  // если уровня 0 нет — суммируем верхний уровень (lvl1)
-  if(rev===0){
-    document.querySelectorAll('#revenueTree .tree-row.lvl1 input').forEach(function(i){ rev += parseNum(i.value); });
-  }
-  document.querySelectorAll('#expenseTree input').forEach(function(i){ exp += parseNum(i.value); });
-  var profit = rev - exp;
-  var margin = rev>0 ? Math.round(profit/rev*100) : 0;
-  setText('planRevenue', fmt(rev));
-  setText('planExpense', fmt(exp));
-  setText('planProfit', fmt(profit));
-  setText('planMargin', margin+'%');
-}
-
-function setText(id, val){ var el=document.getElementById(id); if(el) el.textContent=val; }
-
-// ===== ИСТОЧНИК ПЛАНА: подстановка цифр =====
-var SOURCE_PRESETS = {
-  'Прошлый месяц': 27400000,
-  'Прошлый год':   24100000,
-  'Среднее значение': 26000000,
-  'Вручную': 0
+/* Конверсии воронки (п.6) — редактируемые */
+var FUNNEL={
+  lead2signup:0.55,   // лид → запись на пробный
+  signup2visit:0.70,  // запись → пришёл на пробный
+  visit2buy:0.50,     // пробный → покупка
+  retention:0.85      // ученик прошлого месяца → продление
 };
-function pickSource(el){
-  document.querySelectorAll('.source-opt').forEach(function(o){ o.classList.remove('on'); });
-  el.classList.add('on');
-  var title = (el.querySelector('.source-opt-title')||{}).textContent || '';
-  var target = SOURCE_PRESETS[title.trim()];
-  if(target === undefined) return;
-  if(target === 0){
-    // режим "Вручную" — обнуляем дерево для ввода с нуля
-    document.querySelectorAll('#revenueTree input').forEach(function(i){ i.value = '0'; });
+
+/* Шкала мотивации (п.13) — редактируемая владельцем */
+var MOTIVATION={
+  oklad:350000,
+  scale:[
+    {from:0,   to:80,  bonus:0},
+    {from:80,  to:90,  bonus:50000},
+    {from:90,  to:100, bonus:150000},
+    {from:100, to:110, bonus:250000},
+    {from:110, to:999, bonus:400000}
+  ]
+};
+
+/* ============================================================
+   СОСТОЯНИЕ
+   ============================================================ */
+var STATE={
+  branchId:'astana203',
+  month:5,   // 0..11 (по умолчанию текущий месяц проставится в init)
+  year:2026,
+  groups:[],
+  collapsed:false,
+  zoneCollapsed:{},
+  summaryScope:'all',
+  editMode:false,
+  game:{streak:0,points:0,tasksDone:{}},
+  history:[],
+  expenses:[
+    {name:'Аренда',val:1080450,mode:'auto'},
+    {name:'Ком. услуги',val:55000,mode:'auto'},
+    {name:'Зарплаты',mode:'auto',items:[
+      {name:'Педагог · Хамит',val:420000},
+      {name:'Педагог · Тимур',val:480000},
+      {name:'Педагог · Дэйси',val:390000},
+      {name:'Управляющий · Анель',val:350000},
+      {name:'Администратор',val:250000},
+      {name:'Прочий персонал',val:729025}
+    ]},
+    {name:'Бонусы',mode:'auto',items:[
+      {name:'Бонус управляющего',val:180000},
+      {name:'Бонусы педагогов',val:153700}
+    ]},
+    {name:'Хоз. товары',val:140000,mode:'manual'},
+    {name:'Маркетинг',val:340000,mode:'auto'},
+    {name:'Сотовая связь и подписки',val:147230,mode:'manual'}
+  ],
+  factIncome:[
+    {name:'Продажи абонементов',val:12400000,mode:'auto',manual:false},
+    {name:'Продажа товаров',val:1850000,mode:'auto',manual:false},
+    {name:'Выступления',val:1200000,mode:'auto',manual:false},
+    {name:'Банкеты',val:650000,mode:'auto',manual:false},
+    {name:'Возвраты',val:-200000,mode:'manual',manual:true}
+  ],
+  factExpense:[
+    {name:'Зарплаты',val:2580000,mode:'auto',manual:false},
+    {name:'Аренда',val:1080450,mode:'auto',manual:false},
+    {name:'Маркетинг',val:320000,mode:'auto',manual:false},
+    {name:'Коммунальные',val:62000,mode:'auto',manual:false},
+    {name:'Прочее',val:180000,mode:'manual',manual:true}
+  ]
+};
+
+var MONTHS_RU=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+
+/* ============================================================
+   ХРАНИЛИЩЕ (localStorage; потом заменить на Supabase)
+   Ключ БДР: bdr:<branchId>:<year>-<month>
+   ============================================================ */
+function bdrKey(branchId,year,month){return 'bdr:'+branchId+':'+year+'-'+(month+1);}
+function storageGet(key){
+  try{var v=localStorage.getItem(key);return v?JSON.parse(v):null;}catch(e){return null;}
+}
+function storageSet(key,obj){
+  try{localStorage.setItem(key,JSON.stringify(obj));return true;}catch(e){return false;}
+}
+function bdrExists(branchId,year,month){return !!storageGet(bdrKey(branchId,year,month));}
+
+/* Миграция: старые сохранённые расходы без подстатей несовместимы с новым форматом.
+   Если в сохранённых расходах нет ни одной категории с items — берём дефолтные (с подстатьями). */
+function migrateExpenses(saved){
+  if(!saved||!saved.length)return null;
+  var hasItems=saved.some(function(e){return e.items&&e.items.length;});
+  if(hasItems)return saved; // новый формат, оставляем
+  return null; // старый формат — сигнал использовать дефолт
+}
+function defaultExpenses(){
+  return JSON.parse(JSON.stringify([
+    {name:'Аренда',val:1080450,mode:'auto'},
+    {name:'Ком. услуги',val:55000,mode:'auto'},
+    {name:'Зарплаты',mode:'auto',items:[
+      {name:'Педагог · Хамит',val:420000},{name:'Педагог · Тимур',val:480000},
+      {name:'Педагог · Дэйси',val:390000},{name:'Управляющий · Анель',val:350000},
+      {name:'Администратор',val:250000},{name:'Прочий персонал',val:729025}
+    ]},
+    {name:'Бонусы',mode:'auto',items:[
+      {name:'Бонус управляющего',val:180000},{name:'Бонусы педагогов',val:153700}
+    ]},
+    {name:'Хоз. товары',val:140000,mode:'manual'},
+    {name:'Маркетинг',val:340000,mode:'auto'},
+    {name:'Сотовая связь и подписки',val:147230,mode:'manual'}
+  ]));
+}
+
+function saveCurrentBDR(){
+  var key=bdrKey(STATE.branchId,STATE.year,STATE.month);
+  var data={
+    branchId:STATE.branchId, year:STATE.year, month:STATE.month,
+    groups:STATE.groups, expenses:STATE.expenses,
+    history:STATE.history, savedAt:new Date().toISOString()
+  };
+  storageSet(key,data);
+}
+
+/* запись в историю корректировок */
+function logChange(what,oldV,newV){
+  STATE.history.unshift({
+    what:what, old:oldV, val:newV,
+    when:new Date().toISOString(),
+    who:'Владелец'
+  });
+  if(STATE.history.length>500) STATE.history.pop();
+  saveCurrentBDR();
+}
+
+/* ============================================================
+   РАСЧЁТЫ
+   ============================================================ */
+function gStudents(g){return g.post+g.new;}
+function gSum(g){return g.chek*gStudents(g);}
+function gPlan(g){return g.manualPlan>0?g.manualPlan:gSum(g);}
+function gFree(g){return Math.max(0,g.max-gStudents(g));}
+function gRecommend(g){
+  // рекомендуемый план: среднее факта прошлых месяцев + потенциал свободных мест×чек×вероятность
+  var avg=(g.factPrev+g.factPrev2)/2;
+  var potential=gFree(g)*g.chek*0.4; // 40% свободных мест реалистично закрыть
+  return Math.round(avg+potential);
+}
+function revenueTotal(){return STATE.groups.reduce(function(s,g){return s+gPlan(g);},0);}
+
+/* Разбивка плановой выручки по группам данных */
+function revenueByCategory(groups){
+  groups=groups||STATE.groups;
+  var r={group:0,mini:0,individual:0};
+  groups.forEach(function(g){
+    var cat=loadCategory(g);
+    r[cat]=(r[cat]||0)+gPlan(g);
+  });
+  return r;
+}
+/* Выручка от новых и от постоянных (пропорционально числу учеников в группе) */
+function revenueByAudience(groups){
+  groups=groups||STATE.groups;
+  var res={post:0,new:0};
+  groups.forEach(function(g){
+    var tot=gStudents(g);
+    var plan=gPlan(g);
+    if(tot<=0)return;
+    res.post+=plan*(g.post/tot);
+    res.new +=plan*(g.new /tot);
+  });
+  res.post=Math.round(res.post); res.new=Math.round(res.new);
+  return res;
+}
+function expVal(e){
+  if(e.items&&e.items.length)return e.items.reduce(function(s,it){return s+(+it.val||0);},0);
+  return +e.val||0;
+}
+function expenseTotal(){return STATE.expenses.reduce(function(s,e){return s+expVal(e);},0);}
+function studentsTotal(){return STATE.groups.reduce(function(s,g){return s+gStudents(g);},0);}
+function freeTotal(){return STATE.groups.reduce(function(s,g){return s+gFree(g);},0);}
+function capacityTotal(){return STATE.groups.reduce(function(s,g){return s+g.max;},0);}
+function avgChek(){var n=STATE.groups.length;return n?Math.round(STATE.groups.reduce(function(s,g){return s+g.chek;},0)/n):0;}
+function fillRate(){var cap=capacityTotal();return cap?Math.round(studentsTotal()/cap*100):0;}
+
+/* ============================================================
+   РЕНДЕР: выбор филиала
+   ============================================================ */
+function renderBranchSelect(){
+  var sel=document.getElementById('branchSelect'); if(!sel) return;
+  sel.innerHTML=BRANCHES.map(function(b){
+    return '<option value="'+b.id+'"'+(b.id===STATE.branchId?' selected':'')+'>'+esc(b.name)+'</option>';
+  }).join('');
+}
+
+function zoneList(){
+  var z=[]; STATE.groups.forEach(function(g){if(z.indexOf(g.zone)<0)z.push(g.zone);}); return z;
+}
+
+/* ============================================================
+   РЕНДЕР: сворачиваемый блок филиала + группы (п.3, п.4)
+   ============================================================ */
+function renderGroups(){
+  var host=document.getElementById('groupsHost'); if(!host) return;
+  var b=BRANCHES.filter(function(x){return x.id===STATE.branchId;})[0];
+  var rev=revenueTotal(), exp=expenseTotal(), profit=rev-exp;
+  var fill=fillRate();
+
+  // шапка филиала (сворачиваемая)
+  var head='<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;background:var(--gold-bg);border-radius:12px;margin-bottom:'+(STATE.collapsed?'0':'12px')+';cursor:pointer" onclick="toggleCollapse()">'+
+    '<div style="display:flex;align-items:center;gap:10px">'+
+      '<span style="font-size:15px;transition:.2s;display:inline-block;transform:rotate('+(STATE.collapsed?'-90deg':'0')+')">▾</span>'+
+      '<div><div style="font-weight:800;font-size:15px;color:var(--heading)">'+esc(b?b.name:'—')+'</div>'+
+      '<div style="font-size:11.5px;color:var(--text2)">'+STATE.groups.length+' групп · '+studentsTotal()+' учеников · заполненность '+fill+'%</div></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:18px;text-align:right;font-size:12px">'+
+      '<div><div style="color:var(--text2)">Выручка</div><div style="font-weight:800;color:var(--heading)">'+fmt(rev)+'</div></div>'+
+      '<div><div style="color:var(--text2)">Расходы</div><div style="font-weight:800;color:var(--red,#c0392b)">'+fmt(exp)+'</div></div>'+
+      '<div><div style="color:var(--text2)">Прибыль</div><div style="font-weight:800;color:var(--green)">'+fmt(profit)+'</div></div>'+
+    '</div></div>';
+
+  if(STATE.collapsed){ host.innerHTML=head; recalcPlan(); return; }
+
+  var body='';
+  if(STATE.groups.length===0){
+    body='<div style="padding:24px;text-align:center;color:var(--text2);font-size:13px">Группы этого филиала ещё не подтянулись из вкладки «Группы». Выберите другой филиал.</div>';
   } else {
-    // масштабируем текущее дерево выручки под новую общую сумму
-    var inputs = document.querySelectorAll('#revenueTree .tree-row.lvl0 input');
-    var base = 30000000; // исходная сумма сети из revenueData
-    var k = target / base;
-    document.querySelectorAll('#revenueTree input').forEach(function(i){
-      i.value = fmt(parseNum(i.value) * k);
-    });
-  }
-  recalcPlan();
-}
-
-// ===== ПЕРЕКЛЮЧЕНИЕ РЕЖИМА АВТО/ВРУЧНУЮ =====
-function bindModePills(){
-  document.querySelectorAll('.mode-pill').forEach(function(p){ bindOneModePill(p); });
-}
-
-// ===== ФАКТ: суммирование (показываем подсказку итогов) =====
-function bindFactInputs(){
-  document.querySelectorAll('#panel-fact input').forEach(function(i){
-    i.addEventListener('input', function(){ /* живое редактирование, итоги в П/Ф */ });
-  });
-}
-
-// ===== МОТИВАЦИЯ: KPI-лестница =====
-function bindLadders(){
-  document.querySelectorAll('.mot-card').forEach(function(card){
-    var inputs = card.querySelectorAll('.ladder-input');
-    var salaryEl = card.querySelector('.mot-salary-val');
-    function recalc(){
-      // текущий шаг = .current, иначе последний .reached
-      var current = card.querySelector('.ladder-step.current .ladder-input');
-      var bonus = current ? parseNum(current.value) : 0;
-      var oklad = 350000; // базовый оклад (правится в коррективах)
-      if(salaryEl) salaryEl.textContent = fmt(oklad + bonus) + ' ₸';
-    }
-    inputs.forEach(function(i){ i.addEventListener('input', recalc); });
-    // клик по шагу делает его текущим
-    card.querySelectorAll('.ladder-step').forEach(function(step){
-      step.style.cursor='pointer';
-      step.addEventListener('click', function(e){
-        if(e.target.tagName==='INPUT') return;
-        card.querySelectorAll('.ladder-step').forEach(function(s){ s.classList.remove('current'); });
-        step.classList.add('current');
-        // все шаги до текущего — reached
-        var steps = Array.prototype.slice.call(card.querySelectorAll('.ladder-step'));
-        var idx = steps.indexOf(step);
-        steps.forEach(function(s,n){ s.classList.toggle('reached', n>0 && n<=idx); });
-        recalc();
+    zoneList().forEach(function(zone){
+      var zg=STATE.groups.filter(function(g){return g.zone===zone;});
+      var zsum=zg.reduce(function(s,g){return s+gPlan(g);},0);
+      var zst=zg.reduce(function(s,g){return s+gStudents(g);},0);
+      var zcollapsed=!!STATE.zoneCollapsed[zone];
+      body+='<div style="margin-top:12px">'+
+        '<div data-zone="'+esc(zone)+'" style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--inset);border-radius:9px'+(zcollapsed?'':' 9px 0 0')+';font-weight:700;font-size:12.5px;color:var(--heading);cursor:pointer">'+
+        '<span style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;display:inline-block;transition:.15s;transform:rotate('+(zcollapsed?'-90deg':'0')+')">▾</span>'+esc(zone)+' · '+zg.length+' гр · '+zst+' уч</span><span>'+fmt(zsum)+' ₸</span></div>';
+      if(!zcollapsed){
+        body+='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:720px"><thead>'+
+        '<tr style="font-size:10.5px;color:var(--text2);text-align:right">'+
+        '<th style="text-align:left;padding:5px 6px">Группа</th>'+
+        '<th style="padding:5px 4px">Педагог</th>'+
+        '<th style="padding:5px 4px">Чек</th>'+
+        '<th style="padding:5px 4px">Пост</th>'+
+        '<th style="padding:5px 4px">Нов</th>'+
+        '<th style="padding:5px 4px">Всего</th>'+
+        '<th style="padding:5px 4px">Своб</th>'+
+        '<th style="padding:5px 4px">Факт пр. мес.</th>'+
+        '<th style="padding:5px 4px">Реком.</th>'+
+        '<th style="padding:5px 4px">План</th>'+
+        '<th></th></tr></thead><tbody>';
+      zg.forEach(function(g){
+        var total=gStudents(g), free=gFree(g), over=total>g.max&&g.max>0;
+        var rec=gRecommend(g), plan=gPlan(g);
+        body+='<tr style="border-bottom:1px solid var(--border-c)">'+
+          '<td style="padding:4px 6px;font-size:12px;font-weight:600;color:var(--heading)"><span contenteditable="true" data-gname="'+g.id+'" style="outline:none">'+esc(g.name)+'</span></td>'+
+          '<td style="text-align:left;font-size:12px;color:var(--text2)" title="Из вкладки Педагоги">'+(g.teacher?esc(g.teacher):'<span style="opacity:.5">—</span>')+'</td>'+
+          '<td style="text-align:right"><input data-g="'+g.id+'" data-f="chek" value="'+fmt(g.chek)+'" style="width:64px"></td>'+
+          '<td style="text-align:right"><input data-g="'+g.id+'" data-f="post" value="'+g.post+'" style="width:38px"></td>'+
+          '<td style="text-align:right"><input data-g="'+g.id+'" data-f="new" value="'+g.new+'" style="width:38px"></td>'+
+          '<td style="text-align:right;font-weight:700;font-size:12px'+(over?';color:var(--red,#c0392b)':'')+'">'+total+'</td>'+
+          '<td style="text-align:right;font-size:12px;color:var(--text2)">'+free+'</td>'+
+          '<td style="text-align:right;font-size:11.5px;color:var(--text2)">'+fmt(g.factPrev)+'</td>'+
+          '<td style="text-align:right;font-size:11.5px;color:var(--gold-c,#a08a4a);font-weight:600" title="Рекомендуемый план">'+fmt(rec)+'</td>'+
+          '<td style="text-align:right"><input data-g="'+g.id+'" data-f="manualPlan" value="'+(g.manualPlan>0?fmt(g.manualPlan):fmt(plan))+'" style="width:78px;font-weight:700" title="Ручной план владельца"></td>'+
+          '<td style="text-align:right;padding-right:4px"><span data-gdel="'+g.id+'" title="Удалить" style="cursor:pointer;color:var(--text2);font-weight:700">✕</span></td>'+
+          '</tr>';
       });
+      body+='</tbody></table></div>';
+      }
+      body+='</div>';
     });
-    recalc();
-  });
-}
-
-// ===== СОЗДАТЬ НОВЫЙ БДР =====
-function createNewBDR(){
-  // обнуляем дерево выручки и расходов для планирования с нуля
-  document.querySelectorAll('#revenueTree input').forEach(function(i){ i.value='0'; });
-  document.querySelectorAll('#expenseTree input').forEach(function(i){ i.value='0'; });
-  // сбрасываем выбор источника на "Вручную"
-  document.querySelectorAll('.source-opt').forEach(function(o){ o.classList.remove('on'); });
-  var manual = Array.prototype.slice.call(document.querySelectorAll('.source-opt'))
-    .filter(function(o){ var t=o.querySelector('.source-opt-title'); return t && t.textContent.trim()==='Вручную'; })[0];
-  if(manual) manual.classList.add('on');
-  // переключаемся на вкладку План
-  var planTab = document.querySelector('.subtab');
-  if(planTab) showPanel('plan', planTab);
-  recalcPlan();
-  // обновляем подпись периода под новый месяц
-  var pb=document.getElementById('periodBtn');
-  if(pb){
-    var months=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
-    var d=new Date();
-    pb.textContent='Период: '+months[d.getMonth()]+' '+d.getFullYear()+' ▾';
   }
-  flash('Новый БДР создан — заполните план с нуля');
+  host.innerHTML=head+body;
+  styleInputs(host);
+  bindGroupHandlers(host);
+  host.querySelectorAll('[data-zone]').forEach(function(z){
+    z.addEventListener('click',function(e){
+      var zone=z.getAttribute('data-zone');
+      STATE.zoneCollapsed[zone]=!STATE.zoneCollapsed[zone];
+      renderGroups();
+    });
+  });
+  recalcPlan();
 }
 
-// ===== ВЫБОР ПЕРИОДА =====
-var PERIOD_MONTHS=['Март 2026','Апрель 2026','Май 2026','Июнь 2026','Июль 2026'];
-var periodIdx=3;
-function pickPeriod(btn){
-  periodIdx=(periodIdx+1)%PERIOD_MONTHS.length;
-  btn.textContent='Период: '+PERIOD_MONTHS[periodIdx]+' ▾';
-  flash('Период переключён: '+PERIOD_MONTHS[periodIdx]);
+function styleInputs(host){
+  host.querySelectorAll('input').forEach(function(i){
+    i.style.border='1px solid transparent';i.style.borderRadius='6px';i.style.padding='3px 5px';
+    i.style.fontFamily="'IBM Plex Sans',sans-serif";i.style.fontSize='12px';i.style.fontWeight='600';
+    i.style.background='transparent';i.style.color='var(--text)';
+    if(!i.style.textAlign)i.style.textAlign='right';
+    i.addEventListener('focus',function(){i.style.borderColor='var(--gold-c)';i.style.background='var(--inset)';});
+    i.addEventListener('blur',function(){i.style.borderColor='transparent';i.style.background='transparent';});
+  });
 }
 
-// ===== ДОБАВИТЬ КАТЕГОРИЮ РАСХОДОВ =====
+function bindGroupHandlers(host){
+  host.querySelectorAll('input[data-g]').forEach(function(i){
+    var oldVal=i.value;
+    i.addEventListener('focus',function(){oldVal=i.value;});
+    i.addEventListener('input',function(){
+      var g=STATE.groups.filter(function(x){return x.id===i.getAttribute('data-g');})[0];
+      if(!g)return;
+      var f=i.getAttribute('data-f');
+      g[f]=parseNum(i.value);
+      if(['chek','post','new','manualPlan','max'].indexOf(f)>=0){
+        renderGroups();
+        var sel='[data-g="'+i.getAttribute('data-g')+'"][data-f="'+f+'"]';
+        var again=document.querySelector(sel);
+        if(again&&again.focus){again.focus();if(again.value!==undefined){var v=again.value;again.value='';again.value=v;}}
+      }
+    });
+    i.addEventListener('change',function(){
+      var g=STATE.groups.filter(function(x){return x.id===i.getAttribute('data-g');})[0];
+      if(!g)return;
+      var f=i.getAttribute('data-f');
+      if(oldVal!==i.value){ logChange(g.name+' · '+f, oldVal, i.value); oldVal=i.value; }
+    });
+  });
+  host.querySelectorAll('[data-gname]').forEach(function(s){
+    s.addEventListener('input',function(){var g=STATE.groups.filter(function(x){return x.id===s.getAttribute('data-gname');})[0];if(g)g.name=s.textContent.trim();});
+    s.addEventListener('blur',function(){saveCurrentBDR();});
+  });
+  host.querySelectorAll('[data-gdel]').forEach(function(x){
+    x.addEventListener('click',function(){
+      var id=x.getAttribute('data-gdel');var g=STATE.groups.filter(function(y){return y.id===id;})[0];
+      if(g&&confirm('Удалить группу «'+g.name+'»?')){STATE.groups=STATE.groups.filter(function(y){return y.id!==id;});renderGroups();}
+    });
+  });
+}
+
+function toggleCollapse(){STATE.collapsed=!STATE.collapsed;renderGroups();}
+
+/* ============================================================
+   РАСХОДЫ
+   ============================================================ */
+function renderExpenses(){
+  var tb=document.getElementById('expenseTree');if(!tb)return;
+  if(!STATE.expExpanded){STATE.expExpanded={};
+    // по умолчанию раскрываем категории с подстатьями (ЗП, Бонусы), чтобы список был виден
+    STATE.expenses.forEach(function(e,i){if(e.items&&e.items.length)STATE.expExpanded[i]=true;});
+  }
+  var rows='';
+  STATE.expenses.forEach(function(e,idx){
+    var hasItems=e.items&&e.items.length;
+    var open=!!STATE.expExpanded[idx];
+    var sum=expVal(e);
+    // строка категории
+    rows+='<tr class="tree-row lvl1">'+
+      '<td><span style="display:inline-flex;align-items:center;gap:6px">'+
+        (hasItems?'<span data-exptoggle="'+idx+'" style="cursor:pointer;font-size:11px;display:inline-block;transform:rotate('+(open?'0':'-90')+'deg);color:var(--text2)">▾</span>':'<span style="width:11px;display:inline-block"></span>')+
+        '<span contenteditable="true" data-expname="'+idx+'" style="outline:none;font-weight:600">'+esc(e.name)+'</span></span></td>'+
+      '<td class="num editable-cell">'+
+        (hasItems
+          ? '<span style="font-weight:700;padding-right:6px">'+fmt(sum)+'</span>'
+          : '<input data-exp="'+idx+'" value="'+fmt(e.val||0)+'">')+
+      '</td>'+
+      '<td class="num"><span class="mode-pill '+(e.mode||'manual')+'" data-expmode="'+idx+'" style="cursor:pointer">'+(e.mode==='auto'?'авто':'вручную')+'</span></td>'+
+      '<td class="num"><span data-expdel="'+idx+'" style="cursor:pointer;color:var(--text2);font-weight:700;padding:0 6px" title="Удалить категорию">✕</span></td></tr>';
+    // подстатьи
+    if(hasItems&&open){
+      e.items.forEach(function(it,j){
+        rows+='<tr class="tree-row" style="background:var(--inset)">'+
+          '<td style="padding-left:34px;font-size:12px;color:var(--text2)"><span contenteditable="true" data-itname="'+idx+'-'+j+'" style="outline:none">'+esc(it.name)+'</span></td>'+
+          '<td class="num editable-cell"><input data-it="'+idx+'-'+j+'" value="'+fmt(it.val||0)+'" style="width:90px"></td>'+
+          '<td class="num"></td>'+
+          '<td class="num"><span data-itdel="'+idx+'-'+j+'" style="cursor:pointer;color:var(--text2);padding:0 6px" title="Удалить">✕</span></td></tr>';
+      });
+      rows+='<tr><td style="padding-left:34px"><span data-itadd="'+idx+'" style="cursor:pointer;font-size:11.5px;color:var(--gold-c,#a08a4a);font-weight:600">+ добавить строку</span></td><td colspan="3"></td></tr>';
+    }
+  });
+  tb.innerHTML=rows;
+
+  // категория: сумма (только у простых)
+  tb.querySelectorAll('input[data-exp]').forEach(function(i){
+    var oldVal=i.value;
+    i.addEventListener('focus',function(){oldVal=i.value;});
+    i.addEventListener('input',function(){STATE.expenses[+i.getAttribute('data-exp')].val=parseNum(i.value);recalcPlan();});
+    i.addEventListener('change',function(){var e=STATE.expenses[+i.getAttribute('data-exp')];if(oldVal!==i.value){logChange('Расход · '+e.name,oldVal,i.value);oldVal=i.value;}});
+  });
+  // имя категории
+  tb.querySelectorAll('[data-expname]').forEach(function(s){s.addEventListener('input',function(){STATE.expenses[+s.getAttribute('data-expname')].name=s.textContent.trim();});});
+  // режим
+  tb.querySelectorAll('[data-expmode]').forEach(function(p){p.addEventListener('click',function(){var e=STATE.expenses[+p.getAttribute('data-expmode')];e.mode=e.mode==='auto'?'manual':'auto';renderExpenses();});});
+  // удалить категорию
+  tb.querySelectorAll('[data-expdel]').forEach(function(x){x.addEventListener('click',function(){var idx=+x.getAttribute('data-expdel');if(confirm('Удалить «'+STATE.expenses[idx].name+'»?')){STATE.expenses.splice(idx,1);renderExpenses();recalcPlan();}});});
+  // раскрытие категории
+  tb.querySelectorAll('[data-exptoggle]').forEach(function(t){t.addEventListener('click',function(){var idx=+t.getAttribute('data-exptoggle');STATE.expExpanded[idx]=!STATE.expExpanded[idx];renderExpenses();});});
+  // подстатьи: сумма
+  tb.querySelectorAll('input[data-it]').forEach(function(i){
+    var oldVal=i.value;
+    i.addEventListener('focus',function(){oldVal=i.value;});
+    i.addEventListener('input',function(){var p=i.getAttribute('data-it').split('-');STATE.expenses[+p[0]].items[+p[1]].val=parseNum(i.value);recalcPlan();});
+    i.addEventListener('change',function(){var p=i.getAttribute('data-it').split('-');var it=STATE.expenses[+p[0]].items[+p[1]];if(oldVal!==i.value){logChange('Расход · '+it.name,oldVal,i.value);oldVal=i.value;}renderExpenses();recalcPlan();});
+  });
+  // подстатьи: имя
+  tb.querySelectorAll('[data-itname]').forEach(function(s){s.addEventListener('input',function(){var p=s.getAttribute('data-itname').split('-');STATE.expenses[+p[0]].items[+p[1]].name=s.textContent.trim();});});
+  // подстатьи: удалить
+  tb.querySelectorAll('[data-itdel]').forEach(function(x){x.addEventListener('click',function(){var p=x.getAttribute('data-itdel').split('-');STATE.expenses[+p[0]].items.splice(+p[1],1);renderExpenses();recalcPlan();});});
+  // подстатьи: добавить
+  tb.querySelectorAll('[data-itadd]').forEach(function(a){a.addEventListener('click',function(){var idx=+a.getAttribute('data-itadd');var nm=prompt('Название строки:','Новая строка');if(nm===null)return;STATE.expenses[idx].items.push({name:nm||'Новая строка',val:0});renderExpenses();recalcPlan();});});
+}
+
+function recalcPlan(){
+  var rev=revenueTotal(),exp=expenseTotal(),profit=rev-exp;
+  var margin=rev>0?Math.round(profit/rev*100):0;
+  setText('planRevenue',fmt(rev));setText('planExpense',fmt(exp));
+  setText('planProfit',fmt(profit));setText('planMargin',margin+'%');
+  renderSummary();
+  if(typeof applyEditLock==='function')applyEditLock();
+  if(typeof renderDaily==='function')renderDaily();
+  if(typeof renderAI==='function')renderAI();
+}
+
+/* Сводная шапка плана */
+function summaryScopeLabel(){
+  if(STATE.summaryScope==='all')return 'Вся сеть';
+  var b=BRANCHES.filter(function(x){return x.id===STATE.summaryScope;})[0];
+  return b?b.name:'—';
+}
+function branchRevenue(b){
+  var gs=b.groups||[];
+  return gs.reduce(function(ss,g){return ss+(g.manualPlan>0?g.manualPlan:g.chek*(g.post+g.new));},0);
+}
+function scopeRevenue(){
+  if(STATE.summaryScope==='all'){
+    return BRANCHES.reduce(function(s,b){return s+branchRevenue(b);},0);
+  }
+  // конкретный филиал: если это текущий открытый — берём STATE.groups (с правками), иначе из BRANCHES
+  if(STATE.summaryScope===STATE.branchId)return revenueTotal();
+  var b=BRANCHES.filter(function(x){return x.id===STATE.summaryScope;})[0];
+  return b?branchRevenue(b):0;
+}
+function scopeExpense(){
+  /* Расходы пока хранятся только для открытого филиала (STATE.expenses).
+     TODO: когда у филиалов появятся свои расходы из базы — суммировать по сети. */
+  return expenseTotal();
+}
+
+function scopeGroups(){
+  if(STATE.summaryScope==='all'){
+    var all=[];
+    BRANCHES.forEach(function(b){(b.groups||[]).forEach(function(g){all.push(g);});});
+    return all;
+  }
+  if(STATE.summaryScope===STATE.branchId)return STATE.groups;
+  var b=BRANCHES.filter(function(x){return x.id===STATE.summaryScope;})[0];
+  return b?(b.groups||[]):[];
+}
+
+function renderSummary(){
+  var host=document.getElementById('bdrSummary'); if(!host) return;
+  var pRev=scopeRevenue(), pExp=scopeExpense(), pPro=pRev-pExp;
+  var margin=pRev>0?Math.round(pPro/pRev*100):0;
+  function row(lbl,val,cls,key){
+    return '<div class="sum-row" data-detail="'+key+'"><span class="lbl">'+lbl+'</span>'+
+      '<span class="val" style="color:'+(cls||'var(--heading)')+'">'+fmt(val)+' ₸</span></div>';
+  }
+  var opts='<option value="all"'+(STATE.summaryScope==='all'?' selected':'')+'>Вся сеть</option>'+
+    BRANCHES.map(function(b){return '<option value="'+b.id+'"'+(STATE.summaryScope===b.id?' selected':'')+'>'+esc(b.name)+'</option>';}).join('');
+
+  // разбивка выручки
+  var grp=scopeGroups();
+  var byCat=revenueByCategory(grp);
+  var byAud=revenueByAudience(grp);
+  function miniRow(lbl,val){
+    return '<div style="display:flex;justify-content:space-between;padding:5px 10px;font-size:12px"><span style="color:var(--text2)">'+lbl+'</span><span style="font-weight:700;font-variant-numeric:tabular-nums">'+fmt(val)+' ₸</span></div>';
+  }
+  var breakdown=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border-c)">'+
+      '<div><div style="font-size:11px;font-weight:700;color:var(--text2);padding:0 10px 4px;text-transform:uppercase;letter-spacing:.04em">По типу занятий</div>'+
+        miniRow('Групповые абонементы',byCat.group)+
+        miniRow('Мини-группы',byCat.mini)+
+        miniRow('Индивидуальные',byCat.individual)+'</div>'+
+      '<div><div style="font-size:11px;font-weight:700;color:var(--text2);padding:0 10px 4px;text-transform:uppercase;letter-spacing:.04em">По аудитории</div>'+
+        miniRow('Постоянные ученики',byAud.post)+
+        miniRow('Новые ученики',byAud.new)+'</div>'+
+    '</div>';
+
+  host.innerHTML=
+    '<div class="sum-card" style="grid-column:1 / -1">'+
+      '<h4>Общие показатели · План БДР · '+curPeriodLabel()+
+        '<select id="scopeSel" onchange="onScopeChange()" style="font-family:\'IBM Plex Sans\',sans-serif;font-size:12px;font-weight:600;padding:5px 10px;border-radius:8px;border:1px solid var(--border-c);background:var(--control);color:var(--text);cursor:pointer">'+opts+'</select>'+
+      '</h4>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+
+        row('Выручка',pRev,'var(--heading)','plan-rev')+
+        row('Расходы',pExp,'var(--red,#c0392b)','plan-exp')+
+        row('Ожидаемая прибыль · '+margin+'%',pPro,'var(--green)','plan-pro')+
+      '</div>'+
+      breakdown+
+      '<div id="detail-plan" class="sum-detail" style="display:none"></div></div>';
+  host.querySelectorAll('.sum-row').forEach(function(r){
+    r.addEventListener('click',function(){ showSummaryDetail(r.getAttribute('data-detail')); });
+  });
+}
+function onScopeChange(){
+  var sel=document.getElementById('scopeSel');
+  STATE.summaryScope=sel.value;
+  renderSummary();
+}
+
+function showSummaryDetail(key){
+  var box=document.getElementById('detail-plan');
+  if(!box)return;
+  var html='';
+  var allMode=STATE.summaryScope==='all';
+  if(key.indexOf('rev')>=0){
+    if(allMode){
+      html='<b>Выручка по филиалам:</b><br>'+BRANCHES.map(function(b){
+        var gs=b.groups||[];var sum=gs.reduce(function(s,g){return s+(g.manualPlan>0?g.manualPlan:g.chek*(g.post+g.new));},0);
+        return esc(b.name)+' — '+fmt(sum)+' ₸';
+      }).join('<br>');
+    } else {
+      html='<b>Выручка по группам:</b><br>'+STATE.groups.map(function(g){return esc(g.name)+' — '+fmt(gPlan(g))+' ₸';}).join('<br>');
+    }
+  } else if(key.indexOf('exp')>=0){
+    html='<b>Расходы по категориям:</b><br>'+STATE.expenses.map(function(e){return esc(e.name)+' — '+fmt(e.val)+' ₸';}).join('<br>');
+    if(allMode)html+='<br><i>× число активных филиалов (демо до подключения базы)</i>';
+  } else {
+    html='<b>Прибыль = Выручка − Расходы</b><br>'+fmt(scopeRevenue())+' − '+fmt(scopeExpense())+' = '+fmt(scopeRevenue()-scopeExpense())+' ₸';
+  }
+  if(box.style.display==='none'||box.getAttribute('data-key')!==key){
+    box.innerHTML=html; box.style.display='block'; box.setAttribute('data-key',key);
+  } else {
+    box.style.display='none'; box.removeAttribute('data-key');
+  }
+}
+
+/* ============================================================
+   ДЕЙСТВИЯ
+   ============================================================ */
+function onBranchChange(){
+  var sel=document.getElementById('branchSelect');
+  STATE.branchId=sel.value;
+  STATE.groups=loadGroups(STATE.branchId);
+  STATE.groups.forEach(function(g,i){g.id='g'+i;if(g.pu===undefined)g.pu=0;});
+  STATE.collapsed=false;
+  renderGroups();
+  var b=BRANCHES.filter(function(x){return x.id===STATE.branchId;})[0];
+  flash('Филиал: '+(b?b.name:'—')+' · '+STATE.groups.length+' групп');
+}
+
 function addCategory(){
-  var name=prompt('Название категории расхода:','Новая категория');
-  if(name===null) return;
-  var tbody=document.getElementById('expenseTree');
-  var tr=document.createElement('tr');
-  tr.className='tree-row lvl1';
-  tr.innerHTML='<td>'+(name||'Новая категория')+'</td>'+
-    '<td class="num editable-cell"><input value="0"></td>'+
-    '<td class="num"><span class="mode-pill manual">вручную</span></td>';
-  tbody.appendChild(tr);
-  // навешиваем интерактив на новую строку
-  var inp=tr.querySelector('input');
-  inp.addEventListener('input', recalcPlan);
-  bindOneModePill(tr.querySelector('.mode-pill'));
-  recalcPlan();
+  var name=prompt('Категория расхода:','Новая категория');if(name===null)return;
+  STATE.expenses.push({name:name||'Новая категория',val:0,mode:'manual'});
+  renderExpenses();recalcPlan();
+  logChange('Добавлена категория расхода',' ',name||'Новая категория');
 }
 
-// ===== МИНИ-УВЕДОМЛЕНИЕ =====
+/* Открыть новое направление: группу или индивидуальное занятие */
+function openNewGroup(){
+  var kind=prompt('Что открываем? Введите: "группа" или "индивидуальное"','группа');
+  if(kind===null)return;
+  kind=(kind||'').toLowerCase();
+  var isIndi=kind.indexOf('индив')>=0;
+  var name=prompt(isIndi?'Имя/название индивидуального занятия:':'Название группы:', isIndi?'Индивидуальные':'Новая группа');
+  if(name===null)return;
+  var zones=zoneList(), zone=zones[0]||'Зал №1';
+  if(zones.length>1){var z=prompt('Зал ('+zones.join(' / ')+'):',zone);if(z)zone=z.trim();}
+  var teacher=prompt('Педагог:','')||'';
+  STATE.groups.push({
+    id:'g'+Date.now(), zone:zone, name:name||(isIndi?'Индивидуальные':'Новая группа'),
+    teacher:teacher, chek:isIndi?35000:20000, post:0, new:0, pu:0,
+    max:isIndi?1:20, factPrev:0, factPrev2:0, manualPlan:0
+  });
+  renderGroups();
+  logChange('Открыто новое направление',' ',(isIndi?'Индивидуальное: ':'Группа: ')+name);
+  flash('Направление добавлено: '+name);
+}
+
+/* Рекомендации по плану (п.5) */
+function calcRecommendations(){
+  STATE.groups.forEach(function(g){g.manualPlan=gRecommend(g);});
+  renderGroups();
+  var rev=revenueTotal();
+  var fill=fillRate(),free=freeTotal(),chek=avgChek();
+  var needProlong=Math.round(studentsTotal()*(1-FUNNEL.retention));
+  var needNew=Math.round(free*0.4);
+  var needPU=Math.round(needNew/FUNNEL.visit2buy);
+  var b=BRANCHES.filter(function(x){return x.id===STATE.branchId;})[0];
+  var msg='По филиалу «'+(b?b.name:'—')+'» рекомендуется план '+fmt(rev)+' ₸.\n'+
+    'Основание: заполненность '+fill+'%, свободно '+free+' мест, средний чек '+fmt(chek)+' ₸.\n'+
+    'Для выполнения: ~'+needProlong+' продлений, ~'+needNew+' новых абонементов, ~'+needPU+' пробных уроков.';
+  var host=document.getElementById('recoHost');
+  if(host){
+    host.style.display='block';
+    host.innerHTML='<div class="ai-card" style="margin-top:14px"><div class="ai-lbl">✦ Рекомендация системы</div>'+
+      '<div class="ai-text"><p>'+msg.replace(/\n/g,'</p><p>')+'</p></div></div>';
+  }
+  flash('Рекомендации рассчитаны и подставлены в план');
+}
+
+/* Калькулятор воронки (п.6) */
+function renderFunnel(){
+  var host=document.getElementById('funnelHost');if(!host)return;
+  var needNew=parseNum((document.getElementById('funnelNeed')||{}).value||20);
+  var buy=FUNNEL.visit2buy,visit=FUNNEL.signup2visit,signup=FUNNEL.lead2signup;
+  var needVisits=buy>0?Math.ceil(needNew/buy):0;
+  var needSignups=visit>0?Math.ceil(needVisits/visit):0;
+  var needLeads=signup>0?Math.ceil(needSignups/signup):0;
+  host.innerHTML=
+    '<div class="funnel-step"><span>Нужно новых продаж</span><b>'+needNew+'</b></div>'+
+    '<div class="funnel-arrow">↓ конверсия пробный→покупка '+Math.round(buy*100)+'%</div>'+
+    '<div class="funnel-step"><span>Провести пробных уроков</span><b>'+needVisits+'</b></div>'+
+    '<div class="funnel-arrow">↓ запись→приход '+Math.round(visit*100)+'%</div>'+
+    '<div class="funnel-step"><span>Записать на пробный</span><b>'+needSignups+'</b></div>'+
+    '<div class="funnel-arrow">↓ лид→запись '+Math.round(signup*100)+'%</div>'+
+    '<div class="funnel-step"><span>Нужно лидов</span><b>'+needLeads+'</b></div>';
+}
+
+function createNewBDR(){
+  // запрет создавать дважды за один период/филиал
+  if(bdrExists(STATE.branchId,STATE.year,STATE.month)){
+    flash('БДР за '+MONTHS_RU[STATE.month]+' '+STATE.year+' уже существует');
+    return;
+  }
+  STATE.groups.forEach(function(g){g.post=0;g.new=0;g.pu=0;g.manualPlan=0;});
+  STATE.expenses.forEach(function(e){e.val=0;});
+  STATE.collapsed=false;
+  STATE.history=[];
+  logChange('Создан БДР',' ',MONTHS_RU[STATE.month]+' '+STATE.year);
+  saveCurrentBDR();
+  renderGroups();renderExpenses();updateBdrStatus();
+  document.querySelectorAll('.source-opt').forEach(function(o){o.classList.remove('on');});
+  var manual=Array.prototype.slice.call(document.querySelectorAll('.source-opt')).filter(function(o){var t=o.querySelector('.source-opt-title');return t&&t.textContent.trim()==='Вручную';})[0];
+  if(manual)manual.classList.add('on');
+  var planTab=document.querySelector('.subtab');if(planTab)showPanel('plan',planTab);
+  flash('БДР за '+MONTHS_RU[STATE.month]+' '+STATE.year+' создан');
+}
+
+/* выбор периода (свободный, месяц+год) */
+function buildPeriodSelectors(){
+  var ms=document.getElementById('monthSel'), ys=document.getElementById('yearSel');
+  if(ms) ms.innerHTML=MONTHS_RU.map(function(m,i){return '<option value="'+i+'"'+(i===STATE.month?' selected':'')+'>'+m+'</option>';}).join('');
+  if(ys){var opts='';for(var y=2024;y<=2028;y++){opts+='<option value="'+y+'"'+(y===STATE.year?' selected':'')+'>'+y+'</option>';}ys.innerHTML=opts;}
+}
+function onPeriodChange(){
+  var ms=document.getElementById('monthSel'), ys=document.getElementById('yearSel');
+  STATE.month=+ms.value; STATE.year=+ys.value;
+  // если за этот период есть сохранённый БДР — загрузим его
+  var saved=storageGet(bdrKey(STATE.branchId,STATE.year,STATE.month));
+  if(saved){
+    STATE.groups=saved.groups||STATE.groups;
+    STATE.expenses=migrateExpenses(saved.expenses)||defaultExpenses();
+    STATE.expExpanded=null;
+    STATE.history=saved.history||[];
+    renderGroups();renderExpenses();
+    flash('Загружен БДР за '+MONTHS_RU[STATE.month]+' '+STATE.year);
+  } else {
+    flash('Период: '+MONTHS_RU[STATE.month]+' '+STATE.year+' · БДР ещё не создан');
+  }
+  updateBdrStatus();
+  if(typeof renderAI==='function')renderAI();
+  if(typeof renderDaily==='function')renderDaily();
+}
+function updateBdrStatus(){
+  var el=document.getElementById('bdrStatus'); if(!el)return;
+  var exists=bdrExists(STATE.branchId,STATE.year,STATE.month);
+  var createBtn=document.getElementById('createBtn');
+  var editBtn=document.getElementById('editBtn');
+  var deleteBtn=document.getElementById('deleteBtn');
+  var cancelBtn=document.getElementById('cancelBtn');
+  if(exists){
+    if(STATE.editMode){
+      el.textContent='Редактирование'; el.style.background='var(--gold-bg)'; el.style.color='var(--gold-c,#7A6A3F)';
+      if(editBtn){editBtn.style.display='';editBtn.textContent='Сохранить';}
+      if(cancelBtn){cancelBtn.style.display='';}
+    } else {
+      var saved=storageGet(bdrKey(STATE.branchId,STATE.year,STATE.month));
+      var when=saved&&saved.savedAt?new Date(saved.savedAt).toLocaleDateString('ru-RU'):'';
+      el.textContent='БДР создан · просмотр'+(when?' · '+when:''); el.style.background='var(--gold-bg)'; el.style.color='var(--gold-c,#7A6A3F)';
+      if(editBtn){editBtn.style.display='';editBtn.textContent='Редактировать';}
+      if(cancelBtn){cancelBtn.style.display='none';}
+    }
+    if(createBtn){createBtn.style.display='none';}
+    if(deleteBtn){deleteBtn.style.display=STATE.editMode?'':'none';}
+  } else {
+    el.textContent='БДР не создан'; el.style.background='var(--inset)'; el.style.color='var(--text2)';
+    if(createBtn){createBtn.style.display='';createBtn.style.opacity='1';createBtn.style.pointerEvents='auto';createBtn.textContent='+ Создать БДР';}
+    if(editBtn){editBtn.style.display='none';}
+    if(deleteBtn){deleteBtn.style.display='none';}
+    if(cancelBtn){cancelBtn.style.display='none';}
+    STATE.editMode=false;
+  }
+  applyEditLock();
+}
+
+function deleteBDR(){
+  if(!confirm('Удалить БДР за '+MONTHS_RU[STATE.month]+' '+STATE.year+'? Действие необратимо.'))return;
+  try{localStorage.removeItem(bdrKey(STATE.branchId,STATE.year,STATE.month));}catch(e){}
+  STATE.editMode=false;
+  STATE.history=[];
+  flash('БДР удалён');
+  updateBdrStatus();
+}
+
+/* Блокировка/разблокировка полей по режиму */
+function applyEditLock(){
+  var exists=bdrExists(STATE.branchId,STATE.year,STATE.month);
+  // редактирование разрешено если: БДР не создан (черновик) ИЛИ включён editMode
+  var locked = exists && !STATE.editMode;
+  var panel=document.getElementById('panel-plan'); if(!panel)return;
+  panel.querySelectorAll('input, [contenteditable]').forEach(function(el){
+    if(locked){
+      if(el.tagName==='INPUT')el.setAttribute('disabled','disabled');
+      else el.setAttribute('contenteditable','false');
+      el.style.opacity='0.85';
+    } else {
+      if(el.tagName==='INPUT')el.removeAttribute('disabled');
+      else if(el.hasAttribute('contenteditable'))el.setAttribute('contenteditable','true');
+      el.style.opacity='1';
+    }
+  });
+  // кнопки действий, меняющие план, тоже блокируем в просмотре
+  panel.querySelectorAll('[data-gdel],[data-expdel],[data-itadd],[data-itdel],[data-exptoggle],.source-opt').forEach(function(el){
+    el.style.pointerEvents=locked?'none':'auto';
+    el.style.opacity=locked?'0.5':'1';
+  });
+}
+
+function toggleEditMode(){
+  if(STATE.editMode){
+    // сохраняем
+    STATE.editMode=false;
+    STATE._snapshot=null;
+    saveCurrentBDR();
+    recalcPlan();
+    flash('Изменения сохранены, показатели пересчитаны');
+  } else {
+    // запоминаем снимок для возможной отмены
+    STATE._snapshot=JSON.stringify({groups:STATE.groups,expenses:STATE.expenses});
+    STATE.editMode=true;
+    flash('Режим редактирования включён');
+  }
+  updateBdrStatus();
+}
+
+function cancelEdit(){
+  if(STATE._snapshot){
+    try{
+      var snap=JSON.parse(STATE._snapshot);
+      STATE.groups=snap.groups; STATE.expenses=snap.expenses;
+    }catch(e){}
+  }
+  STATE._snapshot=null;
+  STATE.editMode=false;
+  renderGroups(); renderExpenses(); recalcPlan();
+  updateBdrStatus();
+  flash('Изменения отменены');
+}
+
+/* История корректировок */
+function showHistory(){
+  var rows=STATE.history.length? STATE.history.map(function(h){
+    var d=new Date(h.when);
+    var t=d.toLocaleDateString('ru-RU')+' '+d.toLocaleTimeString('ru-RU',{hour:'2-digit',minute:'2-digit'});
+    return '<tr style="border-bottom:1px solid var(--border-c);font-size:12px">'+
+      '<td style="padding:6px 8px;color:var(--text2)">'+t+'</td>'+
+      '<td style="padding:6px 8px">'+esc(h.who)+'</td>'+
+      '<td style="padding:6px 8px">'+esc(h.what)+'</td>'+
+      '<td style="padding:6px 8px;text-align:right;color:var(--text2)">'+esc(String(h.old))+'</td>'+
+      '<td style="padding:6px 8px;text-align:right;font-weight:700">'+esc(String(h.val))+'</td></tr>';
+  }).join('') : '<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--text2)">История пуста</td></tr>';
+  var html='<div style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)this.remove()">'+
+    '<div style="background:var(--card,#fff);border-radius:16px;max-width:760px;width:100%;max-height:80vh;overflow:auto;padding:22px">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'+
+    '<h3 style="margin:0;font-size:17px;color:var(--heading)">История изменений · '+MONTHS_RU[STATE.month]+' '+STATE.year+'</h3>'+
+    '<span onclick="this.closest(\'[style*=fixed]\').remove()" style="cursor:pointer;font-size:22px;color:var(--text2)">✕</span></div>'+
+    '<table style="width:100%;border-collapse:collapse"><thead><tr style="font-size:11px;color:var(--text2);text-align:left">'+
+    '<th style="padding:6px 8px">Когда</th><th style="padding:6px 8px">Кто</th><th style="padding:6px 8px">Что</th>'+
+    '<th style="padding:6px 8px;text-align:right">Было</th><th style="padding:6px 8px;text-align:right">Стало</th></tr></thead>'+
+    '<tbody>'+rows+'</tbody></table></div></div>';
+  var wrap=document.createElement('div'); wrap.innerHTML=html; document.body.appendChild(wrap.firstChild);
+}
+
+var SOURCE_PRESETS={'Прошлый месяц':1.0,'Прошлый год':0.88,'Среднее значение':0.95,'Вручную':0};
+function pickSource(el){
+  document.querySelectorAll('.source-opt').forEach(function(o){o.classList.remove('on');});
+  el.classList.add('on');
+  var title=((el.querySelector('.source-opt-title')||{}).textContent||'').trim();
+  var k=SOURCE_PRESETS[title];if(k===undefined)return;
+  if(k===0){STATE.groups.forEach(function(g){g.post=0;g.new=0;g.manualPlan=0;});}
+  else{STATE.groups.forEach(function(g){g.post=Math.round(g.post*k);g.manualPlan=0;});}
+  renderGroups();
+  logChange('Источник плана',' ',title);
+}
+
+function curPeriodLabel(){return MONTHS_RU[STATE.month]+' '+STATE.year;}
+
+function showPanel(id,btn){
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.subtab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('panel-'+id).classList.add('active');
+  if(btn)btn.classList.add('active');
+  if(id==='daily'&&typeof renderDaily==='function')renderDaily();
+  if(id==='ai'&&typeof renderAI==='function')renderAI();
+}
+
+/* ============================================================
+   ЕЖЕДНЕВНЫЙ ОТЧЁТ + ЗАРАБОТОК (п.11, п.12)
+   ============================================================ */
+function daysLeftInMonth(){
+  var d=new Date();var last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  return Math.max(1,last-d.getDate());
+}
+function bonusForPct(pct){
+  for(var i=0;i<MOTIVATION.scale.length;i++){
+    var s=MOTIVATION.scale[i];
+    if(pct>=s.from&&pct<s.to)return s.bonus;
+  }
+  return MOTIVATION.scale[MOTIVATION.scale.length-1].bonus;
+}
+function coachMessage(pct,forecast){
+  if(pct>=100)return 'Огонь! План закрыт на <b>'+pct+'%</b>. Держи планку — каждый день выше нормы укрепляет твой стрик и бонус.';
+  if(pct>=90)return 'Ты почти у цели — <b>'+pct+'%</b>. Осталось совсем чуть-чуть. Закрой задачи ниже и выйдешь на 100% уже сегодня.';
+  if(pct>=70)return 'Хороший темп, <b>'+pct+'%</b>. Прогноз '+forecast+'%. Сфокусируйся на продлениях и пробных — это твой самый быстрый рост.';
+  if(pct>=50)return 'Ты на половине пути — <b>'+pct+'%</b>. Не сбавляй. Выполни задачи дня, и прогноз пойдёт вверх.';
+  return 'Старт положен — <b>'+pct+'%</b>. Главное сейчас — ритм. Закрывай по 2-3 задачи в день, и план станет реальным.';
+}
+
+function renderDaily(){
+  var host=document.getElementById('dailyHost');if(!host)return;
+  var plan=revenueTotal();
+  var d=new Date();var last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  var passed=d.getDate();
+  var fact=factIncomeTotal()>0?factIncomeTotal():Math.round(plan*passed/last);
+  var left=Math.max(0,plan-fact);
+  var daysLeft=daysLeftInMonth();
+  var perDay=Math.round(left/daysLeft);
+  var pct=plan>0?Math.round(fact/plan*100):0;
+  var forecast=passed>0?Math.min(150,Math.round(fact/passed*last/plan*100)):0;
+  var oklad=MOTIVATION.oklad, curBonus=bonusForPct(pct), foreBonus=bonusForPct(forecast), salary=oklad+foreBonus;
+
+  // прогресс-кольцо
+  var R=52, C=2*Math.PI*R, ringPct=Math.min(100,pct);
+  var dash=C*ringPct/100;
+  var ringColor=pct>=100?'#3a9d5d':pct>=80?'#d4b46a':pct>=50?'#e0a458':'#c0654a';
+
+  // геймификация
+  var streak=STATE.game.streak, points=STATE.game.points;
+  var tasks=dailyTasks();
+  var doneCount=tasks.filter(function(t){return STATE.game.tasksDone[t.id];}).length;
+
+  host.innerHTML=
+    '<div class="game-hero">'+
+      '<div class="ring"><svg width="120" height="120">'+
+        '<circle cx="60" cy="60" r="'+R+'" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="10"/>'+
+        '<circle cx="60" cy="60" r="'+R+'" fill="none" stroke="'+ringColor+'" stroke-width="10" stroke-linecap="round" stroke-dasharray="'+dash+' '+C+'"/>'+
+        '</svg><div class="ring-label"><div class="ring-pct">'+pct+'%</div><div class="ring-sub">выполнено</div></div></div>'+
+      '<div class="game-stats">'+
+        '<div class="gstat"><div class="gstat-val">🔥 '+streak+'</div><div class="gstat-lbl">дней подряд</div></div>'+
+        '<div class="gstat"><div class="gstat-val">⭐ '+points+'</div><div class="gstat-lbl">очков</div></div>'+
+        '<div class="gstat"><div class="gstat-val">'+forecast+'%</div><div class="gstat-lbl">прогноз</div></div>'+
+      '</div>'+
+      '<div class="coach-msg">👨‍🏫 '+coachMessage(pct,forecast)+'</div>'+
+    '</div>'+
+
+    '<div class="daily-grid" style="margin-top:16px">'+
+      card('План месяца',fmt(plan))+
+      card('Факт',fmt(fact),'brand')+
+      card('До плана',fmt(left),'red')+
+      card('Нужно в день',fmt(perDay),'brand')+
+      card('Осталось дней',daysLeft+'')+
+      card('Потенциальная ЗП',fmt(salary),'green')+
+    '</div>'+
+
+    '<div class="slabel" style="margin-top:20px">Задачи на сегодня · '+doneCount+' из '+tasks.length+' · закрой план</div>'+
+    '<div id="taskList">'+tasks.map(function(t){
+      var done=!!STATE.game.tasksDone[t.id];
+      return '<div class="task-item'+(done?' done':'')+'" data-task="'+t.id+'">'+
+        '<div class="task-check">'+(done?'✓':'')+'</div>'+
+        '<div class="task-text">'+t.text+'</div>'+
+        '<div class="task-pts">+'+t.pts+' ⭐</div></div>';
+    }).join('')+'</div>'+
+
+    '<div class="slabel" style="margin-top:18px">Заработок управляющего</div>'+
+    '<div class="daily-grid">'+
+      card('Оклад',fmt(oklad))+
+      card('Текущий бонус ('+pct+'%)',fmt(curBonus),'brand')+
+      card('Прогноз бонуса ('+forecast+'%)',fmt(foreBonus),'green')+
+      card('Итого к выплате',fmt(salary),'green')+
+    '</div>';
+
+  // задачи: клик = отметить/снять, начисление очков
+  host.querySelectorAll('[data-task]').forEach(function(el){
+    el.addEventListener('click',function(){
+      var id=el.getAttribute('data-task');
+      var t=tasks.filter(function(x){return x.id===id;})[0];
+      if(STATE.game.tasksDone[id]){
+        delete STATE.game.tasksDone[id];
+        STATE.game.points=Math.max(0,STATE.game.points-(t?t.pts:0));
+      } else {
+        STATE.game.tasksDone[id]=true;
+        STATE.game.points+=(t?t.pts:0);
+        // все задачи выполнены → +стрик и бонус
+        var all=tasks.every(function(x){return STATE.game.tasksDone[x.id];});
+        if(all){STATE.game.streak++;STATE.game.points+=50;flash('🎉 Все задачи дня закрыты! +50 очков, стрик '+STATE.game.streak);}
+      }
+      saveCurrentBDR();
+      renderDaily();
+    });
+  });
+}
+function card(lbl,val,cls){
+  return '<div class="daily-card"><div class="daily-card-lbl">'+lbl+'</div><div class="daily-card-val '+(cls||'')+'">'+val+'</div></div>';
+}
+function dailyTasks(){
+  var free=freeTotal();
+  var needProlong=Math.max(1,Math.round(studentsTotal()*(1-FUNNEL.retention)/Math.max(1,daysLeftInMonth())*3));
+  var needPU=Math.max(1,Math.round(free*0.4/Math.max(1,daysLeftInMonth())*2));
+  return [
+    {id:'prolong',text:'Продлить '+needProlong+' учеников с истекающими абонементами',pts:30},
+    {id:'pu',text:'Провести '+needPU+' пробных урока по записанным лидам',pts:25},
+    {id:'sale',text:'Закрыть 2 продажи после пробного',pts:20},
+    {id:'fill',text:'Дозаполнить группы со свободными местами ('+free+' свободно)',pts:15},
+    {id:'call',text:'Обзвонить должников и вернуть 1-2 ушедших',pts:10}
+  ];
+}
+function recsToday(){
+  return dailyTasks().map(function(t){return '<div class="rec-item"><div class="rec-check">✓</div><div class="rec-text">'+t.text+'</div></div>';}).join('');
+}
+
+/* ============================================================
+   AI-АНАЛИЗ (п.14) — на формулах
+   ============================================================ */
+function renderAI(){
+  var host=document.getElementById('aiHost');if(!host)return;
+  var plan=revenueTotal();
+  var factPrev=STATE.groups.reduce(function(s,g){return s+g.factPrev;},0);
+  var factPrev2=STATE.groups.reduce(function(s,g){return s+g.factPrev2;},0);
+  var fact=factIncomeTotal()>0?factIncomeTotal():Math.round(plan*0.53);
+  var pct=plan>0?Math.round(fact/plan*100):0;
+  var devPrev=factPrev>0?Math.round((plan-factPrev)/factPrev*100):0;
+  var devPrev2=factPrev2>0?Math.round((plan-factPrev2)/factPrev2*100):0;
+  // худшая группа по заполненности
+  var worst=null;
+  STATE.groups.forEach(function(g){
+    var fill=g.max>0?gStudents(g)/g.max:1;
+    if(!worst||fill<worst.fill)worst={g:g,fill:fill};
+  });
+  var prob=Math.max(40,Math.min(98,pct+Math.round((100-fillRate())/-3)+45));
+
+  var worstTxt=worst?'Основное отклонение — группа «'+esc(worst.g.name)+'» (заполнена на '+Math.round(worst.fill*100)+'%).':'';
+  host.innerHTML=
+    '<div class="ai-prob"><div class="ai-prob-circle"><span>'+prob+'%</span></div>'+
+    '<div class="ai-prob-text"><h4>Вероятность выполнения плана — '+prob+'%</h4>'+
+    '<p>План '+fmt(plan)+' ₸. Заполненность сети '+fillRate()+'%.</p></div></div>'+
+    '<div class="ai-card"><div class="ai-lbl">✦ AI-аналитик · '+curPeriodLabel()+'</div><div class="ai-text">'+
+    '<p>📊 План '+(devPrev>=0?'выше':'ниже')+' прошлого месяца на '+Math.abs(devPrev)+'%, '+(devPrev2>=0?'выше':'ниже')+' позапрошлого на '+Math.abs(devPrev2)+'%.</p>'+
+    '<p>📉 '+worstTxt+'</p>'+
+    '<p>💰 Свободно '+freeTotal()+' мест · средний чек '+fmt(avgChek())+' ₸ — есть потенциал дозагрузки.</p>'+
+    '</div></div>'+
+    '<div class="ai-recs"><h4>Рекомендации для выполнения плана</h4>'+recsToday()+'</div>';
+}
+
+/* ============================================================
+   МОТИВАЦИЯ (п.13) — редактируемая шкала
+   ============================================================ */
+function renderMotivation(){
+  var host=document.getElementById('motHost');if(!host)return;
+  var rows=MOTIVATION.scale.map(function(s,i){
+    return '<div class="ladder-step'+(i===3?' current':'')+'">'+
+      '<div class="ladder-pct">'+(s.to>=999?s.from+'%+':s.from+'–'+(s.to-1)+'%')+'</div>'+
+      '<input class="ladder-input" data-mot="'+i+'" value="'+fmt(s.bonus)+'"></div>';
+  }).join('');
+  host.innerHTML=
+    '<div class="mot-card">'+
+    '<div class="mot-head"><div class="mot-mgr"><div class="mot-avatar">АН</div>'+
+    '<div><div class="mot-name">Анель Нурбекова</div><div class="mot-branch">Астана 203 · оклад <input id="motOklad" value="'+fmt(MOTIVATION.oklad)+'" style="width:90px;border:1px solid var(--border-c);border-radius:6px;padding:2px 6px;font-weight:700;background:var(--control);color:var(--text)"> ₸</div></div></div>'+
+    '<div class="mot-salary"><div class="mot-salary-lbl">Прогноз ЗП</div><div class="mot-salary-val" id="motSalary">'+fmt(MOTIVATION.oklad+250000)+' ₸</div></div></div>'+
+    '<div class="kpi-ladder">'+rows+'</div>'+
+    '<div style="font-size:11.5px;color:var(--text2);margin-top:10px">Все суммы редактируются. Кликните на ступень, чтобы выбрать текущее выполнение.</div>'+
+    '</div>';
+  // привязка
+  host.querySelectorAll('[data-mot]').forEach(function(i){
+    i.addEventListener('input',function(){MOTIVATION.scale[+i.getAttribute('data-mot')].bonus=parseNum(i.value);updateMotSalary(host);});
+  });
+  var ok=document.getElementById('motOklad');
+  if(ok)ok.addEventListener('input',function(){MOTIVATION.oklad=parseNum(ok.value);updateMotSalary(host);});
+  host.querySelectorAll('.ladder-step').forEach(function(step,idx){
+    step.style.cursor='pointer';
+    step.addEventListener('click',function(e){
+      if(e.target.tagName==='INPUT')return;
+      host.querySelectorAll('.ladder-step').forEach(function(s){s.classList.remove('current');});
+      step.classList.add('current');
+      host.querySelectorAll('.ladder-step').forEach(function(s,n){s.classList.toggle('reached',n<idx);});
+      updateMotSalary(host);
+    });
+  });
+  updateMotSalary(host);
+}
+function updateMotSalary(host){
+  var cur=host.querySelector('.ladder-step.current .ladder-input');
+  var bonus=cur?parseNum(cur.value):0;
+  var el=document.getElementById('motSalary');
+  if(el)el.textContent=fmt(MOTIVATION.oklad+bonus)+' ₸';
+}
+
+/* ============================================================
+   ПЛАН/ФАКТ
+   ============================================================ */
+var pfData=[
+  {lvl:0,name:'Доходы',plan:9177185,fact:9029007},
+  {lvl:1,name:'Групповые',plan:8628449,fact:8474882},
+  {lvl:1,name:'Мини-группы',plan:882486,fact:810500},
+  {lvl:1,name:'Индивидуальные',plan:551500,fact:554125}
+];
+function renderPF(){
+  var tb=document.getElementById('pfTree');if(!tb)return;
+  tb.innerHTML=pfData.map(function(r){
+    var dev=r.fact-r.plan,pct=Math.round(r.fact/r.plan*100);
+    var bar=pct>=100?'good':pct>=90?'mid':'bad';
+    return '<tr class="tree-row lvl'+r.lvl+'"><td>'+r.name+'</td><td class="num">'+fmt(r.plan)+'</td><td class="num">'+fmt(r.fact)+'</td>'+
+      '<td class="num '+(dev>=0?'dev-pos':'dev-neg')+'">'+(dev>=0?'+':'')+fmt(dev)+'</td>'+
+      '<td class="num"><span class="pf-bar-wrap"><span class="pf-bar '+bar+'" style="width:'+Math.min(pct,100)+'%"></span></span>'+pct+'%</td></tr>';
+  }).join('');
+}
+function factIncomeTotal(){return STATE.factIncome.reduce(function(s,x){return s+(+x.val||0);},0);}
+function factExpenseTotal(){return STATE.factExpense.reduce(function(s,x){return s+(+x.val||0);},0);}
+
+function renderFactTable(hostId,arrName){
+  var host=document.getElementById(hostId);if(!host)return;
+  var arr=STATE[arrName];
+  var rows=arr.map(function(e,idx){
+    return '<tr class="tree-row lvl1">'+
+      '<td><span contenteditable="true" data-fname="'+arrName+'-'+idx+'" style="outline:none">'+esc(e.name)+'</span>'+
+        (e.manual?' <span style="font-size:10px;color:var(--gold-c,#a08a4a)" title="Изменено вручную">✎ вручную</span>':'')+'</td>'+
+      '<td class="num editable-cell"><input data-fval="'+arrName+'-'+idx+'" value="'+fmt(e.val)+'"></td>'+
+      '<td class="num"><span class="mode-pill '+e.mode+'">'+(e.mode==='auto'?'авто':'вручную')+'</span></td>'+
+      '<td class="num"><span data-fdel="'+arrName+'-'+idx+'" style="cursor:pointer;color:var(--text2);font-weight:700;padding:0 6px">✕</span></td></tr>';
+  }).join('');
+  var total=arr.reduce(function(s,x){return s+(+x.val||0);},0);
+  host.innerHTML='<table style="width:100%"><thead><tr><th style="text-align:left">'+(arrName==='factIncome'?'Источник':'Категория')+'</th><th class="num">Факт, ₸</th><th class="num">Режим</th><th></th></tr></thead>'+
+    '<tbody>'+rows+
+    '<tr style="border-top:2px solid var(--border-c)"><td style="font-weight:700">Итого</td><td class="num" style="font-weight:800">'+fmt(total)+'</td><td colspan="2"></td></tr>'+
+    '</tbody></table>'+
+    '<div style="padding:8px 4px 0"><span data-fadd="'+arrName+'" style="cursor:pointer;font-size:12px;color:var(--gold-c,#a08a4a);font-weight:600">+ добавить строку</span></div>';
+
+  host.querySelectorAll('input[data-fval]').forEach(function(i){
+    var oldVal=i.value;
+    i.addEventListener('focus',function(){oldVal=i.value;});
+    i.addEventListener('input',function(){var p=i.getAttribute('data-fval').split('-');STATE[p[0]][+p[1]].val=parseNum(i.value);renderFactSummary();});
+    i.addEventListener('change',function(){var p=i.getAttribute('data-fval').split('-');var e=STATE[p[0]][+p[1]];
+      if(oldVal!==i.value){e.manual=true;e.mode='manual';logChange('Факт · '+e.name,oldVal,i.value);renderFactTable(hostId,arrName);renderFactSummary();}});
+  });
+  host.querySelectorAll('[data-fname]').forEach(function(s){s.addEventListener('input',function(){var p=s.getAttribute('data-fname').split('-');STATE[p[0]][+p[1]].name=s.textContent.trim();});});
+  host.querySelectorAll('[data-fdel]').forEach(function(x){x.addEventListener('click',function(){var p=x.getAttribute('data-fdel').split('-');if(confirm('Удалить строку?')){STATE[p[0]].splice(+p[1],1);renderFactTable(hostId,arrName);renderFactSummary();}});});
+  host.querySelectorAll('[data-fadd]').forEach(function(a){a.addEventListener('click',function(){var nm=prompt('Название:','Новая строка');if(nm===null)return;STATE[a.getAttribute('data-fadd')].push({name:nm||'Новая строка',val:0,mode:'manual',manual:true});renderFactTable(hostId,arrName);renderFactSummary();});});
+}
+
+function renderFactSummary(){
+  var host=document.getElementById('factSummary');if(!host)return;
+  var rev=factIncomeTotal(), exp=factExpenseTotal(), pro=rev-exp;
+  var margin=rev>0?Math.round(pro/rev*100):0;
+  function row(lbl,val,cls){return '<div class="sum-row"><span class="lbl">'+lbl+'</span><span class="val" style="color:'+(cls||'var(--heading)')+'">'+fmt(val)+' ₸</span></div>';}
+  host.innerHTML='<div class="sum-card" style="grid-column:1 / -1">'+
+    '<h4>Факт БДР · '+curPeriodLabel()+'<span style="font-size:11px;font-weight:600;color:var(--text2)">авто из CRM</span></h4>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">'+
+      row('Поступления',rev,'var(--heading)')+
+      row('Расходы',exp,'var(--red,#c0392b)')+
+      row('Прибыль · '+margin+'%',pro,'var(--green)')+
+    '</div></div>';
+}
+
+function renderFact(){
+  renderFactSummary();
+  renderFactTable('factIncomeHost','factIncome');
+  renderFactTable('factExpenseHost','factExpense');
+}
+
 function flash(msg){
-  var n=document.createElement('div');
-  n.textContent=msg;
-  n.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--navy,#1a2b4a);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;';
-  document.body.appendChild(n);
-  requestAnimationFrame(function(){ n.style.opacity='1'; });
-  setTimeout(function(){ n.style.opacity='0'; setTimeout(function(){ n.remove(); },250); }, 2200);
+  var n=document.createElement('div');n.textContent=msg;
+  n.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a2b4a;color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.25);opacity:0;transition:opacity .2s;';
+  document.body.appendChild(n);requestAnimationFrame(function(){n.style.opacity='1';});
+  setTimeout(function(){n.style.opacity='0';setTimeout(function(){n.remove();},250);},2200);
 }
 
-function bindOneModePill(p){
-  if(!p || p.querySelector('.auto-dot')) return;
-  p.style.cursor='pointer';
-  p.title='Переключить режим';
-  p.addEventListener('click', function(){
-    var isAuto=p.classList.contains('auto');
-    p.classList.toggle('auto', !isAuto);
-    p.classList.toggle('manual', isAuto);
-    p.textContent=isAuto?'вручную':'авто';
-  });
+/* СТАРТ */
+function initBDR(){
+  // текущий период по умолчанию
+  var now=new Date();
+  STATE.month=now.getMonth(); STATE.year=now.getFullYear();
+  buildPeriodSelectors();
+
+  STATE.groups=loadGroups(STATE.branchId);
+  STATE.groups.forEach(function(g,i){g.id='g'+i;if(g.pu===undefined)g.pu=0;});
+
+  // если за текущий период есть сохранённый БДР — подгрузим
+  var saved=storageGet(bdrKey(STATE.branchId,STATE.year,STATE.month));
+  if(saved){
+    if(saved.groups)STATE.groups=saved.groups;
+    if(saved.expenses)STATE.expenses=migrateExpenses(saved.expenses)||defaultExpenses();
+    STATE.expExpanded=null;
+    STATE.history=saved.history||[];
+  }
+
+  renderBranchSelect();renderGroups();renderExpenses();renderPF();
+  renderFunnel();renderDaily();renderAI();renderMotivation();
+  renderFact();recalcPlan();updateBdrStatus();
+  initCollapsibleSections();
 }
 
-// ===== ИНИЦИАЛИЗАЦИЯ ИНТЕРАКТИВА =====
-function initInteractive(){
-  // live-пересчёт плана
-  document.querySelectorAll('#revenueTree input, #expenseTree input').forEach(function(i){
-    i.addEventListener('input', recalcPlan);
+/* Сворачивание секций (slabel) для снижения шума */
+function initCollapsibleSections(){
+  document.querySelectorAll('.bdr .slabel').forEach(function(lbl){
+    // следующий элемент после заголовка — контент секции
+    var content=lbl.nextElementSibling;
+    if(!content||content.classList.contains('slabel'))return;
+    if(lbl.getAttribute('data-collapsible'))return; // уже навешено
+    lbl.setAttribute('data-collapsible','1');
+    lbl.style.cursor='pointer';
+    lbl.style.userSelect='none';
+    var arrow=document.createElement('span');
+    arrow.textContent='▾';
+    arrow.style.cssText='display:inline-block;margin-right:7px;font-size:11px;transition:.15s;transform:rotate(0deg)';
+    lbl.insertBefore(arrow,lbl.firstChild);
+    lbl.addEventListener('click',function(){
+      var hidden=content.style.display==='none';
+      content.style.display=hidden?'':'none';
+      arrow.style.transform=hidden?'rotate(0deg)':'rotate(-90deg)';
+    });
   });
-  bindModePills();
-  bindFactInputs();
-  bindLadders();
-  recalcPlan();
 }
-// деревья рендерятся выше в этом же скрипте, DOM уже готов
-initInteractive();
+initBDR();
 
 </script>
 
