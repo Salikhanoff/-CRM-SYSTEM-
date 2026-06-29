@@ -943,19 +943,23 @@ function renderTrials(){
     funRow('Пришло на пробный',visit,Math.round(CONV.signup2visit*100)+'%',noShow)+
     funRow('Купило абонемент',buy,Math.round(CONV.visit2buy*100)+'%',noBuy);
   setHTML('trialsFunnel',fn);
-  // история отказов
+  // история отказов: реальные ушедшие из карточек учеников (churn:list) + демо как fallback
+  var churn=loadChurn();
+  var refusals=churn.length?churn:R.refusals;
   var byReason={};
-  R.refusals.forEach(function(r){byReason[r.reason]=(byReason[r.reason]||0)+1;});
-  var rrows=R.refusals.map(function(r){
+  refusals.forEach(function(r){byReason[r.reason]=(byReason[r.reason]||0)+1;});
+  var rrows=refusals.map(function(r){
     return '<tr><td>'+esc(r.name)+'</td><td>'+esc(r.reason)+'</td><td>'+esc(r.date)+'</td><td>'+esc(r.comment||'—')+'</td></tr>';
   }).join('');
+  var sourceNote=churn.length
+    ? '<div class="rep-stub" style="margin-top:12px">Данные из карточек учеников — отмечаются кнопкой <b>«Отметить как ушедшего»</b> на вкладке «Ученики».</div>'
+    : '<div class="rep-stub" style="margin-top:12px">Пока показаны примеры. Реальные ушедшие появятся здесь, когда админ отметит уход кнопкой <b>«Отметить как ушедшего»</b> в карточке ученика.</div>';
   setHTML('refusalTable',
     '<table class="rep-table"><thead><tr><th>Ученик</th><th>Причина</th><th>Дата</th><th>Комментарий</th></tr></thead><tbody>'+
-    (rrows||'<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:14px">Нет записей</td></tr>')+'</tbody></table>'+
-    '<div class="rep-stub" style="margin-top:12px">Полная история отказов и ухода с настраиваемыми причинами будет вестись из карточек учеников (вкладка <b>Ученики</b>).</div>');
+    (rrows||'<tr><td colspan="4" style="text-align:center;color:var(--text2);padding:14px">Нет записей</td></tr>')+'</tbody></table>'+sourceNote);
   // AI по отказам
   var top=Object.keys(byReason).sort(function(a,b){return byReason[b]-byReason[a];})[0];
-  var topPct=top?Math.round(byReason[top]/R.refusals.length*100):0;
+  var topPct=top&&refusals.length?Math.round(byReason[top]/refusals.length*100):0;
   setHTML('trialsAi',
     '<div class="ai-block"><h4>✦ AI-анализ причин ухода</h4>'+
     '<p>Основная причина ухода за период — <b>«'+esc(top||'—')+'»</b> ('+topPct+'% случаев).</p>'+
@@ -1151,6 +1155,11 @@ function exportReport(type,name){
 /* ============================================================
    СОХРАНЕНИЕ СОСТОЯНИЯ ОТЧЁТА (лиды, отказы, комменты)
    ============================================================ */
+/* Ушедшие ученики из карточек (вкладка Ученики пишет в churn:list).
+   TODO: при подключении базы — читать из Supabase. */
+function loadChurn(){
+  try{var v=localStorage.getItem('churn:list');return v?JSON.parse(v):[];}catch(e){return [];}
+}
 function saveReportState(){
   try{localStorage.setItem('repstate',JSON.stringify({leads:R.leads,refusals:R.refusals,mktBudget:R.mktBudget,ownerComments:R.ownerComments}));}catch(e){}
 }

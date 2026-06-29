@@ -241,6 +241,8 @@ input[type=checkbox]{accent-color:#6D5BD0;width:15px;height:15px;cursor:pointer;
 .btn-secondary:hover{background:var(--bg);}
 .btn-ghost{background:var(--bg);color:var(--muted);border:1px solid var(--border);}
 .btn-wait{background:var(--purple-bg);color:var(--purple);border:1px solid var(--purple-border);width:100%;justify-content:center;border-radius:9px;padding:9px;}
+.btn-leave{background:var(--red-bg,#fbeaea);color:var(--red,#c0392b);border:1px solid var(--red-border,#f0c8c8);border-radius:9px;padding:9px;font-family:'Inter';font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.btn-leave:hover{filter:brightness(.97);}
 .btn-wait:hover{background:var(--purple);color:#fff;}
 
 /* MODAL */
@@ -985,6 +987,22 @@ function renderDrawer(){
       </div>
 
       <div class="drawer-sec">
+        <div class="drawer-label">Отметить уход</div>
+        ${s.status==='left'
+          ? `<div class="conflict" style="background:var(--bg);color:var(--ink2)">${warnIcon()}Ученик отмечен как ушедший${s.leftReason?` · причина: <b>${s.leftReason}</b>`:''}${s.leftDate?` · ${s.leftDate.split('-').reverse().join('.')}`:''}
+               <button class="btn btn-secondary" style="margin-left:auto;font-size:12px;padding:5px 10px" onclick="undoLeft(${s.id})">Вернуть</button></div>`
+          : `<button class="btn btn-leave" style="width:100%;justify-content:center" onclick="toggleLeaveForm()">↪ Отметить как ушедшего</button>
+             <div id="leaveForm" style="display:none;margin-top:10px">
+               <select id="leaveReason" class="status-sel" style="margin-bottom:8px">
+                 ${REFUSAL_REASONS.map(r=>`<option value="${r}">${r}</option>`).join('')}
+               </select>
+               <input type="date" id="leaveDate" class="dc-inp" style="width:100%;margin-bottom:8px" value="${new Date().toISOString().slice(0,10)}">
+               <input class="dc-inp" id="leaveComment" placeholder="Комментарий администратора (необязательно)" style="width:100%;margin-bottom:8px">
+               <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="markLeft(${s.id})">Подтвердить уход</button>
+             </div>`}
+      </div>
+
+      <div class="drawer-sec">
         <div class="drawer-label">Комментарии</div>
         <div id="dcList">${s.comments.length?s.comments.map(c=>`<div class="dc-item"><div class="dc-meta">${c.date}</div>${c.text}</div>`).join(''):'<div style="color:var(--muted);font-size:13px;padding:6px 0">Пока нет комментариев</div>'}</div>
         <div class="dc-inp-row">
@@ -1006,6 +1024,52 @@ function changeStatus(id,v){
   s.status=v;if(v==='left')s.archived=true;
   renderKPI();renderFunnel();renderTable();renderDrawer();
   toast(`Статус: ${SC[v]?.label}`,'ok');
+}
+
+/* ===== ОТМЕТКА УХОДА (попадает в отчёт об оттоке) ===== */
+const REFUSAL_REASONS=['Неудобное расписание','Дорого','Далеко','Не понравилось','Переезд','Здоровье','Другое'];
+function toggleLeaveForm(){
+  const f=document.getElementById('leaveForm');
+  if(f)f.style.display=f.style.display==='none'?'block':'none';
+}
+function markLeft(id){
+  const s=students.find(x=>x.id===id);if(!s) return;
+  const reason=document.getElementById('leaveReason').value;
+  const date=document.getElementById('leaveDate').value||new Date().toISOString().slice(0,10);
+  const comment=document.getElementById('leaveComment').value.trim();
+  s.status='left'; s.archived=true;
+  s.leftReason=reason; s.leftDate=date; s.leftComment=comment;
+  saveChurn(s);
+  renderKPI();renderFunnel();renderTable();renderDrawer();
+  toast(`${fullName(s)} отмечен как ушедший · ${reason}`,'ok');
+}
+function undoLeft(id){
+  const s=students.find(x=>x.id===id);if(!s) return;
+  s.status='active'; s.archived=false;
+  removeChurn(s);
+  delete s.leftReason; delete s.leftDate; delete s.leftComment;
+  renderKPI();renderFunnel();renderTable();renderDrawer();
+  toast(`${fullName(s)} возвращён в активные`,'ok');
+}
+/* Сохраняем уход в localStorage в формате, который читает модуль «Отчётность»
+   (раздел «Пробные и отказы» → история отказов). TODO: при базе — в Supabase. */
+function saveChurn(s){
+  try{
+    const key='churn:list';
+    let list=JSON.parse(localStorage.getItem(key)||'[]');
+    list=list.filter(x=>x.id!==s.id); // без дублей
+    list.unshift({id:s.id, name:fullName(s), branch:s.branch, group:s.group||'',
+      reason:s.leftReason, date:s.leftDate, comment:s.leftComment||''});
+    localStorage.setItem(key,JSON.stringify(list));
+  }catch(e){}
+}
+function removeChurn(s){
+  try{
+    const key='churn:list';
+    let list=JSON.parse(localStorage.getItem(key)||'[]');
+    list=list.filter(x=>x.id!==s.id);
+    localStorage.setItem(key,JSON.stringify(list));
+  }catch(e){}
 }
 function addToWaitlist(sid){
   const s=students.find(x=>x.id===sid);if(!s) return;
