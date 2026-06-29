@@ -649,7 +649,13 @@
 <div class="rep-panel" id="rep-trials">
   <div id="trialsKpi" class="kpi-cards"></div>
   <div class="rep-card"><h3>Воронка пробных уроков</h3><div id="trialsFunnel"></div></div>
-  <div class="rep-card"><h3>История отказов и причины ухода</h3><div id="refusalTable"></div></div>
+  <div class="rep-card">
+    <h3>История отказов и причины ухода
+      <button class="btn btn-brand" style="float:right;padding:6px 14px;font-size:12px" onclick="openWinback()">↩ Запустить возврат с оффером</button>
+    </h3>
+    <div id="refusalTable"></div>
+  </div>
+  <div id="winbackBox"></div>
   <div id="trialsAi"></div>
 </div>
 
@@ -744,9 +750,9 @@ var R={
   ],
   mktBudget:340000,
   refusals:[
-    {name:'Иванов А.',reason:'Неудобное расписание',date:'2026-06-05',comment:''},
-    {name:'Петрова М.',reason:'Дорого',date:'2026-06-12',comment:''},
-    {name:'Сидоров К.',reason:'Неудобное расписание',date:'2026-06-18',comment:''}
+    {name:'Иванов А.',phone:'+7 707 100 20 30',reason:'Неудобное расписание',date:'2026-06-05',comment:''},
+    {name:'Петрова М.',phone:'+7 701 200 30 40',reason:'Дорого',date:'2026-06-12',comment:''},
+    {name:'Сидоров К.',phone:'+7 705 300 40 50',reason:'Неудобное расписание',date:'2026-06-18',comment:''}
   ],
   ownerComments:{}
 };
@@ -1155,6 +1161,121 @@ function exportReport(type,name){
 /* ============================================================
    СОХРАНЕНИЕ СОСТОЯНИЯ ОТЧЁТА (лиды, отказы, комменты)
    ============================================================ */
+/* ============================================================
+   ВОЗВРАТ УШЕДШИХ — рассылка с оффером (WhatsApp)
+   Полностью авто-рассылка требует WhatsApp Business API + сервер.
+   Здесь: генерируем персональные сообщения, админ отправляет в 1 клик.
+   ============================================================ */
+var WINBACK_OFFERS=[
+  {id:'discount',name:'Скидка на возврат',text:'Здравствуйте, {name}! Мы скучаем по вам в студии «Эхо Гор» 💛 Возвращайтесь — дарим скидку 30% на первый месяц. Записать вас на удобное время?'},
+  {id:'trial',name:'Бесплатное занятие',text:'Здравствуйте, {name}! В «Эхо Гор» появились новые группы и расписание. Приглашаем на бесплатное пробное занятие — просто приходите, мы будем рады вас видеть!'},
+  {id:'oldprice',name:'Возврат по старой цене',text:'Здравствуйте, {name}! Только для вернувшихся учеников сохраняем прежнюю стоимость абонемента. Предложение ограничено — хотите вернуться?'},
+  {id:'custom',name:'Свой текст',text:'Здравствуйте, {name}! '}
+];
+function onlyDigits(p){return String(p||'').replace(/[^\d]/g,'');}
+
+/* единый источник ушедших: реальные из карточек, иначе демо-примеры */
+function churnSource(){
+  var churn=loadChurn();
+  return churn.length?churn:R.refusals;
+}
+function openWinback(){
+  var list=churnSource();
+  var box=document.getElementById('winbackBox');
+  if(!box)return;
+  if(!list.length){
+    box.innerHTML='<div class="rep-card"><div class="rep-stub">Пока некого возвращать. Отметьте уход в карточке ученика — и они появятся здесь.</div></div>';
+    return;
+  }
+  var opts=WINBACK_OFFERS.map(function(o){return '<option value="'+o.id+'">'+esc(o.name)+'</option>';}).join('');
+  // фильтры: причины и месяцы из данных
+  var reasons={}, months={};
+  list.forEach(function(c){
+    if(c.reason)reasons[c.reason]=1;
+    if(c.date){var m=c.date.slice(0,7);months[m]=1;}
+  });
+  var reasonOpts='<option value="all">Все причины</option>'+Object.keys(reasons).map(function(r){return '<option value="'+esc(r)+'">'+esc(r)+'</option>';}).join('');
+  var monthOpts='<option value="all">Все месяцы</option>'+Object.keys(months).sort().reverse().map(function(m){return '<option value="'+m+'">'+monthName(m)+'</option>';}).join('');
+  box.innerHTML=
+    '<div class="rep-card" style="border:2px solid var(--gold-c)">'+
+      '<h3>↩ Рассылка для возврата ушедших</h3>'+
+      '<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">'+
+        '<label style="font-size:12px;color:var(--text2);font-weight:600">Кому:</label>'+
+        '<select id="wbMonth" onchange="renderWinbackList()" style="font-family:\'IBM Plex Sans\',sans-serif;font-size:13px;font-weight:600;padding:8px 12px;border-radius:9px;border:1px solid var(--border-c);background:var(--control);color:var(--text)">'+monthOpts+'</select>'+
+        '<select id="wbReason" onchange="renderWinbackList()" style="font-family:\'IBM Plex Sans\',sans-serif;font-size:13px;font-weight:600;padding:8px 12px;border-radius:9px;border:1px solid var(--border-c);background:var(--control);color:var(--text)">'+reasonOpts+'</select>'+
+        '<label style="font-size:12px;color:var(--text2);font-weight:600;margin-left:8px">Оффер:</label>'+
+        '<select id="wbOffer" onchange="onOfferChange()" style="font-family:\'IBM Plex Sans\',sans-serif;font-size:13px;font-weight:600;padding:8px 12px;border-radius:9px;border:1px solid var(--border-c);background:var(--control);color:var(--text)">'+opts+'</select>'+
+      '</div>'+
+      '<textarea id="wbText" oninput="renderWinbackList()" style="width:100%;min-height:70px;font-family:\'IBM Plex Sans\',sans-serif;font-size:13px;padding:10px;border-radius:10px;border:1px solid var(--border-c);background:var(--control);color:var(--text);resize:vertical">'+esc(WINBACK_OFFERS[0].text)+'</textarea>'+
+      '<div style="font-size:11.5px;color:var(--text2);margin:6px 0 14px"><b>{name}</b> заменяется на имя. Отправка — по кнопке у каждого (откроется WhatsApp с готовым текстом).</div>'+
+      '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">'+
+        '<button class="btn btn-brand" onclick="sendAllWinback()">💬 Открыть все в WhatsApp</button>'+
+        '<span id="wbCount" style="font-size:12px;color:var(--text2)"></span>'+
+      '</div>'+
+      '<div id="wbList"></div>'+
+      '<div class="rep-stub" style="margin-top:14px">Полностью автоматическая рассылка подключается через <b>WhatsApp Business API</b> при интеграции с сервером. Сейчас — отправка в один клик по каждому.</div>'+
+    '</div>';
+  renderWinbackList();
+}
+function monthName(ym){
+  var p=ym.split('-'); var m=+p[1]-1;
+  var MN=['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'];
+  return (MN[m]||'')+' '+p[0];
+}
+function filteredWinback(){
+  var list=churnSource();
+  var fm=document.getElementById('wbMonth'); var fmv=fm?fm.value:'all';
+  var fr=document.getElementById('wbReason'); var frv=fr?fr.value:'all';
+  return list.filter(function(c){
+    if(fmv!=='all'&&(!c.date||c.date.slice(0,7)!==fmv))return false;
+    if(frv!=='all'&&c.reason!==frv)return false;
+    return true;
+  });
+}
+function onOfferChange(){
+  var sel=document.getElementById('wbOffer');
+  var o=WINBACK_OFFERS.filter(function(x){return x.id===sel.value;})[0];
+  var ta=document.getElementById('wbText');
+  if(o&&ta){ta.value=o.text;renderWinbackList();}
+}
+function winbackMsg(c,tpl){
+  return tpl.replace(/\{name\}/g,(c.name||'').split(' ')[0]||c.name||'');
+}
+function renderWinbackList(){
+  var list=filteredWinback();
+  var tpl=(document.getElementById('wbText')||{}).value||'';
+  setHTML('wbCount','Получателей: '+list.length);
+  var rows=list.map(function(c){
+    var msg=winbackMsg(c,tpl);
+    var phone=onlyDigits(c.phone);
+    var waUrl=phone?'https://wa.me/'+phone+'?text='+encodeURIComponent(msg):'';
+    return '<tr><td>'+esc(c.name)+'</td><td style="color:var(--text2)">'+esc(c.reason||'—')+'</td>'+
+      '<td style="font-size:12px;color:var(--text2)">'+esc(c.date||'—')+'</td>'+
+      '<td style="font-size:12px;color:var(--text2);max-width:300px">'+esc(msg)+'</td>'+
+      '<td style="text-align:right">'+
+        (waUrl
+          ? '<a href="'+waUrl+'" target="_blank" class="btn btn-brand" style="padding:5px 12px;font-size:12px;text-decoration:none">💬 WhatsApp</a>'
+          : '<span style="font-size:11px;color:var(--text2)">нет телефона</span>')+
+      '</td></tr>';
+  }).join('');
+  setHTML('wbList',
+    '<table class="rep-table"><thead><tr><th>Ученик</th><th>Причина</th><th>Дата ухода</th><th>Сообщение</th><th style="text-align:right">Отправить</th></tr></thead><tbody>'+
+    (rows||'<tr><td colspan="5" style="text-align:center;color:var(--text2);padding:14px">Нет получателей по фильтрам</td></tr>')+'</tbody></table>');
+}
+function sendAllWinback(){
+  var list=filteredWinback();
+  var tpl=(document.getElementById('wbText')||{}).value||'';
+  var withPhone=list.filter(function(c){return onlyDigits(c.phone);});
+  if(!withPhone.length){flash('Нет получателей с телефоном');return;}
+  if(!confirm('Откроется '+withPhone.length+' вкладок WhatsApp — по одной на каждого. Продолжить?'))return;
+  withPhone.forEach(function(c){
+    var msg=winbackMsg(c,tpl);
+    var url='https://wa.me/'+onlyDigits(c.phone)+'?text='+encodeURIComponent(msg);
+    window.open(url,'_blank');
+  });
+  flash('Открыто '+withPhone.length+' чатов WhatsApp');
+}
+
 /* Ушедшие ученики из карточек (вкладка Ученики пишет в churn:list).
    TODO: при подключении базы — читать из Supabase. */
 function loadChurn(){

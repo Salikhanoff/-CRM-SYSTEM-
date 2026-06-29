@@ -764,7 +764,8 @@ function computeFiltered(){
   const fLtv=document.getElementById('fLtv').value;
   const q=document.getElementById('searchInp').value.trim().toLowerCase();
   return students.filter(s=>{
-    if(!archPass(s)) return false;
+    // если явно фильтруем по статусу «Ушедший» — не прячем их архив-фильтром
+    if(fSt!=='left'&&!archPass(s)) return false;
     if(!def.p(s)) return false;
     if(fSt!=='all'&&s.status!==fSt) return false;
     if(fBr!=='all'&&s.branch!==fBr) return false;
@@ -776,6 +777,20 @@ function computeFiltered(){
 }
 
 // ===== KPI =====
+/* Ушедшие в текущем месяце (по дате отметки ухода leftDate).
+   Если даты нет — считаем по статусу 'left' (на случай ручной смены статуса). */
+function leftThisMonth(){
+  const now=new Date();
+  const y=now.getFullYear(), m=now.getMonth();
+  return students.filter(function(s){
+    if(s.status!=='left')return false;
+    if(s.leftDate){
+      const d=new Date(s.leftDate);
+      return d.getFullYear()===y && d.getMonth()===m;
+    }
+    return true; // ушёл, но дата не указана — показываем
+  });
+}
 function renderKPI(){
   const na=students.filter(s=>!s.archived);
   const items=[
@@ -785,6 +800,7 @@ function renderKPI(){
     {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`, ic:'red', n:na.filter(s=>s.debt>0||s.status==='debt').length, l:'Должники', seg:'debt'},
     {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`, ic:'blue', n:na.filter(s=>s.status==='no_status').length, l:'Без статуса', seg:'no_status'},
     {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`, ic:'purple', n:waitlist.length, l:'Лист ожидания', seg:'waitlist'},
+    {icon:`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 6L6 18M6 6l12 12"/></svg>`, ic:'red', n:leftThisMonth().length, l:'Ушли в этом месяце', seg:'left'},
   ];
   document.getElementById('kpiGrid').innerHTML=items.map(i=>`
     <div class="kpi-card" onclick="filterBySeg('${i.seg}')">
@@ -828,6 +844,11 @@ function filterBySeg(key){
   activeSeg=key;
   const fSt=document.getElementById('fStatus');
   if(SC[key]) fSt.value=key; else fSt.value='all';
+  // ушедшие архивны — чтобы они показались, снимаем фильтр «только активные»
+  if(key==='left'){
+    const fArch=document.getElementById('fArch');
+    if(fArch)fArch.value='archive';
+  }
   renderSegs();renderTable();
   document.getElementById('view-registry').scrollIntoView({behavior:'smooth',block:'start'});
 }
@@ -1058,7 +1079,7 @@ function saveChurn(s){
     const key='churn:list';
     let list=JSON.parse(localStorage.getItem(key)||'[]');
     list=list.filter(x=>x.id!==s.id); // без дублей
-    list.unshift({id:s.id, name:fullName(s), branch:s.branch, group:s.group||'',
+    list.unshift({id:s.id, name:fullName(s), phone:s.phone||'', branch:s.branch, group:s.group||'',
       reason:s.leftReason, date:s.leftDate, comment:s.leftComment||''});
     localStorage.setItem(key,JSON.stringify(list));
   }catch(e){}
