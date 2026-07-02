@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Личный кабинет ученика — Эхо Гор CRM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ===== ЭХО ГОР — система тем (день/ночь) ===== */
+  :root, [data-theme="night"]{
+    --bg:#12161A; --panel:#1A2027; --inset:#161B21; --control:#1E252D; --hover:#232D37;
+    --nav-active:#222C36; --border-c:#2A333C; --border2:#232C35; --row-border:#1F272F;
+    --chip:#232C35; --scrollbar:#2C353F;
+    --text:#E9ECEF; --heading:#F2F4F6; --text2:#AEB6BE; --text-muted:#9AA4AE;
+    --muted-c:#7E8893; --muted2:#6E7884; --faint:#5E6873;
+    --gold-c:#BF9D5F; --gold-deep:#947C51; --blue-c:#8FB8CC; --blue-deep:#5E8194;
+    --green-c:#7FB089; --red-c:#C45A5A; --on-gold:#1A2027;
+    --ok-bg:rgba(127,176,137,.14); --gold-bg:rgba(191,157,95,.16);
+    --red-bg2:rgba(196,90,90,.15); --blue-bg2:rgba(143,184,204,.15);
+    --shadow:0 8px 28px rgba(0,0,0,.45); --r:16px;
+  }
+  [data-theme="day"]{
+    --bg:#E8ECF1; --panel:#FFFFFF; --inset:#F1F4F7; --control:#F1F4F7; --hover:#EDF1F5;
+    --nav-active:#ECF0F4; --border-c:#DCE2E8; --border2:#E8ECF1; --row-border:#EEF1F4;
+    --chip:#EDF1F5; --scrollbar:#CCD4DD;
+    --text:#222B33; --heading:#11171D; --text2:#46505B; --text-muted:#5C6772;
+    --muted-c:#6B7682; --muted2:#8A95A1; --faint:#A2ADB8;
+    --gold-c:#947C51; --gold-deep:#7E6840; --blue-c:#5E8194; --blue-deep:#3F5F73;
+    --green-c:#4F8A63; --red-c:#B14545; --on-gold:#FFFFFF;
+    --ok-bg:rgba(79,138,99,.13); --gold-bg:rgba(148,124,81,.15);
+    --red-bg2:rgba(177,69,69,.12); --blue-bg2:rgba(94,129,148,.14);
+    --shadow:0 4px 16px rgba(0,0,0,.1); --r:16px;
+  }
+  :root, [data-theme]{
+    --card:var(--panel); --line:var(--border-c); --ink:var(--heading); --muted:var(--muted-c);
+    --gold:var(--gold-c); --gold-soft:var(--gold-bg); --gold-ink:var(--gold-c);
+    --green:var(--green-c); --green-soft:var(--ok-bg); --red:var(--red-c); --red-soft:var(--red-bg2);
+    --blue:var(--blue-c); --blue-soft:var(--blue-bg2);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'IBM Plex Sans','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased;overflow-y:scroll}
+  h1,h2,h3,h4,.brand-logo{font-family:'Oswald',sans-serif;color:var(--heading);letter-spacing:.3px}
+  a{text-decoration:none;color:inherit}
+
+  .app{display:flex;min-height:100vh}
+
+  /* ---- Сайдбар ---- */
+  .side{width:252px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--border-c);display:flex;flex-direction:column}
+  .eg-logo-box{padding:22px 22px 18px;border-bottom:1px solid var(--border2)}
+  .eg-logo-box img{width:100%;display:block}
+  .nav{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:3px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:8px;color:var(--text2);font-weight:500;font-size:14px;transition:background .15s}
+  .nav a .navbar{width:4px;height:18px;border-radius:3px;background:transparent;flex:none}
+  .nav a:hover{background:var(--hover)}
+  .nav a.active{background:var(--nav-active);color:var(--heading);font-weight:600}
+  .nav a.active .navbar{background:var(--gold-c)}
+  .nav a svg{width:18px;height:18px;flex-shrink:0;opacity:.85}
+  .eg-values{padding:16px 20px;border-top:1px solid var(--border2)}
+  .eg-values .vl{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:2px;color:var(--gold-c);text-transform:uppercase;margin-bottom:6px}
+  .eg-values .sub{font-size:12px;color:var(--muted2);line-height:1.5}
+
+  /* ---- Основная зона ---- */
+  .main{flex:1;display:flex;flex-direction:column;background:var(--bg);min-width:0}
+  .eg-topbar{height:70px;flex:none;background:var(--inset);border-bottom:1px solid var(--border-c);display:flex;align-items:center;gap:16px;padding:0 28px}
+  .eg-topbar .who{display:flex;flex-direction:column;line-height:1.25}
+  .eg-topbar .who b{font-size:15px;color:var(--heading);font-weight:600}
+  .eg-topbar .who span{font-size:12px;color:var(--muted-c)}
+  .eg-spacer{flex:1}
+
+  /* Демо-переключатель роли */
+  .role-switch{display:flex;align-items:center;background:var(--control);border:1px solid var(--border-c);border-radius:9px;padding:3px}
+  .role-switch button{padding:7px 13px;border-radius:6px;font-size:13px;font-weight:600;border:none;background:transparent;color:var(--muted-c);cursor:pointer;font-family:inherit;transition:.15s}
+  .role-switch button.on{background:var(--gold-c);color:var(--on-gold)}
+  .role-picker{background:var(--control);border:1px solid var(--border-c);border-radius:8px;padding:8px 12px;color:var(--text);font-family:inherit;font-size:13px;cursor:pointer;max-width:210px}
+  .eg-toggle{display:flex;align-items:center;background:var(--control);border:1px solid var(--border-c);border-radius:8px;padding:3px}
+  .eg-toggle div{padding:6px 11px;border-radius:6px;font-size:14px;cursor:pointer;line-height:1;color:var(--muted-c)}
+  .eg-toggle div.on{background:var(--gold-c);color:var(--on-gold)}
+
+  .eg-content{flex:1;width:100%;min-width:0;padding:30px 36px;overflow-x:hidden}
+  .eg-content>.wrap{max-width:1180px;margin:0 auto}
+
+  .lead{color:var(--muted-c);max-width:820px;margin:6px 0 22px;font-size:15px}
+
+  /* Баннер-предупреждение о серверных функциях */
+  .server-note{display:flex;gap:11px;align-items:flex-start;background:var(--gold-bg);border:1px solid var(--gold-c);border-radius:12px;padding:13px 16px;margin-bottom:22px;font-size:13px;color:var(--text)}
+  .server-note svg{flex:none;margin-top:1px;color:var(--gold-c)}
+  .server-note b{color:var(--heading)}
+
+  /* ---- Профиль-хедер ученика ---- */
+  .profile-head{display:flex;gap:24px;background:var(--panel);border:1px solid var(--border-c);border-radius:var(--r);padding:24px;margin-bottom:20px;flex-wrap:wrap}
+  .ai-card{width:186px;flex:none;border-radius:14px;overflow:hidden;border:3px solid var(--gold-c);background:linear-gradient(160deg,#2a2f36,#12161a);position:relative;aspect-ratio:3/4;display:flex;align-items:flex-end}
+  .ai-card img.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .ai-card .ai-frame{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 2px rgba(191,157,95,.5);border-radius:11px}
+  .ai-card .ai-badge{position:absolute;top:9px;left:9px;background:rgba(18,22,26,.72);color:#BF9D5F;font-family:'Oswald';font-size:10px;letter-spacing:1.5px;padding:4px 8px;border-radius:6px;text-transform:uppercase;z-index:2}
+  .ai-card .ai-name{position:relative;z-index:2;width:100%;padding:14px 12px 10px;background:linear-gradient(transparent,rgba(10,12,15,.9));color:#fff}
+  .ai-card .ai-name b{font-family:'Oswald';font-size:17px;display:block;line-height:1.1}
+  .ai-card .ai-name span{font-size:11px;color:#BF9D5F;letter-spacing:1px;text-transform:uppercase}
+  .ai-card.empty{align-items:center;justify-content:center;cursor:pointer;color:var(--muted-c);text-align:center;padding:16px;font-size:13px}
+  .ai-card.empty:hover{border-color:var(--gold-deep)}
+
+  .profile-info{flex:1;min-width:260px}
+  .profile-info h1{font-size:30px;margin-bottom:4px}
+  .profile-tags{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 16px}
+  .tag{display:inline-flex;align-items:center;gap:5px;background:var(--chip);border:1px solid var(--border-c);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--text2)}
+  .tag b{color:var(--heading);font-weight:600}
+
+  .sub-status{display:inline-flex;align-items:center;gap:9px;padding:10px 16px;border-radius:11px;font-size:14px;font-weight:600;margin-bottom:6px}
+  .sub-status .dot{width:9px;height:9px;border-radius:50%}
+  .sub-status.on{background:var(--ok-bg);color:var(--green-c)}
+  .sub-status.on .dot{background:var(--green-c)}
+  .sub-status.off{background:var(--red-bg2);color:var(--red-c)}
+  .sub-status.off .dot{background:var(--red-c)}
+  .sub-status small{font-weight:400;color:var(--muted-c);margin-left:4px}
+  .profile-photo-actions{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+
+  /* ---- Сетка статов ---- */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+  .stat{background:var(--panel);border:1px solid var(--border-c);border-radius:14px;padding:16px 18px}
+  .stat .ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--gold-bg);color:var(--gold-c);margin-bottom:11px}
+  .stat .ico.blue{background:var(--blue-bg2);color:var(--blue-c)}
+  .stat .ico.green{background:var(--ok-bg);color:var(--green-c)}
+  .stat .val{font-family:'Oswald';font-size:27px;font-weight:600;color:var(--heading);line-height:1}
+  .stat .lbl{font-size:12px;color:var(--muted-c);margin-top:4px;text-transform:uppercase;letter-spacing:.4px}
+
+  /* ---- Секции/карточки ---- */
+  .section{background:var(--panel);border:1px solid var(--border-c);border-radius:var(--r);padding:22px 24px;margin-bottom:20px}
+  .section-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:12px;flex-wrap:wrap}
+  .section-h h2{font-size:20px}
+  .section-h .hint{font-size:13px;color:var(--muted-c)}
+
+  /* Наклейки прогресс */
+  .sticker-top{display:flex;align-items:center;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+  .sticker-big{font-family:'Oswald';font-size:44px;color:var(--gold-c);line-height:1}
+  .progress-wrap{flex:1;min-width:220px}
+  .progress-bar{height:12px;background:var(--control);border-radius:99px;overflow:hidden;border:1px solid var(--border-c)}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-deep),var(--gold-c));border-radius:99px;transition:width .5s}
+  .progress-meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted-c);margin-top:7px}
+
+  /* Награды */
+  .reward-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:12px}
+  .reward{background:var(--inset);border:1px solid var(--border-c);border-radius:13px;padding:16px 12px;text-align:center;position:relative;transition:.15s}
+  .reward .emoji{font-size:34px;line-height:1;margin-bottom:9px;filter:grayscale(1);opacity:.4}
+  .reward.earned .emoji{filter:none;opacity:1}
+  .reward.next{border-color:var(--gold-c);box-shadow:0 0 0 1px var(--gold-c)}
+  .reward b{display:block;font-size:13.5px;color:var(--heading);font-family:'Oswald';letter-spacing:.3px}
+  .reward span{font-size:11.5px;color:var(--muted-c)}
+  .reward .lock{position:absolute;top:8px;right:9px;font-size:12px;opacity:.5}
+  .reward .check{position:absolute;top:7px;right:9px;color:var(--green-c);font-size:14px}
+  .reward.next .ribbon{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold-c);color:var(--on-gold);font-size:9.5px;font-family:'Oswald';letter-spacing:1px;padding:2px 9px;border-radius:99px;text-transform:uppercase;white-space:nowrap}
+
+  /* Достижения */
+  .ach-cat{margin-bottom:18px}
+  .ach-cat:last-child{margin-bottom:0}
+  .ach-cat .cat-name{font-family:'Oswald';font-size:13px;letter-spacing:1.4px;text-transform:uppercase;color:var(--gold-c);margin-bottom:11px}
+  .ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(146px,1fr));gap:10px}
+  .ach{display:flex;gap:10px;align-items:center;background:var(--inset);border:1px solid var(--border-c);border-radius:11px;padding:11px 13px;opacity:.5}
+  .ach.done{opacity:1;border-color:var(--gold-bg)}
+  .ach .ach-ico{width:34px;height:34px;border-radius:9px;background:var(--control);display:flex;align-items:center;justify-content:center;font-size:18px;flex:none}
+  .ach.done .ach-ico{background:var(--gold-bg)}
+  .ach .ach-t b{font-size:13px;color:var(--heading);display:block;line-height:1.2}
+  .ach .ach-t span{font-size:11px;color:var(--muted-c)}
+
+  /* Мой путь (таймлайн) */
+  .path{position:relative;padding-left:8px}
+  .path-item{display:flex;gap:16px;position:relative;padding-bottom:22px}
+  .path-item:last-child{padding-bottom:0}
+  .path-line{position:absolute;left:12px;top:26px;bottom:0;width:2px;background:var(--border-c)}
+  .path-item.done .path-line{background:var(--gold-c)}
+  .path-dot{width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:var(--control);border:2px solid var(--border-c);color:var(--muted-c);font-size:13px;z-index:1}
+  .path-item.done .path-dot{background:var(--gold-c);border-color:var(--gold-c);color:var(--on-gold)}
+  .path-item.current .path-dot{border-color:var(--gold-c);color:var(--gold-c);animation:pulse 1.8s infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(191,157,95,.4)}50%{box-shadow:0 0 0 6px rgba(191,157,95,0)}}
+  .path-body b{font-size:15px;color:var(--heading);font-family:'Oswald'}
+  .path-body span{display:block;font-size:12.5px;color:var(--muted-c)}
+  .path-item.current .path-body b{color:var(--gold-c)}
+
+  /* Сообщество ТОП-10 */
+  .comm-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .comm-tab{padding:8px 16px;border-radius:999px;border:1px solid var(--border-c);background:var(--inset);font-size:13px;font-weight:600;color:var(--text2);cursor:pointer;font-family:inherit;transition:.15s}
+  .comm-tab:hover{border-color:var(--gold-c)}
+  .comm-tab.on{background:var(--gold-c);border-color:var(--gold-c);color:var(--on-gold)}
+  .rank-list{display:flex;flex-direction:column;gap:8px}
+  .rank{display:flex;align-items:center;gap:14px;background:var(--inset);border:1px solid var(--border-c);border-radius:12px;padding:11px 14px;cursor:pointer;transition:.15s}
+  .rank:hover{border-color:var(--gold-c);transform:translateX(2px)}
+  .rank .pos{width:30px;font-family:'Oswald';font-size:20px;color:var(--muted-c);text-align:center;flex:none}
+  .rank.top1 .pos{color:#E6C06A}.rank.top2 .pos{color:#B8C0C8}.rank.top3 .pos{color:#C9925E}
+  .rank .av{width:42px;height:42px;border-radius:10px;object-fit:cover;flex:none;background:var(--control);display:flex;align-items:center;justify-content:center;font-family:'Oswald';color:var(--gold-c);font-size:17px;border:1px solid var(--border-c)}
+  .rank .r-info{flex:1;min-width:0}
+  .rank .r-info b{font-size:14.5px;color:var(--heading);display:block}
+  .rank .r-info span{font-size:12px;color:var(--muted-c)}
+  .rank .r-val{font-family:'Oswald';font-size:19px;color:var(--gold-c);flex:none}
+  .rank .r-val small{font-size:11px;color:var(--muted-c);display:block;text-align:right;font-family:'IBM Plex Sans'}
+
+  /* ЭхоБаксы (взрослый) */
+  .eb-head{display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:20px}
+  .eb-balance{background:linear-gradient(150deg,var(--gold-deep),var(--gold-c));color:var(--on-gold);border-radius:16px;padding:20px 26px;min-width:220px}
+  .eb-balance .lbl{font-size:12px;letter-spacing:1.5px;text-transform:uppercase;opacity:.85}
+  .eb-balance .amt{font-family:'Oswald';font-size:42px;line-height:1;margin-top:4px;display:flex;align-items:baseline;gap:8px}
+  .eb-balance .amt span{font-size:16px;opacity:.9}
+  .gift-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .gift{background:var(--inset);border:1px solid var(--border-c);border-radius:13px;padding:16px 14px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .gift .emoji{font-size:34px}
+  .gift b{font-size:14px;color:var(--heading);font-family:'Oswald'}
+  .gift .cost{font-size:13px;color:var(--gold-c);font-weight:600}
+  .gift button{width:100%;margin-top:4px}
+
+  .eb-history{display:flex;flex-direction:column;gap:2px}
+  .eb-row{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--row-border);font-size:13.5px}
+  .eb-row:last-child{border:none}
+  .eb-row .eb-ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex:none;font-size:14px}
+  .eb-row .eb-ic.plus{background:var(--ok-bg);color:var(--green-c)}
+  .eb-row .eb-ic.minus{background:var(--red-bg2);color:var(--red-c)}
+  .eb-row .eb-t{flex:1}.eb-row .eb-t b{color:var(--heading);font-weight:500;display:block;font-size:13.5px}
+  .eb-row .eb-t span{color:var(--muted-c);font-size:11.5px}
+  .eb-row .eb-amt{font-family:'Oswald';font-size:16px}
+  .eb-row .eb-amt.plus{color:var(--green-c)}.eb-row .eb-amt.minus{color:var(--red-c)}
+
+  /* Кнопки */
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 16px;border-radius:9px;font-family:inherit;font-size:13.5px;font-weight:600;border:1px solid var(--border-c);background:var(--control);color:var(--text);cursor:pointer;transition:.15s}
+  .btn:hover{background:var(--hover)}
+  .btn-primary{background:linear-gradient(135deg,var(--gold-deep),var(--gold-c));color:var(--on-gold);border:none}
+  .btn-primary:hover{opacity:.92}
+  .btn-sm{padding:7px 12px;font-size:12.5px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+
+  /* Секции по роли */
+  .role-only{display:none}
+  body[data-role="child"] .show-child,
+  body[data-role="adult"] .show-adult,
+  body[data-role="parent"] .show-parent{display:block}
+  body[data-role="parent"] .hide-parent{display:none !important}
+
+  /* Модалка */
+  .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:100}
+  .modal-ov.open{display:flex}
+  .modal{background:var(--panel);border:1px solid var(--border-c);border-radius:16px;max-width:460px;width:100%;box-shadow:var(--shadow);overflow:hidden}
+  .modal-h{padding:20px 22px;border-bottom:1px solid var(--border-c);display:flex;align-items:center;justify-content:space-between}
+  .modal-h h3{font-size:18px}
+  .modal-h .x{cursor:pointer;color:var(--muted-c);font-size:20px;background:none;border:none}
+  .modal-b{padding:20px 22px}
+  .modal-b p{font-size:13.5px;color:var(--text2);margin-bottom:14px}
+  .modal-b label{font-size:12.5px;color:var(--muted-c);display:block;margin-bottom:6px}
+  .modal-b input,.modal-b select{width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--border-c);background:var(--control);color:var(--text);font-family:inherit;font-size:14px;margin-bottom:14px}
+  .modal-f{padding:14px 22px;border-top:1px solid var(--border-c);display:flex;gap:9px;justify-content:flex-end}
+
+  /* Профиль другого ученика (публичный) */
+  .pub-head{display:flex;gap:16px;align-items:center;margin-bottom:18px}
+  .pub-av{width:70px;height:70px;border-radius:12px;object-fit:cover;background:var(--control);display:flex;align-items:center;justify-content:center;font-family:'Oswald';color:var(--gold-c);font-size:26px;border:2px solid var(--gold-c);flex:none}
+  .pub-head b{font-size:20px;color:var(--heading);font-family:'Oswald';display:block}
+  .pub-head span{font-size:13px;color:var(--muted-c)}
+  .pub-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pub-stat{background:var(--inset);border:1px solid var(--border-c);border-radius:10px;padding:12px 14px}
+  .pub-stat .v{font-family:'Oswald';font-size:22px;color:var(--gold-c)}
+  .pub-stat .l{font-size:11.5px;color:var(--muted-c);text-transform:uppercase;letter-spacing:.4px}
+
+  /* Тосты */
+  .toasts{position:fixed;bottom:22px;right:22px;display:flex;flex-direction:column;gap:9px;z-index:200}
+  .toast{background:var(--heading);color:var(--bg);padding:12px 17px;border-radius:11px;font-size:13.5px;font-weight:500;box-shadow:var(--shadow);animation:tin .25s;max-width:330px}
+  .toast.err{background:var(--red-c);color:#fff}
+  .toast.ok{background:var(--green-c);color:#fff}
+  @keyframes tin{from{opacity:0;transform:translateY(10px)}}
+
+  @media(max-width:860px){
+    .side{display:none}
+    .eg-content{padding:20px 16px}
+    .eg-topbar{padding:0 16px;gap:10px}
+    .eg-topbar .who{display:none}
+    .role-picker{max-width:130px}
+  }
+</style>
+</head>
+<body data-theme="day" data-role="child">
+<div class="app">
+  <aside class="side">
+    <div class="eg-logo-box"><img id="egLogo" src="../logo-day.png" alt="Эхо Гор"></div>
+    <nav class="nav">
+      <a href="../index.html"><span class="navbar"></span>Ученики</a>
+      <a href="teachers-echo-gor.html"><span class="navbar"></span>Преподаватели</a>
+      <a href="schedule-echo-gor.html"><span class="navbar"></span>Расписание</a>
+      <a href="accounting-echo-gor.html"><span class="navbar"></span>Бухгалтерия</a>
+      <a href="planning-echo-gor.html"><span class="navbar"></span>Планирование</a>
+      <a href="reports-echo-gor.html"><span class="navbar"></span>Отчётность</a>
+      <a href="student-cabinet.html" class="active"><span class="navbar"></span>Кабинет ученика</a>
+    </nav>
+    <div class="eg-values">
+      <div class="vl">Культура · Сила · Характер</div>
+      <div class="sub">Казахстан · обучаем от 5 лет</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="eg-topbar">
+      <div class="who">
+        <b id="tbName">Кабинет ученика</b>
+        <span id="tbRole">Детский кабинет</span>
+      </div>
+      <div class="eg-spacer"></div>
+      <select class="role-picker" id="studentPicker" onchange="pickStudent(this.value)"></select>
+      <div class="role-switch" id="roleSwitch">
+        <button data-role="child" class="on" onclick="setRole('child')">Ребёнок</button>
+        <button data-role="adult" onclick="setRole('adult')">Взрослый</button>
+        <button data-role="parent" onclick="setRole('parent')">Родитель</button>
+      </div>
+      <div class="eg-toggle" id="themeToggle">
+        <div onclick="egTheme('night')" title="Ночь">☾</div>
+        <div class="on" onclick="egTheme('day')" title="День">☀</div>
+      </div>
+    </div>
+
+    <div class="eg-content">
+      <div class="wrap" id="cabinetRoot"><!-- рендерится из JS --></div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-ov" id="modalOv"><div class="modal" id="modalBox"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ============================================================
+   ЭХО ГОР — Личный кабинет ученика. Вся логика.
+   Данные демо; всё считается формулами (не захардкожено).
+   ============================================================ */
+
+// Сегодняшняя дата (совпадает с CRM-демо)
+var TODAY = new Date(2026,8,7); // 07.09.2026
+
+// ---- Правила наград (настраивается владельцем в Настройках) ----
+var REWARDS = [
+  {stickers:20,  name:'Браслет',  emoji:'📿'},
+  {stickers:40,  name:'Блокнот',  emoji:'📒'},
+  {stickers:60,  name:'Стикерпак',emoji:'✨'},
+  {stickers:80,  name:'Шоппер',   emoji:'👜'},
+  {stickers:100, name:'Футболка', emoji:'👕'},
+];
+
+// ---- Правила достижений (по категориям) ----
+var ACH_RULES = {
+  'Посещения': [
+    {id:'v1',   t:'Первый урок',    need:s=>s.visits>=1,   emoji:'🎉'},
+    {id:'v10',  t:'10 занятий',     need:s=>s.visits>=10,  emoji:'🔟'},
+    {id:'v25',  t:'25 занятий',     need:s=>s.visits>=25,  emoji:'🏅'},
+    {id:'v50',  t:'50 занятий',     need:s=>s.visits>=50,  emoji:'🥉'},
+    {id:'v100', t:'100 занятий',    need:s=>s.visits>=100, emoji:'🥈'},
+    {id:'v250', t:'250 занятий',    need:s=>s.visits>=250, emoji:'🥇'},
+    {id:'v500', t:'500 занятий',    need:s=>s.visits>=500, emoji:'🏆'},
+    {id:'v1000',t:'1000 занятий',   need:s=>s.visits>=1000,emoji:'👑'},
+  ],
+  'Время в студии': [
+    {id:'t6',  t:'6 месяцев', need:s=>s.months>=6,   emoji:'🌱'},
+    {id:'t12', t:'1 год',     need:s=>s.months>=12,  emoji:'🌿'},
+    {id:'t24', t:'2 года',    need:s=>s.months>=24,  emoji:'🌳'},
+    {id:'t36', t:'3 года',    need:s=>s.months>=36,  emoji:'🎋'},
+    {id:'t60', t:'5 лет',     need:s=>s.months>=60,  emoji:'⭐'},
+    {id:'t120',t:'10 лет',    need:s=>s.months>=120, emoji:'💫'},
+  ],
+  'Рост': [
+    {id:'g1', t:'Продолжающая группа', need:s=>s.growth>=1, emoji:'📈'},
+    {id:'g2', t:'Студийная группа',    need:s=>s.growth>=2, emoji:'🎯'},
+    {id:'g3', t:'Ансамбль',            need:s=>s.growth>=3, emoji:'💠'},
+  ],
+  'События': [
+    {id:'e_stage', t:'Первое выступление', need:s=>s.events.stage>=1,    emoji:'🎭'},
+    {id:'e_open1', t:'Первый открытый урок',need:s=>s.events.open>=1,     emoji:'🚪'},
+    {id:'e_openA', t:'Все открытые уроки',  need:s=>s.events.open>=s.events.openTotal && s.events.openTotal>0, emoji:'🗝️'},
+    {id:'e_rep1',  t:'Первый концерт',      need:s=>s.events.report>=1,   emoji:'🎼'},
+    {id:'e_repA',  t:'Все концерты',        need:s=>s.events.report>=s.events.reportTotal && s.events.reportTotal>0, emoji:'🎇'},
+    {id:'e_cmp1',  t:'Первый конкурс',      need:s=>s.events.contest>=1,  emoji:'🏵️'},
+    {id:'e_cmpA',  t:'Все конкурсы',        need:s=>s.events.contest>=s.events.contestTotal && s.events.contestTotal>0, emoji:'🎖️'},
+  ],
+};
+
+// ---- Этапы "Мой путь" ----
+var PATH_STEPS = [
+  {t:'Первый урок',            done:s=>s.visits>=1},
+  {t:'10 занятий',             done:s=>s.visits>=10},
+  {t:'50 занятий',             done:s=>s.visits>=50},
+  {t:'Продолжающая группа',    done:s=>s.growth>=1},
+  {t:'Студийная группа',       done:s=>s.growth>=2},
+  {t:'Ансамбль',               done:s=>s.growth>=3},
+];
+
+// ---- Каталог подарков за ЭхоБаксы (взрослые) ----
+var GIFTS = [
+  {name:'Стикерпак',   cost:150, emoji:'✨'},
+  {name:'Бутылка',     cost:400, emoji:'🍶'},
+  {name:'Футболка',    cost:800, emoji:'👕'},
+  {name:'Худи Эхо Гор',cost:1500,emoji:'🧥'},
+  {name:'Мастер-класс',cost:2500,emoji:'🎓'},
+];
+
+// ---- ДЕМО-УЧЕНИКИ ----
+// groupType: 'child'|'adult' — определяет тип кабинета автоматически.
+var STUDENTS = [
+  {id:1, first:'Айгерим', last:'Болатова', gender:'female', dob:'2012-03-15', branch:'Чокина 109/1', group:'Ансамбль', groupType:'child', teacher:'Динара А.', joined:'2022-09-01', visits:214, stickers:87, growth:3, subUntil:'2026-09-25', echoBucks:0, parentName:'Жанна', photo:null, events:{stage:4,open:3,openTotal:3,report:2,reportTotal:2,contest:3,contestTotal:5}},
+  {id:2, first:'Диас', last:'Нурланов', gender:'male', dob:'2013-07-22', branch:'Чокина 109/1', group:'Хип-хоп', groupType:'child', teacher:'Ерлан К.', joined:'2025-06-01', visits:34, stickers:22, growth:1, subUntil:'2026-09-25', echoBucks:0, parentName:'Мадина', photo:null, events:{stage:1,open:1,openTotal:2,report:0,reportTotal:1,contest:0,contestTotal:2}},
+  {id:3, first:'Карина', last:'Ахметова', gender:'female', dob:'2010-11-08', branch:'Сатпаева 210/1', group:'Соло', groupType:'child', teacher:'Динара А.', joined:'2023-02-10', visits:96, stickers:58, growth:2, subUntil:'2026-08-20', echoBucks:0, parentName:'Алма', photo:null, events:{stage:2,open:2,openTotal:2,report:1,reportTotal:2,contest:1,contestTotal:3}},
+  {id:5, first:'Жанна', last:'Касенова', gender:'female', dob:'1998-09-30', branch:'Сатпаева 210/1', group:'Взрослые', groupType:'adult', teacher:'Ерлан К.', joined:'2022-01-15', visits:187, stickers:0, growth:2, subUntil:'2026-10-31', echoBucks:1240, parentName:'', photo:null, events:{stage:3,open:2,openTotal:3,report:2,reportTotal:2,contest:1,contestTotal:2}},
+  {id:6, first:'Самат', last:'Ермеков', gender:'male', dob:'2003-02-14', branch:'Чокина 109/1', group:'Взрослые', groupType:'adult', teacher:'Ерлан К.', joined:'2021-05-20', visits:342, stickers:0, growth:3, subUntil:'2026-06-28', echoBucks:560, parentName:'', photo:null, events:{stage:6,open:3,openTotal:3,report:2,reportTotal:2,contest:4,contestTotal:5}},
+  {id:14, first:'Сабина', last:'Дюсенова', gender:'female', dob:'2009-04-12', branch:'Сатпаева 210/1', group:'Ансамбль', groupType:'child', teacher:'Динара А.', joined:'2021-09-01', visits:268, stickers:100, growth:3, subUntil:'2026-09-25', echoBucks:0, parentName:'Гульмира', photo:null, events:{stage:5,open:3,openTotal:3,report:2,reportTotal:2,contest:5,contestTotal:5}},
+];
+
+// Начисления/списания ЭхоБаксов (демо), ключ = id ученика
+var EB_HISTORY = {
+  5:[{type:'plus',t:'Абонемент продлён',date:'01.09.2026',amt:300},
+     {type:'plus',t:'Посещаемость 100%',date:'31.08.2026',amt:200},
+     {type:'minus',t:'Обмен: Стикерпак',date:'20.08.2026',amt:150},
+     {type:'plus',t:'Приведён друг',date:'12.08.2026',amt:500}],
+  6:[{type:'plus',t:'Выступление на концерте',date:'28.08.2026',amt:400},
+     {type:'minus',t:'Обмен: Бутылка',date:'15.08.2026',amt:400},
+     {type:'plus',t:'Абонемент продлён',date:'01.08.2026',amt:300}],
+};
+
+// ============ ВЫЧИСЛЯЕМЫЕ ПОЛЯ (автоматика из ТЗ п.13) ============
+function monthsBetween(iso, to){
+  var d=new Date(iso); return (to.getFullYear()-d.getFullYear())*12 + (to.getMonth()-d.getMonth()) - (to.getDate()<d.getDate()?1:0);
+}
+function ageOf(iso){ var d=new Date(iso), a=TODAY.getFullYear()-d.getFullYear(); if(TODAY.getMonth()<d.getMonth()||(TODAY.getMonth()===d.getMonth()&&TODAY.getDate()<d.getDate()))a--; return a; }
+function ageLabel(y){var m=y%10,c=y%100; if(m===1&&c!==11)return y+' год'; if(m>=2&&m<=4&&!(c>=12&&c<=14))return y+' года'; return y+' лет';}
+function fio(s){return s.first+' '+s.last;}
+function fmtDate(iso){var p=iso.split('-');return p[2]+'.'+p[1]+'.'+p[0];}
+function daysLeft(iso){var p=iso.split('-');var d=new Date(+p[0],+p[1]-1,+p[2]);return Math.ceil((d-TODAY)/86400000);}
+
+// Обогащаем ученика вычисляемыми полями
+function enrich(s){
+  var e = Object.assign({}, s);
+  e.months = monthsBetween(s.joined, TODAY);
+  e.age = ageOf(s.dob);
+  // достижения
+  e.achievements = [];
+  for(var cat in ACH_RULES) ACH_RULES[cat].forEach(function(r){ if(r.need(e)) e.achievements.push(r.id); });
+  e.achCount = e.achievements.length;
+  // награды заработанные
+  e.rewardsEarned = REWARDS.filter(function(r){return e.stickers>=r.stickers;}).length;
+  // следующая награда
+  e.nextReward = REWARDS.find(function(r){return e.stickers<r.stickers;}) || null;
+  // абонемент
+  e.subActive = daysLeft(s.subUntil) >= 0;
+  e.subDays = daysLeft(s.subUntil);
+  return e;
+}
+
+// человекочитаемо "сколько занимается"
+function tenureLabel(months){
+  if(months<1) return 'меньше месяца';
+  var y=Math.floor(months/12), m=months%12, out=[];
+  if(y>0) out.push(y+(y===1?' год':(y>=2&&y<=4?' года':' лет')));
+  if(m>0) out.push(m+' мес.');
+  return out.join(' ')||'меньше месяца';
+}
+
+// ============ СОСТОЯНИЕ ============
+var currentId = 1;
+var currentRole = 'child';
+var commMetric = 'visits';
+
+function cur(){ return enrich(STUDENTS.find(function(s){return s.id===currentId;})); }
+
+// ============ РОЛИ ============
+function setRole(role){
+  currentRole = role;
+  document.body.setAttribute('data-role', role);
+  document.querySelectorAll('#roleSwitch button').forEach(function(b){b.classList.toggle('on', b.getAttribute('data-role')===role);});
+  render();
+}
+
+// Автоопределение типа кабинета по типу группы (ТЗ п.1)
+function autoRoleForStudent(s){
+  return s.groupType==='adult' ? 'adult' : 'child';
+}
+
+function pickStudent(id){
+  currentId = +id;
+  var s = STUDENTS.find(function(x){return x.id===currentId;});
+  // тип кабинета определяется автоматически по группе; родителя оставляем только для детских
+  var auto = autoRoleForStudent(s);
+  if(currentRole==='parent' && s.groupType==='adult') currentRole='adult';
+  else currentRole = (currentRole==='parent') ? 'parent' : auto;
+  document.body.setAttribute('data-role', currentRole);
+  document.querySelectorAll('#roleSwitch button').forEach(function(b){b.classList.toggle('on', b.getAttribute('data-role')===currentRole);});
+  // родитель доступен только для детских
+  document.querySelector('#roleSwitch button[data-role="parent"]').style.display = (s.groupType==='adult')?'none':'';
+  render();
+}
+
+// ============ РЕНДЕР ============
+function render(){
+  var s = cur();
+  // топбар
+  document.getElementById('tbName').textContent = fio(s);
+  document.getElementById('tbRole').textContent =
+    currentRole==='parent' ? 'Родительский доступ' :
+    (s.groupType==='adult' ? 'Взрослый кабинет' : 'Детский кабинет');
+
+  var root = document.getElementById('cabinetRoot');
+  var html = '';
+
+  html += serverNote();
+  html += profileHead(s);
+  html += statGrid(s);
+  html += subscriptionBlockIfParent(s); // родителю показываем статус отдельным акцентом уже в шапке
+
+  // Наклейки + награды — только детский кабинет и родитель ребёнка
+  if(s.groupType==='child'){
+    html += stickersSection(s);
+    html += rewardsSection(s);
+  }
+  // ЭхоБаксы — только взрослый (не показываем родителю, т.к. родитель бывает только у детей)
+  if(s.groupType==='adult' && currentRole!=='parent'){
+    html += echoBucksSection(s);
+  }
+
+  html += achievementsSection(s);
+  html += pathSection(s);
+
+  // Сообщество — не показываем в родительском режиме (родитель видит только своего ребёнка, ТЗ п.11)
+  if(currentRole!=='parent'){
+    html += communitySection(s);
+  }
+
+  root.innerHTML = html;
+  var pf = document.getElementById('commFill'); // no-op safety
+}
+
+// Баннер про серверные функции — честно о том, что требует бэкенда
+function serverNote(){
+  return '<div class="server-note">'+
+    '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>'+
+    '<div>Это рабочий прототип на демо-данных. Всё, что помечено ниже, считается автоматически из данных ученика. '+
+    '<b>Требует сервера (следующий этап):</b> настоящая AI-генерация фото, вход по логину, сохранение между устройствами и подтверждения администратора.</div>'+
+    '</div>';
+}
+
+function profileHead(s){
+  var aiCard;
+  if(s.photo){
+    aiCard = '<div class="ai-card">'+
+      '<img class="photo" src="'+s.photo+'" alt="">'+
+      '<div class="ai-frame"></div>'+
+      '<div class="ai-badge">Эхо Гор</div>'+
+      '<div class="ai-name"><b>'+esc(s.first)+'</b><span>'+esc(s.group)+'</span></div>'+
+    '</div>';
+  } else {
+    var editable = (currentRole!=='parent');
+    aiCard = '<div class="ai-card empty" '+(editable?'onclick="openPhotoModal()"':'')+'>'+
+      '<div><div style="font-size:30px;margin-bottom:8px">🖼️</div>'+
+      (editable?'Загрузить фото<br>для карточки «Эхо Гор»':'Фото не загружено')+'</div>'+
+    '</div>';
+  }
+
+  var sub = s.subActive
+    ? '<div class="sub-status on"><span class="dot"></span>🟢 Абонемент активен <small>до '+fmtDate(s.subUntil)+' · осталось '+s.subDays+' дн.</small></div>'
+    : '<div class="sub-status off"><span class="dot"></span>🔴 Абонемент неактивен <small>закончился '+fmtDate(s.subUntil)+'</small></div>';
+
+  var photoActions = (s.photo && currentRole!=='parent')
+    ? '<div class="profile-photo-actions"><button class="btn btn-sm" onclick="openPhotoModal()">Заменить фото</button><button class="btn btn-sm" onclick="sharePhoto()">В сообщество</button></div>'
+    : '';
+
+  return '<div class="profile-head">'+
+    aiCard +
+    '<div class="profile-info">'+
+      '<h1>'+esc(fio(s))+'</h1>'+
+      sub +
+      '<div class="profile-tags">'+
+        tag('Возраст', ageLabel(s.age))+
+        tag('Филиал', s.branch)+
+        tag('Группа', s.group)+
+        tag('Педагог', s.teacher)+
+        tag('В студии', tenureLabel(s.months))+
+      '</div>'+
+      photoActions +
+    '</div>'+
+  '</div>';
+}
+
+function tag(k,v){return '<span class="tag">'+k+': <b>'+esc(v)+'</b></span>';}
+
+function statGrid(s){
+  var cells = [
+    {ico:'blue', svg:'M9 11l3 3L22 4', v:s.visits, l:'Посещено'},
+    {ico:'', svg:'M12 2l3 7h7l-6 4 2 7-6-4-6 4 2-7-6-4h7z', v:s.achCount, l:'Достижений'},
+  ];
+  if(s.groupType==='child'){
+    cells.push({ico:'green', svg:'M20 6L9 17l-5-5', v:s.stickers, l:'Наклеек'});
+    cells.push({ico:'', svg:'M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z', v:s.rewardsEarned+'/'+REWARDS.length, l:'Наград'});
+    if(s.nextReward) cells.push({ico:'', svg:'M13 2L3 14h9l-1 8 10-12h-9z', v:s.nextReward.name, l:'След. награда'});
+  } else {
+    cells.push({ico:'green', svg:'M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6', v:s.echoBucks, l:'ЭхоБаксы'});
+  }
+  return '<div class="stat-grid">'+cells.map(function(c){
+    return '<div class="stat"><div class="ico '+c.ico+'"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="'+c.svg+'"/></svg></div>'+
+      '<div class="val">'+esc(String(c.v))+'</div><div class="lbl">'+c.l+'</div></div>';
+  }).join('')+'</div>';
+}
+
+function subscriptionBlockIfParent(s){ return ''; } // статус уже в шапке; отдельный блок не нужен
+
+// ---- Наклейки ----
+function stickersSection(s){
+  var nr = s.nextReward;
+  var pct, metaLeft, metaRight, prev;
+  if(nr){
+    prev = REWARDS.slice().reverse().find(function(r){return s.stickers>=r.stickers;});
+    var base = prev ? prev.stickers : 0;
+    pct = Math.min(100, Math.round((s.stickers-base)/(nr.stickers-base)*100));
+    metaLeft = s.stickers+' наклеек';
+    metaRight = 'до «'+nr.name+'»: '+(nr.stickers-s.stickers)+' шт.';
+  } else {
+    pct=100; metaLeft=s.stickers+' наклеек'; metaRight='Все награды собраны! 🎉';
+  }
+  return '<div class="section show-child">'+
+    '<div class="section-h"><h2>Наклейки</h2><span class="hint">Педагог ставит наклейку после занятия</span></div>'+
+    '<div class="sticker-top">'+
+      '<div class="sticker-big">'+s.stickers+'</div>'+
+      '<div class="progress-wrap">'+
+        '<div class="progress-bar"><div class="progress-fill" style="width:'+pct+'%"></div></div>'+
+        '<div class="progress-meta"><span>'+metaLeft+'</span><span>'+metaRight+'</span></div>'+
+      '</div>'+
+    '</div>'+
+    (currentRole!=='parent' ? '<div style="font-size:12.5px;color:var(--muted-c)">Наклейки начисляет педагог в разделе «Ученики» → карточка ученика. Здесь ученик видит прогресс.</div>' : '')+
+  '</div>';
+}
+
+// ---- Награды ----
+function rewardsSection(s){
+  var cards = REWARDS.map(function(r){
+    var earned = s.stickers>=r.stickers;
+    var isNext = s.nextReward && s.nextReward.stickers===r.stickers;
+    var cls = 'reward'+(earned?' earned':'')+(isNext?' next':'');
+    return '<div class="'+cls+'">'+
+      (isNext?'<span class="ribbon">Следующая</span>':'')+
+      (earned?'<span class="check">✓</span>':'<span class="lock">🔒</span>')+
+      '<div class="emoji">'+r.emoji+'</div>'+
+      '<b>'+r.name+'</b><span>'+r.stickers+' наклеек</span>'+
+    '</div>';
+  }).join('');
+  return '<div class="section show-child">'+
+    '<div class="section-h"><h2>Награды</h2><span class="hint">Фото и пороги настраиваются владельцем</span></div>'+
+    '<div class="reward-row">'+cards+'</div>'+
+  '</div>';
+}
+
+// ---- Достижения ----
+function achievementsSection(s){
+  var out='';
+  for(var cat in ACH_RULES){
+    var items = ACH_RULES[cat].map(function(r){
+      var done = s.achievements.indexOf(r.id)>=0;
+      return '<div class="ach'+(done?' done':'')+'">'+
+        '<div class="ach-ico">'+r.emoji+'</div>'+
+        '<div class="ach-t"><b>'+r.t+'</b><span>'+(done?'Получено':'Не открыто')+'</span></div>'+
+      '</div>';
+    }).join('');
+    out += '<div class="ach-cat"><div class="cat-name">'+cat+'</div><div class="ach-grid">'+items+'</div></div>';
+  }
+  return '<div class="section">'+
+    '<div class="section-h"><h2>Достижения</h2><span class="hint">'+s.achCount+' получено · считаются автоматически</span></div>'+
+    out +
+  '</div>';
+}
+
+// ---- Мой путь ----
+function pathSection(s){
+  var firstUndone = PATH_STEPS.findIndex(function(st){return !st.done(s);});
+  var items = PATH_STEPS.map(function(st,i){
+    var done = st.done(s);
+    var current = (i===firstUndone);
+    var cls='path-item'+(done?' done':'')+(current?' current':'');
+    return '<div class="'+cls+'">'+
+      '<div class="path-dot">'+(done?'✓':(current?'●':(i+1)))+'</div>'+
+      (i<PATH_STEPS.length-1?'<div class="path-line"></div>':'')+
+      '<div class="path-body"><b>'+st.t+'</b><span>'+(done?'Пройдено':(current?'Сейчас здесь':'Впереди'))+'</span></div>'+
+    '</div>';
+  }).join('');
+  return '<div class="section">'+
+    '<div class="section-h"><h2>Мой путь</h2></div>'+
+    '<div class="path">'+items+'</div>'+
+  '</div>';
+}
+
+// ---- ЭхоБаксы (взрослый) ----
+function echoBucksSection(s){
+  var hist = (EB_HISTORY[s.id]||[]).map(function(h){
+    return '<div class="eb-row">'+
+      '<div class="eb-ic '+(h.type==='plus'?'plus':'minus')+'">'+(h.type==='plus'?'+':'−')+'</div>'+
+      '<div class="eb-t"><b>'+esc(h.t)+'</b><span>'+h.date+'</span></div>'+
+      '<div class="eb-amt '+(h.type==='plus'?'plus':'minus')+'">'+(h.type==='plus'?'+':'−')+h.amt+'</div>'+
+    '</div>';
+  }).join('') || '<div style="color:var(--muted-c);font-size:13px;padding:10px 0">История пуста</div>';
+
+  var gifts = GIFTS.map(function(g){
+    var afford = s.echoBucks>=g.cost;
+    return '<div class="gift"><div class="emoji">'+g.emoji+'</div><b>'+g.name+'</b>'+
+      '<div class="cost">'+g.cost+' ЭБ</div>'+
+      '<button class="btn btn-sm '+(afford?'btn-primary':'')+'" '+(afford?'':'disabled')+' onclick="redeemGift('+g.cost+',\''+esc(g.name)+'\')">'+(afford?'Обменять':'Не хватает')+'</button>'+
+    '</div>';
+  }).join('');
+
+  return '<div class="section show-adult">'+
+    '<div class="section-h"><h2>ЭхоБаксы</h2><span class="hint">Обмен подтверждает администратор</span></div>'+
+    '<div class="eb-head">'+
+      '<div class="eb-balance"><div class="lbl">Баланс</div><div class="amt">'+s.echoBucks+' <span>ЭБ</span></div></div>'+
+      '<div style="flex:1;min-width:220px;color:var(--muted-c);font-size:13.5px">Начисляются за посещаемость, продление абонемента, выступления и рекомендации. Тратятся на подарки из каталога.</div>'+
+    '</div>'+
+    '<h3 style="font-size:15px;margin:6px 0 12px;color:var(--gold-c);font-family:Oswald;letter-spacing:1px;text-transform:uppercase">Каталог подарков</h3>'+
+    '<div class="gift-grid" style="margin-bottom:22px">'+gifts+'</div>'+
+    '<h3 style="font-size:15px;margin:6px 0 12px;color:var(--gold-c);font-family:Oswald;letter-spacing:1px;text-transform:uppercase">История</h3>'+
+    '<div class="eb-history">'+hist+'</div>'+
+  '</div>';
+}
+
+// ---- Сообщество ТОП-10 ----
+var COMM_METRICS = [
+  {k:'visits',  l:'По посещаемости', val:s=>s.visits,   unit:'занятий'},
+  {k:'growth',  l:'По прогрессу',    val:s=>s.growth*100+s.achCount, unit:'очков', show:s=>s.achCount+' дост.'},
+  {k:'ach',     l:'По достижениям',  val:s=>s.achCount, unit:'достижений'},
+  {k:'months',  l:'По времени',      val:s=>s.months,   unit:'мес.'},
+];
+function communitySection(s){
+  var tabs = COMM_METRICS.map(function(m){
+    return '<button class="comm-tab'+(commMetric===m.k?' on':'')+'" onclick="setComm(\''+m.k+'\')">'+m.l+'</button>';
+  }).join('');
+  return '<div class="section">'+
+    '<div class="section-h"><h2>Сообщество Эхо Гор</h2><span class="hint">ТОП-10 · только публичные данные</span></div>'+
+    '<div class="comm-tabs">'+tabs+'</div>'+
+    '<div class="rank-list" id="rankList">'+rankRows()+'</div>'+
+  '</div>';
+}
+function rankRows(){
+  var m = COMM_METRICS.find(function(x){return x.k===commMetric;});
+  var list = STUDENTS.map(enrich).sort(function(a,b){return m.val(b)-m.val(a);}).slice(0,10);
+  return list.map(function(s,i){
+    var top = i<3?(' top'+(i+1)):'';
+    var av = s.photo ? '<img class="av" src="'+s.photo+'">' : '<div class="av">'+esc(s.first[0])+'</div>';
+    var sub = m.show?m.show(s):(s.group+' · '+s.branch);
+    return '<div class="rank'+top+'" onclick="openPublic('+s.id+')">'+
+      '<div class="pos">'+(i+1)+'</div>'+ av +
+      '<div class="r-info"><b>'+esc(fio(s))+'</b><span>'+esc(sub)+'</span></div>'+
+      '<div class="r-val">'+m.val(s)+'<small>'+m.unit+'</small></div>'+
+    '</div>';
+  }).join('');
+}
+function setComm(k){ commMetric=k; document.getElementById('rankList').innerHTML=rankRows();
+  document.querySelectorAll('.comm-tab').forEach(function(t){t.classList.remove('on');});
+  event.target.classList.add('on');
+}
+
+// ---- Публичный профиль другого ученика (ТЗ п.9) ----
+function openPublic(id){
+  var s = enrich(STUDENTS.find(function(x){return x.id===id;}));
+  var av = s.photo ? '<img class="pub-av" src="'+s.photo+'">' : '<div class="pub-av">'+esc(s.first[0])+'</div>';
+  var body = '<div class="pub-head">'+av+'<div><b>'+esc(fio(s))+'</b><span>'+esc(s.group)+'</span></div></div>'+
+    '<div class="pub-stats">'+
+      pubStat(s.visits,'Посещено')+
+      pubStat(s.achCount,'Достижений')+
+      pubStat(s.rewardsEarned+'/'+REWARDS.length,'Наград')+
+      pubStat(tenureLabel(s.months),'В студии')+
+    '</div>'+
+    '<p style="font-size:12px;color:var(--muted-c);margin-top:14px">Публичный профиль — видны только открытые данные. Телефон, оплаты и личные заметки скрыты.</p>';
+  showModal('Профиль ученика', body, '<button class="btn" onclick="closeModal()">Закрыть</button>');
+}
+function pubStat(v,l){return '<div class="pub-stat"><div class="v">'+esc(String(v))+'</div><div class="l">'+l+'</div></div>';}
+
+// ---- Загрузка фото ----
+function openPhotoModal(){
+  var body = '<p>Загрузите фото ученика. Оно попадёт в фирменную карточку «Эхо Гор» — с рамкой, именем и логотипом. '+
+    '(Настоящая AI-стилизация под кавказский стиль появится на этапе с сервером — сейчас фото вставляется в рамку как есть.)</p>'+
+    '<label>Файл фото</label>'+
+    '<input type="file" accept="image/*" id="photoInput" onchange="previewPhoto(event)">'+
+    '<div id="photoPrev"></div>';
+  showModal('AI-фото · карточка Эхо Гор', body,
+    '<button class="btn" onclick="closeModal()">Отмена</button>'+
+    '<button class="btn btn-primary" id="savePhotoBtn" onclick="savePhoto()" disabled>Сохранить</button>');
+}
+var _pendingPhoto=null;
+function previewPhoto(e){
+  var f=e.target.files[0]; if(!f) return;
+  var rd=new FileReader();
+  rd.onload=function(){ _pendingPhoto=rd.result;
+    document.getElementById('photoPrev').innerHTML='<div style="margin-top:8px;width:120px;aspect-ratio:3/4;border-radius:10px;overflow:hidden;border:3px solid var(--gold-c)"><img src="'+rd.result+'" style="width:100%;height:100%;object-fit:cover"></div>';
+    document.getElementById('savePhotoBtn').disabled=false;
+  };
+  rd.readAsDataURL(f);
+}
+function savePhoto(){
+  if(!_pendingPhoto) return;
+  var s = STUDENTS.find(function(x){return x.id===currentId;});
+  s.photo=_pendingPhoto; _pendingPhoto=null;
+  closeModal(); render(); toast('Фото сохранено в карточку','ok');
+}
+function sharePhoto(){ toast('Карточка отправлена в сообщество','ok'); }
+
+// ---- Обмен ЭхоБаксов ----
+function redeemGift(cost,name){
+  var s = STUDENTS.find(function(x){return x.id===currentId;});
+  if(s.echoBucks<cost){ toast('Недостаточно ЭхоБаксов','err'); return; }
+  showModal('Обмен подарка', '<p>Обменять <b>'+cost+' ЭБ</b> на «'+esc(name)+'»? Заявка уйдёт администратору на подтверждение выдачи.</p>',
+    '<button class="btn" onclick="closeModal()">Отмена</button>'+
+    '<button class="btn btn-primary" onclick="confirmRedeem('+cost+',\''+esc(name)+'\')">Отправить заявку</button>');
+}
+function confirmRedeem(cost,name){
+  var s = STUDENTS.find(function(x){return x.id===currentId;});
+  s.echoBucks-=cost;
+  if(!EB_HISTORY[s.id]) EB_HISTORY[s.id]=[];
+  EB_HISTORY[s.id].unshift({type:'minus',t:'Обмен: '+name+' (ждёт подтв.)',date:fmtToday(),amt:cost});
+  closeModal(); render(); toast('Заявка отправлена администратору','ok');
+}
+function fmtToday(){var d=TODAY;return String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0')+'.'+d.getFullYear();}
+
+// ---- Модалка/тосты/утилиты ----
+function showModal(title,body,footer){
+  document.getElementById('modalBox').innerHTML=
+    '<div class="modal-h"><h3>'+title+'</h3><button class="x" onclick="closeModal()">✕</button></div>'+
+    '<div class="modal-b">'+body+'</div>'+
+    '<div class="modal-f">'+(footer||'')+'</div>';
+  document.getElementById('modalOv').classList.add('open');
+}
+function closeModal(){document.getElementById('modalOv').classList.remove('open');}
+document.getElementById('modalOv').addEventListener('click',function(e){if(e.target===this)closeModal();});
+function toast(msg,type){
+  var c=document.getElementById('toasts');var el=document.createElement('div');
+  el.className='toast'+(type?' '+type:'');el.textContent=msg;c.appendChild(el);
+  setTimeout(function(){el.style.opacity='0';el.style.transition='.3s';setTimeout(function(){el.remove();},300);},2800);
+}
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+// ---- Тема (как в остальных страницах) ----
+var DAY='../logo-day.png', NIGHT='../logo-night.png';
+window.egTheme=function(t){ try{localStorage.setItem('eg-theme',t);}catch(e){} applyTheme(t); };
+function applyTheme(t){
+  document.body.setAttribute('data-theme',t);
+  var tg=document.getElementById('themeToggle');
+  if(tg){tg.children[0].classList.toggle('on',t==='night');tg.children[1].classList.toggle('on',t==='day');}
+  var lg=document.getElementById('egLogo'); if(lg) lg.src=(t==='day')?DAY:NIGHT;
+}
+
+// ---- INIT ----
+(function(){
+  // заполняем выбор ученика
+  var sel=document.getElementById('studentPicker');
+  sel.innerHTML=STUDENTS.map(function(s){return '<option value="'+s.id+'">'+esc(fio(s))+' · '+esc(s.group)+'</option>';}).join('');
+  var saved='day'; try{saved=localStorage.getItem('eg-theme')||'day';}catch(e){}
+  applyTheme(saved);
+  pickStudent(1);
+})();
+</script>
+</body>
+</html>
